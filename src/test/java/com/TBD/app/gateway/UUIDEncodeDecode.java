@@ -2,8 +2,8 @@ package com.TBD.app.gateway;
 
 import java.util.UUID;
 
-import com.TBD.app.gateway.dto.Request;
 import com.TBD.core.util.coding.JSON;
+import com.TBD.gateway.dto.Request;
 
 public class UUIDEncodeDecode
 {

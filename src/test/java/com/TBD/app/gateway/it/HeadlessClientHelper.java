@@ -2,12 +2,12 @@ package com.TBD.app.gateway.it;
 
 import java.net.URI;
 
-import com.TBD.app.gateway.dto.LoginRequest;
-import com.TBD.app.gateway.dto.LoginResponse;
-import com.TBD.app.gateway.dto.Request;
-import com.TBD.app.gateway.dto.Response;
-import com.TBD.app.gateway.dto.SystemInfo;
 import com.TBD.core.util.coding.JSON;
+import com.TBD.gateway.dto.LoginRequest;
+import com.TBD.gateway.dto.LoginResponse;
+import com.TBD.gateway.dto.Request;
+import com.TBD.gateway.dto.Response;
+import com.TBD.gateway.dto.SystemInfo;
 
 public class HeadlessClientHelper
 {

@@ -1,17 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.TBD.backbone.services</groupId>
+	<groupId>com.TBD.gateway</groupId>
 	<artifactId>Gateway</artifactId>
 	<packaging>jar</packaging>
 	<version>0.1</version>
 
-	<parent>
-		<groupId>com.TBD.app.gateway</groupId>
-		<artifactId>mvn-parent</artifactId>
-		<version>1.0</version>
-		<relativePath>../mvn-parent/pom.xml</relativePath>
-	</parent>
+	<properties>
+		<org.springframework.build.aws-maven-version>5.0.0.RELEASE</org.springframework.build.aws-maven-version>
+		<maven-compiler-plugin-version>3.3</maven-compiler-plugin-version>
+		<maven-dependency-plugin>2.10</maven-dependency-plugin>
+		<java-source-version>1.8</java-source-version>
+		<java-target-version>1.8</java-target-version>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -22,6 +23,12 @@
 		<dependency>
 			<groupId>com.TBD.backbone.services</groupId>
 			<artifactId>BackBoneServicesLocator</artifactId>
+			<version>0.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.TBD.core</groupId>
+			<artifactId>Core</artifactId>
 			<version>0.1</version>
 		</dependency>
 		
@@ -36,26 +43,57 @@
 	    <dependency>
 	      <groupId>org.eclipse.jetty.websocket</groupId>
 	      <artifactId>javax-websocket-server-impl</artifactId>
-	      <version>${jetty-version}</version>
+	      <version>9.2.7.v20150116</version>
 	    </dependency>
 	    <!-- To run javax.websocket client -->
 	    <dependency>
 	      <groupId>org.eclipse.jetty.websocket</groupId>
 	      <artifactId>javax-websocket-client-impl</artifactId>
-	      <version>${jetty-version}</version>
+	      <version>9.2.7.v20150116</version>
 	    </dependency>
 		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>${junit-version}</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
+	<distributionManagement>
+		<snapshotRepository>
+			<id>piangle-s3-artifact-central</id>
+			<url>s3://piangle-s3-artifact/snapshot</url>
+		</snapshotRepository>
+		<repository>
+			<id>piangle-s3-artifact-release</id>
+			<url>s3://piangle-s3-artifact/release</url>
+		</repository>
+	</distributionManagement>
+
+
 	<build>
 		<finalName>Gateway</finalName>
+		
+		<extensions>
+			<extension>
+				<groupId>org.springframework.build</groupId>
+				<artifactId>aws-maven</artifactId>
+				<version>5.0.0.RELEASE</version>
+			</extension>
+		</extensions>
+		
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin-version}</version>
+				<configuration>
+					<source>${java-source-version}</source>
+					<target>${java-target-version}</target>
+				</configuration>
+			</plugin>
+		
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -73,7 +111,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>com.TBD.app.gateway.GatewayContainer</mainClass>
+							<mainClass>com.TBD.gateway.GatewayContainer</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -82,7 +120,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>${maven-dependency-plugin}</version>
+				<version>3.1.1</version>
 				<executions>
 					<execution>
 						<id>copy-installed</id>
@@ -93,14 +131,14 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>com.TBD.app.gateway</groupId>
-									<artifactId>app-gateway</artifactId>
-									<version>${app-gateway-version}</version>
+									<groupId>com.TBD.gateway</groupId>
+									<artifactId>Gateway</artifactId>
+									<version>0.1</version>
 									<type>jar</type>
 									<classifier>jar-with-dependencies</classifier>
 									<overWrite>true</overWrite>
-									<outputDirectory>../../../Export</outputDirectory>
-									<destFileName>app-gateway.jar</destFileName>
+									<outputDirectory>../Export</outputDirectory>
+									<destFileName>Gateway.jar</destFileName>
 								</artifactItem>
 							</artifactItems>
 						</configuration>

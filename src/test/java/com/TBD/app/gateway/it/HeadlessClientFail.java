@@ -3,10 +3,10 @@ package com.TBD.app.gateway.it;
 import java.net.URI;
 import java.util.UUID;
 
-import com.TBD.app.gateway.dto.LoginRequest;
-import com.TBD.app.gateway.dto.Request;
-import com.TBD.app.gateway.dto.SystemInfo;
 import com.TBD.core.util.coding.JSON;
+import com.TBD.gateway.dto.LoginRequest;
+import com.TBD.gateway.dto.Request;
+import com.TBD.gateway.dto.SystemInfo;
 
 public class HeadlessClientFail
 {
