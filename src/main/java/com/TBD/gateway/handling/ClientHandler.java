@@ -48,20 +48,13 @@ public final class ClientHandler
 		 * But will change later through the transformation of loginId to syntheticUserId.
 		 * SessionId will also be null
 		 */
-		System.out.println("RECEIVED A NEW CONNECTION");
 		sessionMgmtService = Locator.getInstance().getSessionManagementService();
-		System.out.println("RECEIVED A NEW CONNECTION111111");
 		logger = Locator.getInstance().getLoggingService();
-		System.out.println("RECEIVED A NEW CONNECTION22222");
 		String userId = remoteAddr.getAddress().getHostName() + ":" + remoteAddr.getPort();
 
 		clientDetails = new ClientDetails(remoteAddr, clientEndpoint, new SessionDetails(userId, null));
 		
-		System.out.println("RECEIVED A NEW CONNECTION33333");
 		logger.info(String.format("New connection from : [Host=%s & Port=%d ]", clientDetails.getHostName(), clientDetails.getPort()));
-	
-		System.out.println("RECEIVED A NEW CONNECTION>>>>>>");
-
 	}
 
 	//TODO  When do we get this?
