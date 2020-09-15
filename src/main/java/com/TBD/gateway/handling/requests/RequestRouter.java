@@ -7,6 +7,7 @@ import com.TBD.gateway.handling.requests.processors.ConfigRequestProcessor;
 import com.TBD.gateway.handling.requests.processors.GetUserPreferenceRequestProcessor;
 import com.TBD.gateway.handling.requests.processors.LoginRequestProcessor;
 import com.TBD.gateway.handling.requests.processors.LogoutRequestProcessor;
+import com.TBD.gateway.handling.requests.processors.PingMessageProcessor;
 import com.TBD.gateway.handling.requests.processors.SetUserPreferenceRequestProcessor;
 
 public class RequestRouter
@@ -18,6 +19,7 @@ public class RequestRouter
 	{
 		endpointRequestProcessorMap = new HashMap<String, RequestProcessor>();
 
+		registerRequestProcessor(new PingMessageProcessor());
 		registerRequestProcessor(new LoginRequestProcessor());
 		registerRequestProcessor(new LogoutRequestProcessor());
 		registerRequestProcessor(new ConfigRequestProcessor());

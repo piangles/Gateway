@@ -26,11 +26,10 @@ import com.TBD.gateway.handling.requests.ResponseProcessor;
  * itself is not a thread but runs in a Thread created by Jetty. So keeping
  * track of traceId needs to be done through LoggerService.record.
  * 
- * There will be need for 2 types of Requests 
- * A : Synchronous 
- * B : Asynchronous
+ * There will be need for 2 types of Requests A : Synchronous B : Asynchronous
  * 
- * Both are executed on RequestProcessingThread the former however holds up the queue of requests.
+ * Both are executed on RequestProcessingThread the former however holds up the
+ * queue of requests.
  */
 public final class ClientHandler
 {
@@ -44,47 +43,42 @@ public final class ClientHandler
 	public ClientHandler(InetSocketAddress remoteAddr, ClientEndpoint clientEndpoint)
 	{
 		/*
-		 * UserId initially is the combination of the address and the port.
-		 * But will change later through the transformation of loginId to syntheticUserId.
-		 * SessionId will also be null
+		 * UserId initially is the combination of the address and the port. But
+		 * will change later through the transformation of loginId to
+		 * syntheticUserId. SessionId will also be null
 		 */
 		sessionMgmtService = Locator.getInstance().getSessionManagementService();
 		logger = Locator.getInstance().getLoggingService();
 		String userId = remoteAddr.getAddress().getHostName() + ":" + remoteAddr.getPort();
 
 		clientDetails = new ClientDetails(remoteAddr, clientEndpoint, new SessionDetails(userId, null));
-		
+
 		logger.info(String.format("New connection from : [Host=%s & Port=%d ]", clientDetails.getHostName(), clientDetails.getPort()));
 	}
 
-	//TODO  When do we get this?
+	// TODO When do we get this?
 	public void onClose(int statusCode, String reason)
 	{
 		logger.info(String.format("Close received for UserId=%s with StatusCode=%d and Reason=%s", clientDetails.getSessionDetails().getUserId(), statusCode, reason));
-		try
-		{
-			clientNotifier.stop();
-			sessionMgmtService.unregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
-		}
-		catch (SessionManagementException e)
-		{
-			logger.error("Exception unregistering session for User [" + clientDetails + "]", e);
-		}
+		clientNotifier.stop();
 	}
 
-	//TODO  When do we get this?
+	// TODO When do we get this?
 	public void onError(Throwable t)
 	{
 		logger.error(String.format("Error received for UserId=%s with Message=%s", clientDetails.getSessionDetails().getUserId(), t.getMessage()), t);
-		try
-		{
-			clientNotifier.stop();
-			sessionMgmtService.unregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
-		}
-		catch (SessionManagementException e)
-		{
-			logger.error("Exception unregistering session for User [" + clientDetails + "]", e);
-		}
+		clientNotifier.stop();
+		//
+		// try
+		// {
+		// sessionMgmtService.unregister(clientDetails.getSessionDetails().getUserId(),
+		// clientDetails.getSessionDetails().getSessionId());
+		// }
+		// catch (SessionManagementException e)
+		// {
+		// logger.error("Exception unregistering session for User [" +
+		// clientDetails + "]", e);
+		// }
 	}
 
 	/**
@@ -121,15 +115,25 @@ public final class ClientHandler
 		}
 
 		//Step 3 : Process the request.
-		if (requestProcessor != null)
+		if (requestProcessor == null)
 		{
-			if (requestProcessor.isAsyncProcessor())
-			{
-				processRequestASynchronously(request);
-			}
-			else
+			response =  new Response(request.getTraceId(), request.getEndpoint(), false, "This endpoint is not supported.");
+		}
+		else if (requestProcessor.isAsyncProcessor())
+		{
+			processRequestASynchronously(request);
+		}
+		else //Request will be processed synchronously
+		{
+			try
 			{
 				response = processRequestSynchronously(request);
+			}
+			catch (Exception e)
+			{
+				// Probability is low
+				logger.error("Error in RequestProcessingThread because of : " + e.getMessage(), e);
+				response = new Response(request.getTraceId(), request.getEndpoint(), false, "Could not process request because of : " + e.getMessage());
 			}
 			
 			switch (state)
@@ -155,10 +159,10 @@ public final class ClientHandler
 							clientNotifier = new ClientNotifier(clientDetails);
 							clientNotifier.start();
 						}
-						response = null; //So we are not sending double responses
+						//Response for Login already goes through RequestProcessingThread
+						response = null;
 						
-						
-						//Now start the ClientNotifier it should not be a thread 
+						//TODO Now start the ClientNotifier it should not be a thread 
 						//as messaging API will already have internal thread
 					}
 					catch (Exception e)
@@ -178,39 +182,21 @@ public final class ClientHandler
 				break;
 			}
 		}
-		else if (response != null) //ResponseHandler was not found and also there was no response, the latter is important check
-		{
-			response =  new Response(request.getTraceId(), request.getEndpoint(), false, "This endpoint is not supported.");
-		}
 		
 		/**
-		 * 1. Exceptions are returned as failed Responses.
-		 * 2. When authentication related requests fail application logic response is
-		 * send from the RequestProcessingThread so the reponse will be null in those case.
+		 * All exceptions are returned as failed Responses.
 		 */
-		if (response != null && !response.isRequestSuccessful())
+		if (response != null)
 		{
 			ResponseProcessor.processResponse(clientDetails, response);
 		}
 	}
 
-	private Response processRequestSynchronously(Request request)
+	private Response processRequestSynchronously(Request request) throws Exception
 	{
-		Response response = null;
 		RequestProcessingThread reqProcThread = processRequestASynchronously(request);
-		try
-		{
-			reqProcThread.join();
-			response = reqProcThread.getResponse();
-		}
-		catch (InterruptedException e)
-		{
-			//Probability is low
-			logger.error("Error in RequestProcessingThread because of : " + e.getMessage(), e);
-			response = new Response(request.getTraceId(), request.getEndpoint(), false, "Could not process request because of : " + e.getMessage());
-		}
-
-		return response;
+		reqProcThread.join();
+		return reqProcThread.getResponse();
 	}
 
 	private RequestProcessingThread processRequestASynchronously(Request request)
