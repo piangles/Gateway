@@ -111,7 +111,9 @@ public final class RequestProcessingThread extends Thread implements Traceable, 
 		SessionDetails sessionDetails = null;
 		if (!requestProcessor.shouldValidateSession() && clientDetails.getSessionDetails().getSessionId() != null)
 		{
-			throw new RuntimeException("RequestProcessor for endpoint " + requestProcessor.getEndpoint() + " has a sessionId but is coded for not validating session.");
+			String errorMessage = "RequestProcessor for endpoint " + requestProcessor.getEndpoint() + " has a sessionId but is coded for not validating session.";
+			logger.error(errorMessage);
+			throw new RuntimeException(errorMessage);
 		}
 		else
 		{
