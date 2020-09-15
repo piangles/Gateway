@@ -5,6 +5,7 @@ import com.TBD.backbone.services.auth.AuthenticationResponse;
 import com.TBD.backbone.services.auth.AuthenticationService;
 import com.TBD.backbone.services.session.SessionDetails;
 import com.TBD.backbone.services.session.SessionManagementService;
+import com.TBD.gateway.Constants;
 import com.TBD.gateway.dto.LoginRequest;
 import com.TBD.gateway.dto.LoginResponse;
 import com.TBD.gateway.handling.ClientDetails;
@@ -16,7 +17,7 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 	
 	public LoginRequestProcessor()
 	{
-		super("Login", false, LoginRequest.class);
+		super(Constants.ENDPOINT_LOGIN, false, LoginRequest.class);
 	}
 	
 	/**
@@ -50,6 +51,7 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 		// sessionId or by UserId / Password
 		// If the user lost connection and is reconnecting it will be
 		// done by sessionId
+		
 		AuthenticationResponse authResponse = authService.authenticate(loginRequest.getLoginId(), loginRequest.getPassword());
 		
 		if (authResponse.isAuthenticated())
