@@ -52,6 +52,17 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 			appRequest = JSON.getDecoder().decode(request.getAppRequestAsString().getBytes(), requestClass);
 		}
 
+//		try
+//		{
+//			//TODO Validate the Request 
+//			RequestValidator.validate(clientDetails, request);
+//		}
+//		catch (ValidationException e)
+//		{
+//			logger.warn("Message receieved from userId : " + clientDetails.getSessionDetails().getUserId() + " is not valid.", e);
+//			response = new Response(request.getTraceId(), request.getEndpoint(), false, "Request failed validation because of : " + e.getMessage());
+//		}
+
 		AppResp appResponse = processRequest(clientDetails, appRequest);
 		
 		String appResponseAsStr = new String(JSON.getEncoder().encode(appResponse));
