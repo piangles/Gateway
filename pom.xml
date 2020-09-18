@@ -31,27 +31,33 @@
 			<artifactId>Core</artifactId>
 			<version>0.1</version>
 		</dependency>
-		
-	    <!-- To write basic javax.websocket against -->
+
 		<dependency>
-		    <groupId>javax.websocket</groupId>
-		    <artifactId>javax.websocket-api</artifactId>
-		    <version>1.1</version>
-		    <scope>provided</scope>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.11</version>
 		</dependency>
-	    <!-- To run javax.websocket in embedded server -->
-	    <dependency>
-	      <groupId>org.eclipse.jetty.websocket</groupId>
-	      <artifactId>javax-websocket-server-impl</artifactId>
-	      <version>9.2.7.v20150116</version>
-	    </dependency>
-	    <!-- To run javax.websocket client -->
-	    <dependency>
-	      <groupId>org.eclipse.jetty.websocket</groupId>
-	      <artifactId>javax-websocket-client-impl</artifactId>
-	      <version>9.2.7.v20150116</version>
-	    </dependency>
-		
+
+		<!-- To write basic javax.websocket against -->
+		<dependency>
+			<groupId>javax.websocket</groupId>
+			<artifactId>javax.websocket-api</artifactId>
+			<version>1.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- To run javax.websocket in embedded server -->
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>javax-websocket-server-impl</artifactId>
+			<version>9.2.7.v20150116</version>
+		</dependency>
+		<!-- To run javax.websocket client -->
+		<dependency>
+			<groupId>org.eclipse.jetty.websocket</groupId>
+			<artifactId>javax-websocket-client-impl</artifactId>
+			<version>9.2.7.v20150116</version>
+		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -74,7 +80,7 @@
 
 	<build>
 		<finalName>Gateway</finalName>
-		
+
 		<extensions>
 			<extension>
 				<groupId>org.springframework.build</groupId>
@@ -82,7 +88,7 @@
 				<version>5.0.0.RELEASE</version>
 			</extension>
 		</extensions>
-		
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -93,7 +99,7 @@
 					<target>${java-target-version}</target>
 				</configuration>
 			</plugin>
-		
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
