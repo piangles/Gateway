@@ -2,8 +2,6 @@ package com.TBD.gateway.handling.requests;
 
 import java.util.UUID;
 
-import javax.xml.bind.ValidationException;
-
 import com.TBD.backbone.services.Locator;
 import com.TBD.backbone.services.logging.LoggingService;
 import com.TBD.backbone.services.session.SessionManagementException;
@@ -11,6 +9,7 @@ import com.TBD.backbone.services.session.SessionManagementService;
 import com.TBD.core.services.remoting.SessionAwareable;
 import com.TBD.core.services.remoting.SessionDetails;
 import com.TBD.core.services.remoting.Traceable;
+import com.TBD.gateway.Constants;
 import com.TBD.gateway.dto.Request;
 import com.TBD.gateway.dto.Response;
 import com.TBD.gateway.handling.ClientDetails;
@@ -38,40 +37,44 @@ public final class RequestProcessingThread extends Thread implements Traceable, 
 	@Override
 	public void run()
 	{
-		try
-		{
-			logger.info("Processing request for Endpoint : " + request.getEndpoint());
+		logger.info("Processing request for Endpoint : " + request.getEndpoint());
 
+		boolean validSession = false;
+		/**
+		 * LoginRequest should be processed without checking for session,
+		 * since session will not exist for login.
+		 * 
+		 * And PingMessage processing should be the only one that is allowed 
+		 * without session validation for performance.
+		 * 
+		 */
+		if (Constants.ENDPOINT_PING.equals(requestProcessor.getEndpoint()) || 
+			Constants.ENDPOINT_LOGIN.equals(requestProcessor.getEndpoint())
+			)
+		{
+			validSession = true;
+		}
+		else if (requestProcessor.shouldValidateSession())
+		{
 			try
 			{
-				//TODO Validate the Request 
-				RequestValidator.validate(clientDetails, request);
+				validSession = sessionMgmtService.isValid(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
 			}
-			catch (ValidationException e)
+			catch (SessionManagementException e)
 			{
-				logger.warn("Message receieved from userId : " + clientDetails.getSessionDetails().getUserId() + " is not valid.", e);
-				response = new Response(request.getTraceId(), request.getEndpoint(), false, "Request failed validation because of : " + e.getMessage());
+				logger.error("Unable to validate Session because of : " + e.getMessage(), e);
+				response = new Response(request.getTraceId(), request.getEndpoint(), false, "Unable to validate Session because of : " + e.getMessage());
 			}
+		}
+		else if (clientDetails.getSessionDetails().getSessionId() != null)
+		{
+			String errorMessage = "RequestProcessor for endpoint " + requestProcessor.getEndpoint() + " has a sessionId but is coded for not validating session.";
+			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
+		}
 
-			boolean validSession = false;
-			if (requestProcessor.shouldValidateSession())
-			{
-				try
-				{
-					validSession = sessionMgmtService.isValid(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
-				}
-				catch (SessionManagementException e)
-				{
-					logger.error("Unable to validate Session because of : " + e.getMessage(), e);
-					response = new Response(request.getTraceId(), request.getEndpoint(), false, "Unable to validate Session because of : " + e.getMessage());
-				}
-			}
-			else
-			{
-				validSession = true;
-			}
-			
-			if (validSession)
+		try
+		{
+			if (validSession && response == null)
 			{
 				//Finally the actual call to the RequestProcessor
 				response = requestProcessor.processRequest(clientDetails, request);
@@ -108,17 +111,6 @@ public final class RequestProcessingThread extends Thread implements Traceable, 
 	@Override
 	public SessionDetails getSessionDetails()
 	{
-		SessionDetails sessionDetails = null;
-		if (!requestProcessor.shouldValidateSession() && clientDetails.getSessionDetails().getSessionId() != null)
-		{
-			String errorMessage = "RequestProcessor for endpoint " + requestProcessor.getEndpoint() + " has a sessionId but is coded for not validating session.";
-			logger.error(errorMessage);
-			throw new RuntimeException(errorMessage);
-		}
-		else
-		{
-			sessionDetails = clientDetails.getSessionDetails();
-		}
-		return sessionDetails;
+		return clientDetails.getSessionDetails();
 	}
 }
