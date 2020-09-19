@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.TBD.gateway.handling.requests.processors.ConfigRequestProcessor;
 import com.TBD.gateway.handling.requests.processors.GetUserPreferenceRequestProcessor;
+import com.TBD.gateway.handling.requests.processors.KeepSessionAliveRequestProcessor;
 import com.TBD.gateway.handling.requests.processors.LoginRequestProcessor;
 import com.TBD.gateway.handling.requests.processors.LogoutRequestProcessor;
 import com.TBD.gateway.handling.requests.processors.PingMessageProcessor;
@@ -22,6 +23,8 @@ public class RequestRouter
 		registerRequestProcessor(new PingMessageProcessor());
 		registerRequestProcessor(new LoginRequestProcessor());
 		registerRequestProcessor(new LogoutRequestProcessor());
+		registerRequestProcessor(new KeepSessionAliveRequestProcessor());
+		
 		registerRequestProcessor(new ConfigRequestProcessor());
 		registerRequestProcessor(new GetUserPreferenceRequestProcessor());
 		registerRequestProcessor(new SetUserPreferenceRequestProcessor());
