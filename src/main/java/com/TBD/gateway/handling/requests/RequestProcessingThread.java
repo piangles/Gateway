@@ -9,10 +9,10 @@ import com.TBD.backbone.services.session.SessionManagementService;
 import com.TBD.core.services.remoting.SessionAwareable;
 import com.TBD.core.services.remoting.SessionDetails;
 import com.TBD.core.services.remoting.Traceable;
-import com.TBD.gateway.Constants;
 import com.TBD.gateway.dto.Request;
 import com.TBD.gateway.dto.Response;
 import com.TBD.gateway.handling.ClientDetails;
+import com.TBD.gateway.handling.Endpoints;
 import com.TBD.gateway.handling.notifcations.ClientNotifier;
 
 public final class RequestProcessingThread extends Thread implements Traceable, SessionAwareable
@@ -48,8 +48,8 @@ public final class RequestProcessingThread extends Thread implements Traceable, 
 		 * without session validation for performance.
 		 * 
 		 */
-		if (Constants.ENDPOINT_PING.equals(requestProcessor.getEndpoint()) || 
-			Constants.ENDPOINT_LOGIN.equals(requestProcessor.getEndpoint())
+		if (Endpoints.Ping.name().equals(requestProcessor.getEndpoint()) || 
+				Endpoints.Login.name().equals(requestProcessor.getEndpoint())
 			)
 		{
 			validSession = true;

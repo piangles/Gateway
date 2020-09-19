@@ -2,12 +2,13 @@ package com.TBD.gateway.handling;
 
 import java.net.InetSocketAddress;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.TBD.backbone.services.Locator;
 import com.TBD.backbone.services.logging.LoggingService;
 import com.TBD.core.services.remoting.SessionDetails;
 import com.TBD.core.util.coding.JSON;
 import com.TBD.gateway.ClientEndpoint;
-import com.TBD.gateway.Constants;
 import com.TBD.gateway.dto.LoginResponse;
 import com.TBD.gateway.dto.Request;
 import com.TBD.gateway.dto.Response;
@@ -16,7 +17,6 @@ import com.TBD.gateway.handling.requests.RequestProcessingThread;
 import com.TBD.gateway.handling.requests.RequestProcessor;
 import com.TBD.gateway.handling.requests.RequestRouter;
 import com.TBD.gateway.handling.requests.ResponseProcessor;
-import org.apache.commons.lang3.StringUtils;
 
 /***
  * This is the entry point for any communication related with client. This Class
@@ -118,13 +118,15 @@ public final class ClientHandler
 			logger.warn(errorMessage);
 			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
 		}
-		else if (state == ClientHandlerState.PreAuthentication && !Constants.ENDPOINT_LOGIN.equals(request.getEndpoint()))
+		else if (state == ClientHandlerState.PreAuthentication && !Endpoints.Login.name().equals(request.getEndpoint()))
 		{
 			String errorMessage = "This endpoint " + request.getEndpoint() + " requires authentication.";
 			logger.warn(errorMessage);
 			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
 		}
-		else if (clientDetails.getSessionDetails() != null && !StringUtils.equals(clientDetails.getSessionDetails().getSessionId(), request.getSessionId()))
+		else if (	!(state == ClientHandlerState.PreAuthentication && Endpoints.Login.name().equals(request.getEndpoint())) && 
+					(clientDetails.getSessionDetails() != null && !StringUtils.equals(clientDetails.getSessionDetails().getSessionId(), request.getSessionId()))
+				)
 		{
 			String errorMessage = "SessionId between client and server does not match.";
 			logger.warn(errorMessage);
@@ -145,7 +147,7 @@ public final class ClientHandler
 				switch (state)
 				{
 				case PreAuthentication:
-					if (Constants.ENDPOINT_LOGIN.equals(request.getEndpoint()) && response.isRequestSuccessful())
+					if (Endpoints.Login.name().equals(request.getEndpoint()) && response.isRequestSuccessful())
 					{
 						try
 						{

@@ -7,6 +7,7 @@ import com.TBD.backbone.services.prefs.UserPreference;
 import com.TBD.backbone.services.prefs.UserPreferenceService;
 import com.TBD.gateway.dto.SimpleResponse;
 import com.TBD.gateway.handling.ClientDetails;
+import com.TBD.gateway.handling.Endpoints;
 
 public class SetUserPreferenceRequestProcessor extends AbstractRequestProcessor<Properties, SimpleResponse>
 {
@@ -14,7 +15,7 @@ public class SetUserPreferenceRequestProcessor extends AbstractRequestProcessor<
 	
 	public SetUserPreferenceRequestProcessor()
 	{
-		super("SetUserPreferences", Properties.class);
+		super(Endpoints.SetUserPreferences.name(), Properties.class);
 	}
 	
 	@Override

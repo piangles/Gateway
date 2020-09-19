@@ -1,15 +1,15 @@
 package com.TBD.gateway.handling.requests.processors;
 
-import com.TBD.gateway.Constants;
 import com.TBD.gateway.dto.Ping;
 import com.TBD.gateway.dto.Pong;
 import com.TBD.gateway.handling.ClientDetails;
+import com.TBD.gateway.handling.Endpoints;
 
 public final class PingMessageProcessor extends AbstractRequestProcessor<Ping, Pong>
 {
 	public PingMessageProcessor()
 	{
-		super(Constants.ENDPOINT_PING, Ping.class);
+		super(Endpoints.Ping.name(), Ping.class);
 	}
 
 	@Override

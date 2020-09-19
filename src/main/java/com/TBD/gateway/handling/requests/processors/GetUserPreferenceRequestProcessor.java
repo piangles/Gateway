@@ -7,6 +7,7 @@ import com.TBD.backbone.services.prefs.UserPreference;
 import com.TBD.backbone.services.prefs.UserPreferenceService;
 import com.TBD.gateway.dto.EmptyRequest;
 import com.TBD.gateway.handling.ClientDetails;
+import com.TBD.gateway.handling.Endpoints;
 
 public class GetUserPreferenceRequestProcessor extends AbstractRequestProcessor<EmptyRequest, Properties>
 {
@@ -14,7 +15,7 @@ public class GetUserPreferenceRequestProcessor extends AbstractRequestProcessor<
 	
 	public GetUserPreferenceRequestProcessor()
 	{
-		super("GetUserPreferences", EmptyRequest.class);
+		super(Endpoints.GetUserPreferences.name(), EmptyRequest.class);
 	}
 	
 	@Override

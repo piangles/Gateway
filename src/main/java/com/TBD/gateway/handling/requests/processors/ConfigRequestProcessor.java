@@ -4,6 +4,7 @@ import com.TBD.backbone.services.Locator;
 import com.TBD.backbone.services.config.ConfigService;
 import com.TBD.backbone.services.config.Configuration;
 import com.TBD.gateway.handling.ClientDetails;
+import com.TBD.gateway.handling.Endpoints;
 
 public class ConfigRequestProcessor extends AbstractRequestProcessor<String, Configuration>
 {
@@ -11,7 +12,7 @@ public class ConfigRequestProcessor extends AbstractRequestProcessor<String, Con
 	
 	public ConfigRequestProcessor()
 	{
-		super("GetConfiguration", String.class);
+		super(Endpoints.GetConfiguration.name(), String.class);
 	}
 	
 	@Override

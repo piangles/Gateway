@@ -5,6 +5,7 @@ import com.TBD.backbone.services.session.SessionManagementService;
 import com.TBD.gateway.dto.EmptyRequest;
 import com.TBD.gateway.dto.SimpleResponse;
 import com.TBD.gateway.handling.ClientDetails;
+import com.TBD.gateway.handling.Endpoints;
 
 public final class LogoutRequestProcessor extends AbstractRequestProcessor<EmptyRequest, SimpleResponse>
 {
@@ -12,7 +13,7 @@ public final class LogoutRequestProcessor extends AbstractRequestProcessor<Empty
 	
 	public LogoutRequestProcessor()
 	{
-		super("Logout", EmptyRequest.class);
+		super(Endpoints.Logout.name(), EmptyRequest.class);
 	}
 	
 	@Override

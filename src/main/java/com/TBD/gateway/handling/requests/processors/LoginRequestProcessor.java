@@ -5,10 +5,10 @@ import com.TBD.backbone.services.auth.AuthenticationResponse;
 import com.TBD.backbone.services.auth.AuthenticationService;
 import com.TBD.backbone.services.session.SessionDetails;
 import com.TBD.backbone.services.session.SessionManagementService;
-import com.TBD.gateway.Constants;
 import com.TBD.gateway.dto.LoginRequest;
 import com.TBD.gateway.dto.LoginResponse;
 import com.TBD.gateway.handling.ClientDetails;
+import com.TBD.gateway.handling.Endpoints;
 
 public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginRequest, LoginResponse>
 {
@@ -17,7 +17,7 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 	
 	public LoginRequestProcessor()
 	{
-		super(Constants.ENDPOINT_LOGIN, false, LoginRequest.class);
+		super(Endpoints.Login.name(), false, LoginRequest.class);
 	}
 	
 	/**
