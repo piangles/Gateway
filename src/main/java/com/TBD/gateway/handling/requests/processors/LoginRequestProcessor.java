@@ -47,23 +47,30 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 			throw new Exception("Invalid LoginRequest request, mandatory fields are absent.");
 		}
 
-		// Check if the authentication is being asked to be done by
-		// sessionId or by UserId / Password
-		// If the user lost connection and is reconnecting it will be
-		// done by sessionId
-		
-		AuthenticationResponse authResponse = authService.authenticate(loginRequest.getLoginId(), loginRequest.getPassword());
-		
-		if (authResponse.isAuthenticated())
+		if (loginRequest.getPassword() != null) //Authenticate using login and password
 		{
-			SessionDetails sessionDetails = sessionMgmtService.register(authResponse.getUserId());
-			loginResponse = new LoginResponse(authResponse.getUserId(), sessionDetails.getSessionId());
+			AuthenticationResponse authResponse = authService.authenticate(loginRequest.getLoginId(), loginRequest.getPassword());
+			
+			if (authResponse.isAuthenticated())
+			{
+				SessionDetails sessionDetails = sessionMgmtService.register(authResponse.getUserId());
+				loginResponse = new LoginResponse(authResponse.getUserId(), sessionDetails.getSessionId());
+			}
 		}
-		else
+		else //Authenticate using login and sessionId
+		{
+			boolean isSessionValid = sessionMgmtService.isValid(loginRequest.getLoginId(), loginRequest.getSessionId());
+			if (isSessionValid)
+			{
+				loginResponse = new LoginResponse(loginRequest.getLoginId(), loginRequest.getSessionId()); 
+			}
+		}
+
+		if (loginResponse == null)
 		{
 			loginResponse = new LoginResponse(); 
 		}
-
+		
 		return loginResponse;
 	}
 	
