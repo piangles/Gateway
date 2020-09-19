@@ -87,7 +87,7 @@ public final class RequestProcessingThread extends Thread implements Traceable, 
 		catch(Exception e)
 		{
 			logger.warn("Exception while processing request because of : " + e.getMessage(), e);
-			response = new Response(getTraceId(), request.getEndpoint(), false, "Request could not be processed successfully because of : " + e.getMessage());
+			response = new Response(getTraceId(), request.getEndpoint(), false, e.getMessage());
 		}
 		ResponseProcessor.processResponse(clientDetails, response);
 	}
