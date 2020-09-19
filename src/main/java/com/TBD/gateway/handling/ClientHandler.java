@@ -58,15 +58,20 @@ public final class ClientHandler
 	public void onClose(int statusCode, String reason)
 	{
 		logger.info(String.format("Close received for UserId=%s with StatusCode=%d and Reason=%s", clientDetails.getSessionDetails().getUserId(), statusCode, reason));
-		clientNotifier.stop();
+		if (clientNotifier != null)
+		{
+			clientNotifier.stop();
+		}
 	}
 
 	// TODO When do we get this?
 	public void onError(Throwable t)
 	{
 		logger.error(String.format("Error received for UserId=%s with Message=%s", clientDetails.getSessionDetails().getUserId(), t.getMessage()), t);
-		clientNotifier.stop();
-		
+		if (clientNotifier != null)
+		{
+			clientNotifier.stop();
+		}
 		//
 		// try
 		// {
