@@ -10,6 +10,7 @@ import com.TBD.gateway.handling.requests.processors.LoginRequestProcessor;
 import com.TBD.gateway.handling.requests.processors.LogoutRequestProcessor;
 import com.TBD.gateway.handling.requests.processors.PingMessageProcessor;
 import com.TBD.gateway.handling.requests.processors.SetUserPreferenceRequestProcessor;
+import com.TBD.gateway.handling.requests.processors.SubscribeRequestRequestProcessor;
 
 public class RequestRouter
 {
@@ -28,6 +29,7 @@ public class RequestRouter
 		registerRequestProcessor(new ConfigRequestProcessor());
 		registerRequestProcessor(new GetUserPreferenceRequestProcessor());
 		registerRequestProcessor(new SetUserPreferenceRequestProcessor());
+		registerRequestProcessor(new SubscribeRequestRequestProcessor());
 	}
 
 	public static RequestRouter getInstance()
