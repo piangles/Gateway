@@ -14,6 +14,7 @@ import com.TBD.gateway.handling.ClientDetails;
  *
  */
 
+
 // Create a Kafka listener for this.
 public final class ClientNotifier
 {
