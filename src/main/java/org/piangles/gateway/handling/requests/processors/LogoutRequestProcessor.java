@@ -1,0 +1,27 @@
+package org.piangles.gateway.handling.requests.processors;
+
+import org.piangles.gateway.dto.EmptyRequest;
+import org.piangles.gateway.dto.SimpleResponse;
+import org.piangles.gateway.handling.ClientDetails;
+import org.piangles.gateway.handling.Endpoints;
+
+import com.TBD.backbone.services.Locator;
+import com.TBD.backbone.services.session.SessionManagementService;
+
+public final class LogoutRequestProcessor extends AbstractRequestProcessor<EmptyRequest, SimpleResponse>
+{
+	private SessionManagementService sessionMgmtService = Locator.getInstance().getSessionManagementService();
+	
+	public LogoutRequestProcessor()
+	{
+		super(Endpoints.Logout.name(), EmptyRequest.class);
+	}
+	
+	@Override
+	public SimpleResponse processRequest(ClientDetails clientDetails, EmptyRequest emptyRequest) throws Exception
+	{
+		sessionMgmtService.unregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+
+		return new SimpleResponse(true, "Logged out successfully.");
+	}
+}
