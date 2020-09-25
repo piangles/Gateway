@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.piangles.gateway.handling.ClientDetails;
 
-import com.TBD.backbone.services.Locator;
-import com.TBD.backbone.services.ctrl.ControlChannelException;
+import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.ctrl.ControlChannelException;
 
 /**
  * Actively listens for messages from the messaging bus >>> meant for this
@@ -20,7 +20,7 @@ import com.TBD.backbone.services.ctrl.ControlChannelException;
 public final class ClientNotifier
 {
 	/**
-	 * Topics com.TBD.gateway.control.user.<UserId>
+	 * Topics org.piangles.gateway.control.user.<UserId>
 	 */
 	private ClientDetails clientDetails = null;
 

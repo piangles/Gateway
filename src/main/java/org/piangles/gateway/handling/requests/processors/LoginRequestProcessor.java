@@ -5,11 +5,11 @@ import org.piangles.gateway.dto.LoginResponse;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
 
-import com.TBD.backbone.services.Locator;
-import com.TBD.backbone.services.auth.AuthenticationResponse;
-import com.TBD.backbone.services.auth.AuthenticationService;
-import com.TBD.backbone.services.session.SessionDetails;
-import com.TBD.backbone.services.session.SessionManagementService;
+import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.auth.AuthenticationResponse;
+import org.piangles.backbone.services.auth.AuthenticationService;
+import org.piangles.backbone.services.session.SessionDetails;
+import org.piangles.backbone.services.session.SessionManagementService;
 
 public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginRequest, LoginResponse>
 {

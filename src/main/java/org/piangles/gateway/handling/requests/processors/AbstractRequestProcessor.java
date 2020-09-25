@@ -8,7 +8,7 @@ import org.piangles.gateway.handling.notifcations.ClientNotifier;
 import org.piangles.gateway.handling.requests.RequestProcessingThread;
 import org.piangles.gateway.handling.requests.RequestProcessor;
 
-import com.TBD.core.util.coding.JSON;
+import org.piangles.core.util.coding.JSON;
 
 /**
  * 

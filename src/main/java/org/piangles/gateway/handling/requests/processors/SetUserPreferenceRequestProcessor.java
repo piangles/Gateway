@@ -6,9 +6,9 @@ import org.piangles.gateway.dto.SimpleResponse;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
 
-import com.TBD.backbone.services.Locator;
-import com.TBD.backbone.services.prefs.UserPreference;
-import com.TBD.backbone.services.prefs.UserPreferenceService;
+import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.prefs.UserPreference;
+import org.piangles.backbone.services.prefs.UserPreferenceService;
 
 public class SetUserPreferenceRequestProcessor extends AbstractRequestProcessor<Properties, SimpleResponse>
 {

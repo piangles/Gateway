@@ -5,8 +5,8 @@ import org.piangles.gateway.dto.SimpleResponse;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
 
-import com.TBD.backbone.services.Locator;
-import com.TBD.backbone.services.session.SessionManagementService;
+import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.session.SessionManagementService;
 
 public final class LogoutRequestProcessor extends AbstractRequestProcessor<EmptyRequest, SimpleResponse>
 {

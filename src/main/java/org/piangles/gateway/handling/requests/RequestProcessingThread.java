@@ -8,13 +8,13 @@ import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
 import org.piangles.gateway.handling.notifcations.ClientNotifier;
 
-import com.TBD.backbone.services.Locator;
-import com.TBD.backbone.services.logging.LoggingService;
-import com.TBD.backbone.services.session.SessionManagementException;
-import com.TBD.backbone.services.session.SessionManagementService;
-import com.TBD.core.services.remoting.SessionAwareable;
-import com.TBD.core.services.remoting.SessionDetails;
-import com.TBD.core.services.remoting.Traceable;
+import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.logging.LoggingService;
+import org.piangles.backbone.services.session.SessionManagementException;
+import org.piangles.backbone.services.session.SessionManagementService;
+import org.piangles.core.services.remoting.SessionAwareable;
+import org.piangles.core.services.remoting.SessionDetails;
+import org.piangles.core.services.remoting.Traceable;
 
 public final class RequestProcessingThread extends Thread implements Traceable, SessionAwareable
 {

@@ -3,9 +3,9 @@ package org.piangles.gateway.handling.requests;
 import org.piangles.gateway.dto.Response;
 import org.piangles.gateway.handling.ClientDetails;
 
-import com.TBD.backbone.services.Locator;
-import com.TBD.backbone.services.logging.LoggingService;
-import com.TBD.core.util.coding.JSON;
+import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.logging.LoggingService;
+import org.piangles.core.util.coding.JSON;
 
 public class ResponseProcessor
 {	

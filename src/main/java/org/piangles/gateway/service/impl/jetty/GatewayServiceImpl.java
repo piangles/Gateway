@@ -8,9 +8,9 @@ import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 import org.piangles.gateway.Constants;
 import org.piangles.gateway.GatewayService;
 
-import com.TBD.core.services.remoting.SessionAwareable;
-import com.TBD.core.services.remoting.SessionDetails;
-import com.TBD.core.services.remoting.SessionDetailsCreator;
+import org.piangles.core.services.remoting.SessionAwareable;
+import org.piangles.core.services.remoting.SessionDetails;
+import org.piangles.core.services.remoting.SessionDetailsCreator;
 
 public class GatewayServiceImpl implements GatewayService
 {

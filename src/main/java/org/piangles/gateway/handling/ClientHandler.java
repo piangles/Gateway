@@ -13,10 +13,10 @@ import org.piangles.gateway.handling.requests.RequestProcessor;
 import org.piangles.gateway.handling.requests.RequestRouter;
 import org.piangles.gateway.handling.requests.ResponseProcessor;
 
-import com.TBD.backbone.services.Locator;
-import com.TBD.backbone.services.logging.LoggingService;
-import com.TBD.core.services.remoting.SessionDetails;
-import com.TBD.core.util.coding.JSON;
+import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.logging.LoggingService;
+import org.piangles.core.services.remoting.SessionDetails;
+import org.piangles.core.util.coding.JSON;
 
 /***
  * This is the entry point for any communication related with client. This Class

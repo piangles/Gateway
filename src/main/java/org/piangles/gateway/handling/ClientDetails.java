@@ -4,7 +4,7 @@ import java.net.InetSocketAddress;
 
 import org.piangles.gateway.ClientEndpoint;
 
-import com.TBD.core.services.remoting.SessionDetails;
+import org.piangles.core.services.remoting.SessionDetails;
 
 public final class ClientDetails
 {
