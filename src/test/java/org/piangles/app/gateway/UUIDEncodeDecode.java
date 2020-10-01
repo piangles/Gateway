@@ -2,9 +2,8 @@ package org.piangles.app.gateway;
 
 import java.util.UUID;
 
+import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.dto.Request;
-
-import com.TBD.core.util.coding.JSON;
 
 public class UUIDEncodeDecode
 {

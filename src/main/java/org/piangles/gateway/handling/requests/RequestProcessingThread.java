@@ -60,6 +60,14 @@ public final class RequestProcessingThread extends Thread implements Traceable, 
 			try
 			{
 				validSession = sessionMgmtService.isValid(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+				/**
+				 * The reason we are at this point in code is because the user took some manual action.
+				 * And if the session is valid the last accessed should be made current.
+				 */
+				if (validSession)
+				{
+					sessionMgmtService.makeLastAccessedCurrent(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+				}
 			}
 			catch (SessionManagementException e)
 			{

@@ -1,5 +1,6 @@
 package org.piangles.gateway.handling.requests.processors;
 
+import org.piangles.backbone.services.msg.Topic;
 import org.piangles.gateway.dto.SimpleResponse;
 import org.piangles.gateway.dto.SubscribeRequest;
 import org.piangles.gateway.handling.ClientDetails;
@@ -19,7 +20,7 @@ public class SubscribeRequestRequestProcessor extends AbstractRequestProcessor<S
 
 		if (subscribeRequest.getTopic() != null)
 		{
-			getClientNotifier().subscribeToTopic(subscribeRequest.getTopic());
+			getClientNotifier().subscribeToTopic(new Topic(subscribeRequest.getTopic()));
 			result = true;
 		}
 		else if (subscribeRequest.getAliases() != null)
