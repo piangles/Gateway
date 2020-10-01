@@ -16,7 +16,6 @@ import org.piangles.gateway.handling.ClientDetails;
  * 
  */
 
-
 public final class ClientNotifier
 {
 	/**
@@ -38,7 +37,7 @@ public final class ClientNotifier
 	public void start()
 	{
 		messageListener = new MessageListener();
-		//What about general messages
+		// What about general messages
 
 		Thread thread = new Thread(messageListener);
 		thread.start();
@@ -70,34 +69,5 @@ public final class ClientNotifier
 
 	public void unsubscribe(Topic topic)
 	{
-	}
-	
-	private class MessageListener implements Runnable
-	{
-		@Override
-		public void run()
-		{
-			try
-			{	
-				logger.info("USER TOPICS ::::::::::::::::::::::" + userTopics);
-
-				userTopics = msgService.getTopicsFor(clientDetails.getSessionDetails().getUserId());
-
-				
-				//Start the while loop
-				while (stop.get())
-				{
-					//On receipt of messages
-					
-					//controlMessageRouter.getHandler(type);
-				}
-			}
-			catch (MessagingException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
 	}
 }
