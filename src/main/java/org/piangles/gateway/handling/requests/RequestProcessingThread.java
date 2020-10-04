@@ -2,12 +2,6 @@ package org.piangles.gateway.handling.requests;
 
 import java.util.UUID;
 
-import org.piangles.gateway.dto.Request;
-import org.piangles.gateway.dto.Response;
-import org.piangles.gateway.handling.ClientDetails;
-import org.piangles.gateway.handling.Endpoints;
-import org.piangles.gateway.handling.notifcations.ClientNotifier;
-
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.session.SessionManagementException;
@@ -15,24 +9,29 @@ import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.core.services.remoting.SessionAwareable;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.services.remoting.Traceable;
+import org.piangles.gateway.dto.Request;
+import org.piangles.gateway.dto.Response;
+import org.piangles.gateway.handling.ClientDetails;
+import org.piangles.gateway.handling.Endpoints;
+import org.piangles.gateway.handling.notifcations.MessageProcessingManager;
 
 public final class RequestProcessingThread extends Thread implements Traceable, SessionAwareable
 {
 	private ClientDetails clientDetails = null;
 	private Request request = null;
 	private Response response = null;
-	private ClientNotifier clientNotifier = null;
+	private MessageProcessingManager mpm = null;
 
 	private RequestProcessor requestProcessor = null;
 	private SessionManagementService sessionMgmtService = Locator.getInstance().getSessionManagementService();
 	protected LoggingService logger = Locator.getInstance().getLoggingService();
 	
-	public RequestProcessingThread(ClientDetails clientDetails, Request request, RequestProcessor requestProcessor, ClientNotifier clientNotifier)
+	public RequestProcessingThread(ClientDetails clientDetails, Request request, RequestProcessor requestProcessor, MessageProcessingManager mpm)
 	{
 		this.clientDetails = clientDetails;
 		this.request = request;
 		this.requestProcessor = requestProcessor;
-		this.clientNotifier = clientNotifier;
+		this.mpm = mpm;
 	}
 	
 	@Override
@@ -112,9 +111,9 @@ public final class RequestProcessingThread extends Thread implements Traceable, 
 		return response;
 	}
 	
-	public ClientNotifier getClientNotifier()
+	public MessageProcessingManager getMessageProcessingManager()
 	{
-		return clientNotifier;
+		return mpm;
 	}
 
 	@Override

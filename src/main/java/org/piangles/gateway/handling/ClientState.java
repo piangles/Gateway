@@ -1,6 +1,6 @@
 package org.piangles.gateway.handling;
 
-public enum ClientHandlerState
+public enum ClientState
 {
 	PreAuthentication,
 	PostAuthentication;

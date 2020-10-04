@@ -20,12 +20,12 @@ public class SubscribeRequestRequestProcessor extends AbstractRequestProcessor<S
 
 		if (subscribeRequest.getTopic() != null)
 		{
-			getClientNotifier().subscribeToTopic(new Topic(subscribeRequest.getTopic()));
+			getMessageProcessingManager().subscribeToTopic(new Topic(subscribeRequest.getTopic()));
 			result = true;
 		}
 		else if (subscribeRequest.getAliases() != null)
 		{
-			getClientNotifier().subscribeToAlias(subscribeRequest.getAliases());
+			getMessageProcessingManager().subscribeToAlias(subscribeRequest.getAliases());
 			result = true;
 		}
 

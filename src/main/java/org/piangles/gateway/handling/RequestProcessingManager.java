@@ -3,20 +3,19 @@ package org.piangles.gateway.handling;
 import java.net.InetSocketAddress;
 
 import org.apache.commons.lang3.StringUtils;
-import org.piangles.gateway.ClientEndpoint;
-import org.piangles.gateway.dto.LoginResponse;
-import org.piangles.gateway.dto.Request;
-import org.piangles.gateway.dto.Response;
-import org.piangles.gateway.handling.notifcations.ClientNotifier;
-import org.piangles.gateway.handling.requests.RequestProcessingThread;
-import org.piangles.gateway.handling.requests.RequestProcessor;
-import org.piangles.gateway.handling.requests.RequestRouter;
-import org.piangles.gateway.handling.requests.ResponseProcessor;
-
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
+import org.piangles.gateway.ClientEndpoint;
+import org.piangles.gateway.dto.LoginResponse;
+import org.piangles.gateway.dto.Request;
+import org.piangles.gateway.dto.Response;
+import org.piangles.gateway.handling.notifcations.MessageProcessingManager;
+import org.piangles.gateway.handling.requests.RequestProcessingThread;
+import org.piangles.gateway.handling.requests.RequestProcessor;
+import org.piangles.gateway.handling.requests.RequestRouter;
+import org.piangles.gateway.handling.requests.ResponseProcessor;
 
 /***
  * This is the entry point for any communication related with client. This Class
@@ -31,15 +30,15 @@ import org.piangles.core.util.coding.JSON;
  * Both are executed on RequestProcessingThread the former however holds up the
  * queue of requests.
  */
-public final class ClientHandler
+public final class RequestProcessingManager
 {
 	private LoggingService logger = null;
 
-	private ClientHandlerState state = ClientHandlerState.PreAuthentication;
+	private ClientState state = ClientState.PreAuthentication;
 	private ClientDetails clientDetails = null;
-	private ClientNotifier clientNotifier = null;
+	private MessageProcessingManager mpm = null;
 
-	public ClientHandler(InetSocketAddress remoteAddr, ClientEndpoint clientEndpoint)
+	public RequestProcessingManager(InetSocketAddress remoteAddr, ClientEndpoint clientEndpoint)
 	{
 		/*
 		 * UserId initially is the combination of the address and the port. But
@@ -58,9 +57,9 @@ public final class ClientHandler
 	public void onClose(int statusCode, String reason)
 	{
 		logger.info(String.format("Close received for UserId=%s with StatusCode=%d and Reason=%s", clientDetails.getSessionDetails().getUserId(), statusCode, reason));
-		if (clientNotifier != null)
+		if (mpm != null)
 		{
-			clientNotifier.stop();
+			mpm.stop();
 		}
 	}
 
@@ -68,9 +67,9 @@ public final class ClientHandler
 	public void onError(Throwable t)
 	{
 		logger.error(String.format("Error received for UserId=%s with Message=%s", clientDetails.getSessionDetails().getUserId(), t.getMessage()), t);
-		if (clientNotifier != null)
+		if (mpm != null)
 		{
-			clientNotifier.stop();
+			mpm.stop();
 		}
 		//
 		// try
@@ -118,13 +117,13 @@ public final class ClientHandler
 			logger.warn(errorMessage);
 			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
 		}
-		else if (state == ClientHandlerState.PreAuthentication && !Endpoints.Login.name().equals(request.getEndpoint()))
+		else if (state == ClientState.PreAuthentication && !Endpoints.Login.name().equals(request.getEndpoint()))
 		{
 			String errorMessage = "This endpoint " + request.getEndpoint() + " requires authentication.";
 			logger.warn(errorMessage);
 			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
 		}
-		else if (	!(state == ClientHandlerState.PreAuthentication && Endpoints.Login.name().equals(request.getEndpoint())) && 
+		else if (	!(state == ClientState.PreAuthentication && Endpoints.Login.name().equals(request.getEndpoint())) && 
 					(clientDetails.getSessionDetails() != null && !StringUtils.equals(clientDetails.getSessionDetails().getSessionId(), request.getSessionId()))
 				)
 		{
@@ -154,7 +153,7 @@ public final class ClientHandler
 							LoginResponse loginResponse = JSON.getDecoder().decode(response.getAppResponseAsString().getBytes(), LoginResponse.class);
 							if (loginResponse.isAuthenticated())
 							{
-								state = ClientHandlerState.PostAuthentication;
+								state = ClientState.PostAuthentication;
 								
 								//Now create a new client details from the original one but with new SessionDetails.
 								//ClientDetails and SessionDetails are immutable. ClientDetails construction is only
@@ -164,8 +163,8 @@ public final class ClientHandler
 										new SessionDetails(loginResponse.getUserId(), loginResponse.getSessionId()));
 
 								//Now that client is authenticated, create the client notifier
-								clientNotifier = new ClientNotifier(clientDetails);
-								clientNotifier.start();
+								mpm = new MessageProcessingManager(clientDetails);
+								mpm.start();
 							}
 							//Response for Login already goes through RequestProcessingThread
 							response = null;
@@ -182,7 +181,7 @@ public final class ClientHandler
 				case PostAuthentication:
 					if (request.getEndpoint().equals("Logout"))
 					{
-						state = ClientHandlerState.PreAuthentication;
+						state = ClientState.PreAuthentication;
 					}
 					break;
 				}
@@ -214,7 +213,7 @@ public final class ClientHandler
 	private RequestProcessingThread processRequestASynchronously(Request request)
 	{
 		RequestProcessor rp = RequestRouter.getInstance().getRequestProcessor(request.getEndpoint());
-		RequestProcessingThread reqProcThread = new RequestProcessingThread(clientDetails, request, rp, clientNotifier);
+		RequestProcessingThread reqProcThread = new RequestProcessingThread(clientDetails, request, rp, mpm);
 		reqProcThread.start();
 
 		return reqProcThread;

@@ -1,14 +1,13 @@
 package org.piangles.gateway.handling.requests.processors;
 
+import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.dto.EmptyRequest;
 import org.piangles.gateway.dto.Request;
 import org.piangles.gateway.dto.Response;
 import org.piangles.gateway.handling.ClientDetails;
-import org.piangles.gateway.handling.notifcations.ClientNotifier;
+import org.piangles.gateway.handling.notifcations.MessageProcessingManager;
 import org.piangles.gateway.handling.requests.RequestProcessingThread;
 import org.piangles.gateway.handling.requests.RequestProcessor;
-
-import org.piangles.core.util.coding.JSON;
 
 /**
  * 
@@ -89,15 +88,15 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 		return true;
 	}
 	
-	protected final ClientNotifier getClientNotifier()
+	protected final MessageProcessingManager getMessageProcessingManager()
 	{
-		ClientNotifier clientNotifier = null;
+		MessageProcessingManager mpm = null;
 		Object currentThread = Thread.currentThread();
 		if (currentThread instanceof RequestProcessingThread)
 		{
-			clientNotifier = ((RequestProcessingThread)currentThread).getClientNotifier();
+			mpm = ((RequestProcessingThread)currentThread).getMessageProcessingManager();
 		}
-		return clientNotifier;
+		return mpm;
 	}
 	
 	public abstract AppResp processRequest(ClientDetails clientDetails, AppReq request) throws Exception;

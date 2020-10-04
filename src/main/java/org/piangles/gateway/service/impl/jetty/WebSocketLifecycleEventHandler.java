@@ -7,23 +7,23 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.piangles.gateway.ClientEndpoint;
-import org.piangles.gateway.handling.ClientHandler;
+import org.piangles.gateway.handling.RequestProcessingManager;
 
 @WebSocket
 public final class WebSocketLifecycleEventHandler
 {
-	private ClientHandler clientHandler = null;
+	private RequestProcessingManager rpm = null;
 	
 	@OnWebSocketClose
 	public void onClose(int statusCode, String reason)
 	{
-		clientHandler.onClose(statusCode, reason);
+		rpm.onClose(statusCode, reason);
 	}
 
 	@OnWebSocketError
 	public void onError(Throwable t)
 	{
-		clientHandler.onError(t);
+		rpm.onError(t);
 	}
 
 	@OnWebSocketConnect
@@ -34,7 +34,7 @@ public final class WebSocketLifecycleEventHandler
 		};
 		try
 		{
-			clientHandler = new ClientHandler(session.getRemoteAddress(), clientEndpoint);
+			rpm = new RequestProcessingManager(session.getRemoteAddress(), clientEndpoint);
 		}
 		catch(Throwable t)
 		{
@@ -46,6 +46,6 @@ public final class WebSocketLifecycleEventHandler
 	@OnWebSocketMessage
 	public void onMessage(String message)
 	{
-		clientHandler.onMessage(message);
+		rpm.onMessage(message);
 	}
 }

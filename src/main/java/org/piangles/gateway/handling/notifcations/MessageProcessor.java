@@ -1,11 +1,11 @@
 package org.piangles.gateway.handling.notifcations;
 
-import org.piangles.backbone.services.msg.ControlDetails;
+import org.piangles.backbone.services.msg.Message;
 import org.piangles.gateway.handling.ClientDetails;
 
-public interface ControlMessageHandler
+public interface MessageProcessor
 {
 	public void init(ClientDetails clientDetails);
 	public String getType();
-	public void process(ControlDetails ccDetails);
+	public void process(Message message);
 }
