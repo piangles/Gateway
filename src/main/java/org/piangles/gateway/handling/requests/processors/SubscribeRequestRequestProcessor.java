@@ -1,10 +1,10 @@
 package org.piangles.gateway.handling.requests.processors;
 
 import org.piangles.backbone.services.msg.Topic;
-import org.piangles.gateway.dto.SimpleResponse;
-import org.piangles.gateway.dto.SubscribeRequest;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
+import org.piangles.gateway.handling.requests.dto.SimpleResponse;
+import org.piangles.gateway.handling.requests.dto.SubscribeRequest;
 
 public class SubscribeRequestRequestProcessor extends AbstractRequestProcessor<SubscribeRequest, SimpleResponse>
 {

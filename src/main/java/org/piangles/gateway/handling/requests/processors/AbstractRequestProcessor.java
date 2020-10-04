@@ -1,13 +1,13 @@
 package org.piangles.gateway.handling.requests.processors;
 
 import org.piangles.core.util.coding.JSON;
-import org.piangles.gateway.dto.EmptyRequest;
-import org.piangles.gateway.dto.Request;
-import org.piangles.gateway.dto.Response;
 import org.piangles.gateway.handling.ClientDetails;
-import org.piangles.gateway.handling.notifcations.MessageProcessingManager;
+import org.piangles.gateway.handling.messages.MessageProcessingManager;
 import org.piangles.gateway.handling.requests.RequestProcessingThread;
 import org.piangles.gateway.handling.requests.RequestProcessor;
+import org.piangles.gateway.handling.requests.dto.EmptyRequest;
+import org.piangles.gateway.handling.requests.dto.Request;
+import org.piangles.gateway.handling.requests.dto.Response;
 
 /**
  * 

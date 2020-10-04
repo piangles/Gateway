@@ -1,4 +1,4 @@
-package org.piangles.gateway.handling.notifcations;
+package org.piangles.gateway.handling.messages;
 
 import java.util.ArrayList;
 import java.util.List;

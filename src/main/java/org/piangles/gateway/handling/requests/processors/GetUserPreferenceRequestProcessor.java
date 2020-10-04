@@ -2,10 +2,9 @@ package org.piangles.gateway.handling.requests.processors;
 
 import java.util.Properties;
 
-import org.piangles.gateway.dto.EmptyRequest;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
-
+import org.piangles.gateway.handling.requests.dto.EmptyRequest;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.prefs.UserPreference;
 import org.piangles.backbone.services.prefs.UserPreferenceService;

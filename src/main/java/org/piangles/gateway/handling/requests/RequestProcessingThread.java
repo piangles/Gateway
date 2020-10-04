@@ -9,11 +9,11 @@ import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.core.services.remoting.SessionAwareable;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.services.remoting.Traceable;
-import org.piangles.gateway.dto.Request;
-import org.piangles.gateway.dto.Response;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
-import org.piangles.gateway.handling.notifcations.MessageProcessingManager;
+import org.piangles.gateway.handling.messages.MessageProcessingManager;
+import org.piangles.gateway.handling.requests.dto.Request;
+import org.piangles.gateway.handling.requests.dto.Response;
 
 public final class RequestProcessingThread extends Thread implements Traceable, SessionAwareable
 {

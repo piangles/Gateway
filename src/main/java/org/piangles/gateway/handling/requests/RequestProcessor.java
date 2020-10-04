@@ -1,8 +1,8 @@
 package org.piangles.gateway.handling.requests;
 
-import org.piangles.gateway.dto.Request;
-import org.piangles.gateway.dto.Response;
 import org.piangles.gateway.handling.ClientDetails;
+import org.piangles.gateway.handling.requests.dto.Request;
+import org.piangles.gateway.handling.requests.dto.Response;
 
 public interface RequestProcessor
 {

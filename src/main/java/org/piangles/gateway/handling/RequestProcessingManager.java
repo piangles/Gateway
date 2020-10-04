@@ -8,14 +8,14 @@ import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.ClientEndpoint;
-import org.piangles.gateway.dto.LoginResponse;
-import org.piangles.gateway.dto.Request;
-import org.piangles.gateway.dto.Response;
-import org.piangles.gateway.handling.notifcations.MessageProcessingManager;
+import org.piangles.gateway.handling.messages.MessageProcessingManager;
 import org.piangles.gateway.handling.requests.RequestProcessingThread;
 import org.piangles.gateway.handling.requests.RequestProcessor;
 import org.piangles.gateway.handling.requests.RequestRouter;
 import org.piangles.gateway.handling.requests.ResponseProcessor;
+import org.piangles.gateway.handling.requests.dto.LoginResponse;
+import org.piangles.gateway.handling.requests.dto.Request;
+import org.piangles.gateway.handling.requests.dto.Response;
 
 /***
  * This is the entry point for any communication related with client. This Class

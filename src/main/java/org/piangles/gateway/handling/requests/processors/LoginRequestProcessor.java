@@ -1,10 +1,9 @@
 package org.piangles.gateway.handling.requests.processors;
 
-import org.piangles.gateway.dto.LoginRequest;
-import org.piangles.gateway.dto.LoginResponse;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
-
+import org.piangles.gateway.handling.requests.dto.LoginRequest;
+import org.piangles.gateway.handling.requests.dto.LoginResponse;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.auth.AuthenticationResponse;
 import org.piangles.backbone.services.auth.AuthenticationService;

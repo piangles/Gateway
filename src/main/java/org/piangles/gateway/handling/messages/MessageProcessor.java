@@ -1,4 +1,4 @@
-package org.piangles.gateway.handling.notifcations;
+package org.piangles.gateway.handling.messages;
 
 import org.piangles.backbone.services.msg.Message;
 import org.piangles.gateway.handling.ClientDetails;

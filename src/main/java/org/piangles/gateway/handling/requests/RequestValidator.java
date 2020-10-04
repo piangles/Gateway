@@ -2,8 +2,8 @@ package org.piangles.gateway.handling.requests;
 
 import javax.xml.bind.ValidationException;
 
-import org.piangles.gateway.dto.Request;
 import org.piangles.gateway.handling.ClientDetails;
+import org.piangles.gateway.handling.requests.dto.Request;
 
 /**
  * One of the checks here should be SessionId the client sends

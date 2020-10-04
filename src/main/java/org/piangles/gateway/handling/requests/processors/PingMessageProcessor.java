@@ -1,9 +1,9 @@
 package org.piangles.gateway.handling.requests.processors;
 
-import org.piangles.gateway.dto.Ping;
-import org.piangles.gateway.dto.Pong;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
+import org.piangles.gateway.handling.requests.dto.Ping;
+import org.piangles.gateway.handling.requests.dto.Pong;
 
 public final class PingMessageProcessor extends AbstractRequestProcessor<Ping, Pong>
 {

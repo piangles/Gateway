@@ -1,4 +1,4 @@
-package org.piangles.gateway.dto;
+package org.piangles.gateway.handling.requests.dto;
 
 public final class SimpleResponse
 {

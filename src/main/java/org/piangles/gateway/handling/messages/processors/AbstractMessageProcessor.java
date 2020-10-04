@@ -1,10 +1,10 @@
-package org.piangles.gateway.handling.notifcations.processors;
+package org.piangles.gateway.handling.messages.processors;
 
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.msg.Message;
 import org.piangles.gateway.handling.ClientDetails;
-import org.piangles.gateway.handling.notifcations.MessageProcessor;
+import org.piangles.gateway.handling.messages.MessageProcessor;
 
 public abstract class AbstractMessageProcessor<T> implements MessageProcessor
 {

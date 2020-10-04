@@ -1,10 +1,9 @@
 package org.piangles.gateway.handling.requests.processors;
 
-import org.piangles.gateway.dto.EmptyRequest;
-import org.piangles.gateway.dto.SimpleResponse;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
-
+import org.piangles.gateway.handling.requests.dto.EmptyRequest;
+import org.piangles.gateway.handling.requests.dto.SimpleResponse;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.session.SessionManagementService;
 

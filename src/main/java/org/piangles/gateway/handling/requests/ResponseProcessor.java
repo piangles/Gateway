@@ -1,8 +1,7 @@
 package org.piangles.gateway.handling.requests;
 
-import org.piangles.gateway.dto.Response;
 import org.piangles.gateway.handling.ClientDetails;
-
+import org.piangles.gateway.handling.requests.dto.Response;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.core.util.coding.JSON;

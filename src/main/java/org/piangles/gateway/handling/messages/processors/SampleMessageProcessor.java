@@ -1,6 +1,6 @@
-package org.piangles.gateway.handling.notifcations.processors;
+package org.piangles.gateway.handling.messages.processors;
 
-import org.piangles.gateway.handling.notifcations.dto.SampleMessage;
+import org.piangles.gateway.handling.messages.dto.SampleMessage;
 
 public class SampleMessageProcessor extends AbstractMessageProcessor<SampleMessage>
 {
