@@ -10,7 +10,7 @@ import org.piangles.gateway.handling.requests.dto.SystemInfo;
 
 public class HeadlessClientFail
 {
-	
+
 	public static void main(String[] args)
 	{
 		try
