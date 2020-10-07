@@ -25,33 +25,33 @@ public final class MessageListener implements Runnable
 
 	private ClientDetails clientDetails = null;
 	private KafkaConsumer<String, String> consumer = null;
+	private MessageDispatcher messageDispatcher = null;
 	private int errorCount = 0; 
-	private final AtomicBoolean stop = new AtomicBoolean(false);
+	private final AtomicBoolean stopRequested = new AtomicBoolean(false);
 
-	public MessageListener(ClientDetails clientDetails, KafkaConsumer<String, String> consumer)
+	public MessageListener(ClientDetails clientDetails, KafkaConsumer<String, String> consumer, MessageDispatcher messageDispatcher)
 	{
 		this.clientDetails = clientDetails;
 		this.consumer = consumer;
+		this.messageDispatcher = messageDispatcher;
 	}
 	
 	@Override
 	public void run()
 	{
-		//Start the while loop
-		while (stop.get())
+		while (!stopRequested.get())
 		{
 			try
 			{
 				ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(DEFAULT_WAIT_TIME));
+				List<Message> messages = new ArrayList<Message>();
 				for (ConsumerRecord<String, String> record : records)
 				{
-					List<Message> messages = new ArrayList<Message>();
-					
 					//Convert the String in Value to Message
 					Message message = composeMessage(record.value());
-
 					messages.add(message);
 				}
+				messageDispatcher.dispatchAllMessages(messages);
 			}
 			catch (Exception e)
 			{
@@ -64,11 +64,13 @@ public final class MessageListener implements Runnable
 				}
 			}
 		}
+		logger.info("Stopped listening for messages for: " + clientDetails);
 	}
 
 	public void markForStopping()
 	{
-		stop.set(true);
+		logger.info("Stop listening for messages requested for: " + clientDetails);
+		stopRequested.set(true);
 	}
 	
 	private Message composeMessage(String messageAsStr) throws Exception
