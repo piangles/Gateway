@@ -10,7 +10,7 @@ import org.piangles.gateway.handling.requests.processors.LoginRequestProcessor;
 import org.piangles.gateway.handling.requests.processors.LogoutRequestProcessor;
 import org.piangles.gateway.handling.requests.processors.PingMessageProcessor;
 import org.piangles.gateway.handling.requests.processors.SetUserPreferenceRequestProcessor;
-import org.piangles.gateway.handling.requests.processors.SubscribeRequestRequestProcessor;
+import org.piangles.gateway.handling.requests.processors.SubscribeRequestProcessor;
 
 public class RequestRouter
 {
@@ -29,7 +29,7 @@ public class RequestRouter
 		registerRequestProcessor(new ConfigRequestProcessor());
 		registerRequestProcessor(new GetUserPreferenceRequestProcessor());
 		registerRequestProcessor(new SetUserPreferenceRequestProcessor());
-		registerRequestProcessor(new SubscribeRequestRequestProcessor());
+		registerRequestProcessor(new SubscribeRequestProcessor());
 	}
 
 	public static RequestRouter getInstance()

@@ -1,10 +1,13 @@
 package org.piangles.gateway.handling;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
+import org.piangles.backbone.services.msg.MessagingService;
+import org.piangles.backbone.services.msg.Topic;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.ClientEndpoint;
@@ -33,7 +36,7 @@ import org.piangles.gateway.handling.requests.dto.Response;
 public final class RequestProcessingManager
 {
 	private LoggingService logger = null;
-
+	
 	private ClientState state = ClientState.PreAuthentication;
 	private ClientDetails clientDetails = null;
 	private MessageProcessingManager mpm = null;
@@ -162,9 +165,8 @@ public final class RequestProcessingManager
 										clientDetails.getClientEndpoint(), 
 										new SessionDetails(loginResponse.getUserId(), loginResponse.getSessionId()));
 
-								//Now that client is authenticated, create the client notifier
+								//Now that client is authenticated, create the MessageProcessingManager
 								mpm = new MessageProcessingManager(clientDetails);
-								mpm.start();
 							}
 							//Response for Login already goes through RequestProcessingThread
 							response = null;
