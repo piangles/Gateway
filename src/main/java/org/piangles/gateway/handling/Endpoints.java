@@ -8,7 +8,10 @@ public enum Endpoints
 	Logout,
 
 	GetConfiguration,
+	
 	GetUserPreferences,
 	SetUserPreferences,
-	Subscribe
+	
+	SubscribeToUser,
+	SubscribeToAlias
 }

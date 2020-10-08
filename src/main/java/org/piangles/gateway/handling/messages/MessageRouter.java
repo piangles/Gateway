@@ -3,6 +3,7 @@ package org.piangles.gateway.handling.messages;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.piangles.gateway.handling.messages.processors.PassThruControlProcessor;
 import org.piangles.gateway.handling.requests.RequestProcessor;
 
 public class MessageRouter
@@ -14,7 +15,7 @@ public class MessageRouter
 	{
 		messageProcessorMap = new HashMap<String, MessageProcessor>();
 
-		//registerHandler(new PingMessageProcessor());
+		registerProcessor(new PassThruControlProcessor());
 	}
 
 	public static MessageRouter getInstance()

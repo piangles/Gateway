@@ -48,6 +48,7 @@ public final class MessageListener implements Runnable
 				for (ConsumerRecord<String, String> record : records)
 				{
 					//Convert the String in Value to Message
+					System.out.println(record.value());
 					Message message = composeMessage(record.value());
 					messages.add(message);
 				}

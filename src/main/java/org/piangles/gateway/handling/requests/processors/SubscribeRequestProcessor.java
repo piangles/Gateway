@@ -16,7 +16,7 @@ public class SubscribeRequestProcessor extends AbstractRequestProcessor<Subscrib
 
 	public SubscribeRequestProcessor()
 	{
-		super(Endpoints.Subscribe.name(), SubscribeRequest.class);
+		super(Endpoints.SubscribeToUser.name(), SubscribeRequest.class);
 		msgService = Locator.getInstance().getMessagingService();
 	}
 
