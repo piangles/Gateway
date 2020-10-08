@@ -41,7 +41,10 @@ public class MessageProcessingManager implements MessageDispatcher
 	{
 		this.clientDetails = clientDetails;
 		topics = new ArrayList<Topic>();
+		
+		//TODO ::: Need to fix this.
 		MessageRouter.getInstance().init(clientDetails);
+		MessageRouter.getInstance().registerMessageProcessors();
 		//kms = ResourceManager.getInstance().getKafkaMessagingSystem(new DefaultConfigProvider(Constants.SERVICE_NAME, COMPONENT_ID));
 		kms = ResourceManager.getInstance().getKafkaMessagingSystem(new DefaultConfigProvider("MessagingService", "fd5f51bc-5a14-4675-9df4-982808bb106b"));
 	}
