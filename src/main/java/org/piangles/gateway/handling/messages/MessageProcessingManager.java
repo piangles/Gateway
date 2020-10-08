@@ -40,7 +40,8 @@ public class MessageProcessingManager implements MessageDispatcher
 	public MessageProcessingManager(ClientDetails clientDetails) throws ResourceException
 	{
 		this.clientDetails = clientDetails;
-		topics = new ArrayList<Topic>();	
+		topics = new ArrayList<Topic>();
+		MessageRouter.getInstance().init(clientDetails);
 		//kms = ResourceManager.getInstance().getKafkaMessagingSystem(new DefaultConfigProvider(Constants.SERVICE_NAME, COMPONENT_ID));
 		kms = ResourceManager.getInstance().getKafkaMessagingSystem(new DefaultConfigProvider("MessagingService", "fd5f51bc-5a14-4675-9df4-982808bb106b"));
 	}

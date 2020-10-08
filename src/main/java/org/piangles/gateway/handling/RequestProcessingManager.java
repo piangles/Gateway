@@ -1,13 +1,10 @@
 package org.piangles.gateway.handling;
 
 import java.net.InetSocketAddress;
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
-import org.piangles.backbone.services.msg.MessagingService;
-import org.piangles.backbone.services.msg.Topic;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.ClientEndpoint;

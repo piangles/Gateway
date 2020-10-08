@@ -2,9 +2,9 @@ package org.piangles.gateway.handling.messages.processors;
 
 import org.piangles.backbone.services.msg.ControlDetails;
 
-public class PassThruControlProcessor extends AbstractMessageProcessor<ControlDetails>
+public class PassThruControlMessageProcessor extends AbstractMessageProcessor<ControlDetails>
 {
-	public PassThruControlProcessor()
+	public PassThruControlMessageProcessor()
 	{
 		super(ControlDetails.class.getCanonicalName());
 	}
