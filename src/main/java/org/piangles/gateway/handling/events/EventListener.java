@@ -1,4 +1,4 @@
-package org.piangles.gateway.handling.messages;
+package org.piangles.gateway.handling.events;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -10,14 +10,14 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
-import org.piangles.backbone.services.msg.Message;
+import org.piangles.backbone.services.msg.Event;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.handling.ClientDetails;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-public final class MessageListener implements Runnable
+public final class EventListener implements Runnable
 {
 	private static final int DEFAULT_WAIT_TIME = 100;
 	private static final int MAX_ERROR_LIMIT = 10;
@@ -25,15 +25,15 @@ public final class MessageListener implements Runnable
 
 	private ClientDetails clientDetails = null;
 	private KafkaConsumer<String, String> consumer = null;
-	private MessageDispatcher messageDispatcher = null;
+	private EventDispatcher eventDispatcher = null;
 	private int errorCount = 0; 
 	private final AtomicBoolean stopRequested = new AtomicBoolean(false);
 
-	public MessageListener(ClientDetails clientDetails, KafkaConsumer<String, String> consumer, MessageDispatcher messageDispatcher)
+	public EventListener(ClientDetails clientDetails, KafkaConsumer<String, String> consumer, EventDispatcher eventDispatcher)
 	{
 		this.clientDetails = clientDetails;
 		this.consumer = consumer;
-		this.messageDispatcher = messageDispatcher;
+		this.eventDispatcher = eventDispatcher;
 	}
 	
 	@Override
@@ -44,44 +44,44 @@ public final class MessageListener implements Runnable
 			try
 			{
 				ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(DEFAULT_WAIT_TIME));
-				List<Message> messages = new ArrayList<Message>();
+				List<Event> events = new ArrayList<Event>();
 				for (ConsumerRecord<String, String> record : records)
 				{
-					//Convert the String in Value to Message
+					//Convert the String in Value to Event
 					System.out.println(record.value());
-					Message message = composeMessage(record.value());
-					messages.add(message);
+					Event event = composeEvent(record.value());
+					events.add(event);
 				}
-				messageDispatcher.dispatchAllMessages(messages);
+				eventDispatcher.dispatchAllEvents(events);
 			}
 			catch (Exception e)
 			{
-				logger.error("Exception while polling / composingMessage:", e);
+				logger.error("Exception while polling / composingEvent:", e);
 				errorCount = errorCount + 1;
 				if (errorCount > MAX_ERROR_LIMIT)
 				{
-					logger.fatal("Message listener crossed the maximum limit of error : " + clientDetails);
+					logger.fatal("Event listener crossed the maximum limit of error : " + clientDetails);
 					break;
 				}
 			}
 		}
-		logger.info("Stopped listening for messages for: " + clientDetails);
+		logger.info("Stopped listening for events for: " + clientDetails);
 	}
 
 	public void markForStopping()
 	{
-		logger.info("Stop listening for messages requested for: " + clientDetails);
+		logger.info("Stop listening for events requested for: " + clientDetails);
 		stopRequested.set(true);
 	}
 	
-	private Message composeMessage(String messageAsStr) throws Exception
+	private Event composeEvent(String eventAsStr) throws Exception
 	{
-		Message message = JSON.getDecoder().decode(messageAsStr.getBytes(), Message.class);
-		JsonObject jsonObject = new Gson().toJsonTree(message.getPayload()).getAsJsonObject();
-		Class<?> payloadClass = Class.forName(message.getPayloadType());
+		Event event = JSON.getDecoder().decode(eventAsStr.getBytes(), Event.class);
+		JsonObject jsonObject = new Gson().toJsonTree(event.getPayload()).getAsJsonObject();
+		Class<?> payloadClass = Class.forName(event.getPayloadType());
 		Object payload = JSON.getDecoder().decode(jsonObject.toString().getBytes(), payloadClass);
-		message.setPayload(payload);
+		event.setPayload(payload);
 
-		return message;
+		return event;
 	}
 }

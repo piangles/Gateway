@@ -11,7 +11,7 @@ import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.services.remoting.Traceable;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
-import org.piangles.gateway.handling.messages.MessageProcessingManager;
+import org.piangles.gateway.handling.events.EventProcessingManager;
 import org.piangles.gateway.handling.requests.dto.Request;
 import org.piangles.gateway.handling.requests.dto.Response;
 
@@ -20,13 +20,13 @@ public final class RequestProcessingThread extends Thread implements Traceable, 
 	private ClientDetails clientDetails = null;
 	private Request request = null;
 	private Response response = null;
-	private MessageProcessingManager mpm = null;
+	private EventProcessingManager mpm = null;
 
 	private RequestProcessor requestProcessor = null;
 	private SessionManagementService sessionMgmtService = Locator.getInstance().getSessionManagementService();
 	protected LoggingService logger = Locator.getInstance().getLoggingService();
 	
-	public RequestProcessingThread(ClientDetails clientDetails, Request request, RequestProcessor requestProcessor, MessageProcessingManager mpm)
+	public RequestProcessingThread(ClientDetails clientDetails, Request request, RequestProcessor requestProcessor, EventProcessingManager mpm)
 	{
 		this.clientDetails = clientDetails;
 		this.request = request;
@@ -111,7 +111,7 @@ public final class RequestProcessingThread extends Thread implements Traceable, 
 		return response;
 	}
 	
-	public MessageProcessingManager getMessageProcessingManager()
+	public EventProcessingManager getMessageProcessingManager()
 	{
 		return mpm;
 	}

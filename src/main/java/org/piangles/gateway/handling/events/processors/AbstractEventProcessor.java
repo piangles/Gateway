@@ -1,18 +1,18 @@
-package org.piangles.gateway.handling.messages.processors;
+package org.piangles.gateway.handling.events.processors;
 
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
-import org.piangles.backbone.services.msg.Message;
+import org.piangles.backbone.services.msg.Event;
 import org.piangles.gateway.handling.ClientDetails;
-import org.piangles.gateway.handling.messages.MessageProcessor;
+import org.piangles.gateway.handling.events.EventProcessor;
 
-public abstract class AbstractMessageProcessor<T> implements MessageProcessor
+public abstract class AbstractEventProcessor<T> implements EventProcessor
 {
 	protected LoggingService logger = Locator.getInstance().getLoggingService();
 	private String type;
 	private ClientDetails clientDetails;
 	
-	public AbstractMessageProcessor(String type)
+	public AbstractEventProcessor(String type)
 	{
 		this.type = type;
 	}
@@ -27,15 +27,15 @@ public abstract class AbstractMessageProcessor<T> implements MessageProcessor
 		return type;
 	}
 	
-	public final void process(Message message)
+	public final void process(Event event)
 	{
 		try
 		{
-			processPayload((T)message.getPayload());			
+			processPayload((T)event.getPayload());			
 		}
 		catch(Exception expt)
 		{
-			logger.info("Unable to process message : " + message, expt);
+			logger.info("Unable to process event : " + event, expt);
 		}
 	}
 

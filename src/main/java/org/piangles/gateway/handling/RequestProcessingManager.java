@@ -8,7 +8,7 @@ import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.ClientEndpoint;
-import org.piangles.gateway.handling.messages.MessageProcessingManager;
+import org.piangles.gateway.handling.events.EventProcessingManager;
 import org.piangles.gateway.handling.requests.RequestProcessingThread;
 import org.piangles.gateway.handling.requests.RequestProcessor;
 import org.piangles.gateway.handling.requests.RequestRouter;
@@ -36,7 +36,7 @@ public final class RequestProcessingManager
 	
 	private ClientState state = ClientState.PreAuthentication;
 	private ClientDetails clientDetails = null;
-	private MessageProcessingManager mpm = null;
+	private EventProcessingManager npm = null;
 
 	public RequestProcessingManager(InetSocketAddress remoteAddr, ClientEndpoint clientEndpoint)
 	{
@@ -57,9 +57,9 @@ public final class RequestProcessingManager
 	public void onClose(int statusCode, String reason)
 	{
 		logger.info(String.format("Close received for UserId=%s with StatusCode=%d and Reason=%s", clientDetails.getSessionDetails().getUserId(), statusCode, reason));
-		if (mpm != null)
+		if (npm != null)
 		{
-			mpm.stop();
+			npm.stop();
 		}
 	}
 
@@ -67,9 +67,9 @@ public final class RequestProcessingManager
 	public void onError(Throwable t)
 	{
 		logger.error(String.format("Error received for UserId=%s with Message=%s", clientDetails.getSessionDetails().getUserId(), t.getMessage()), t);
-		if (mpm != null)
+		if (npm != null)
 		{
-			mpm.stop();
+			npm.stop();
 		}
 		//
 		// try
@@ -163,7 +163,7 @@ public final class RequestProcessingManager
 										new SessionDetails(loginResponse.getUserId(), loginResponse.getSessionId()));
 
 								//Now that client is authenticated, create the MessageProcessingManager
-								mpm = new MessageProcessingManager(clientDetails);
+								npm = new EventProcessingManager(clientDetails);
 							}
 							//Response for Login already goes through RequestProcessingThread
 							response = null;
@@ -212,7 +212,7 @@ public final class RequestProcessingManager
 	private RequestProcessingThread processRequestASynchronously(Request request)
 	{
 		RequestProcessor rp = RequestRouter.getInstance().getRequestProcessor(request.getEndpoint());
-		RequestProcessingThread reqProcThread = new RequestProcessingThread(clientDetails, request, rp, mpm);
+		RequestProcessingThread reqProcThread = new RequestProcessingThread(clientDetails, request, rp, npm);
 		reqProcThread.start();
 
 		return reqProcThread;

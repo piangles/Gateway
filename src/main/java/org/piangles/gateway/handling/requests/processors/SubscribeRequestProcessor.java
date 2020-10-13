@@ -28,18 +28,18 @@ public class SubscribeRequestProcessor extends AbstractRequestProcessor<Subscrib
 		if (subscribeRequest.isUserTopics())
 		{
 			List<Topic> userTopics = msgService.getTopicsForUser(clientDetails.getSessionDetails().getUserId());
-			getMessageProcessingManager().subscribeToTopics(userTopics);
-			getMessageProcessingManager().start();
+			getNotificationProcessingManager().subscribeToTopics(userTopics);
+			getNotificationProcessingManager().start();
 			result = true;
 		}
 		else if (subscribeRequest.getTopic() != null)
 		{
-			getMessageProcessingManager().subscribeToTopic(new Topic(subscribeRequest.getTopic()));
+			getNotificationProcessingManager().subscribeToTopic(new Topic(subscribeRequest.getTopic()));
 			result = true;
 		}
 		else if (subscribeRequest.getAliases() != null)
 		{
-			getMessageProcessingManager().subscribeToAlias(subscribeRequest.getAliases());
+			getNotificationProcessingManager().subscribeToAlias(subscribeRequest.getAliases());
 			result = true;
 		}
 

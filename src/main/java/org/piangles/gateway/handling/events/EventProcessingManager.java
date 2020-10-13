@@ -1,4 +1,4 @@
-package org.piangles.gateway.handling.messages;
+package org.piangles.gateway.handling.events;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.config.DefaultConfigProvider;
 import org.piangles.backbone.services.logging.LoggingService;
-import org.piangles.backbone.services.msg.Message;
+import org.piangles.backbone.services.msg.Event;
 import org.piangles.backbone.services.msg.MessagingException;
 import org.piangles.backbone.services.msg.MessagingService;
 import org.piangles.backbone.services.msg.Topic;
@@ -24,7 +24,7 @@ import org.piangles.gateway.handling.ClientDetails;
  *
  *	TODO : Need to synchronize this class properly
  */
-public class MessageProcessingManager implements MessageDispatcher
+public class EventProcessingManager implements EventDispatcher
 {
 	private static final String COMPONENT_ID = "5d435fe2-7e54-43c3-84d2-8f4addf2dac9";
 	private LoggingService logger = Locator.getInstance().getLoggingService();
@@ -32,19 +32,19 @@ public class MessageProcessingManager implements MessageDispatcher
 
 	private ClientDetails clientDetails = null;
 	private List<Topic> topics = null;
-	private boolean restartMessageListener = true;
+	private boolean restartEventListener = true;
 	private KafkaMessagingSystem kms = null;
 	private KafkaConsumer<String, String> consumer = null;	
-	private MessageListener messageListener = null;
+	private EventListener eventListener = null;
 
-	public MessageProcessingManager(ClientDetails clientDetails) throws ResourceException
+	public EventProcessingManager(ClientDetails clientDetails) throws ResourceException
 	{
 		this.clientDetails = clientDetails;
 		topics = new ArrayList<Topic>();
 		
 		//TODO ::: Need to fix this.
-		MessageRouter.getInstance().init(clientDetails);
-		MessageRouter.getInstance().registerMessageProcessors();
+		EventRouter.getInstance().init(clientDetails);
+		EventRouter.getInstance().registerEventProcessors();
 		//kms = ResourceManager.getInstance().getKafkaMessagingSystem(new DefaultConfigProvider(Constants.SERVICE_NAME, COMPONENT_ID));
 		kms = ResourceManager.getInstance().getKafkaMessagingSystem(new DefaultConfigProvider("MessagingService", "fd5f51bc-5a14-4675-9df4-982808bb106b"));
 	}
@@ -54,7 +54,7 @@ public class MessageProcessingManager implements MessageDispatcher
 		logger.info("Subscribing to " + topic);
 		this.topics.add(topic);
 		//TODO Start a timer thread
-		restartMessageListener = true;
+		restartEventListener = true;
 	}
 
 	public void subscribeToTopics(List<Topic> topics)
@@ -62,7 +62,7 @@ public class MessageProcessingManager implements MessageDispatcher
 		logger.info("Subscribing to " + topics);
 		this.topics.addAll(topics);
 		//TODO Start a timer thread
-		restartMessageListener = true;
+		restartEventListener = true;
 	}
 
 	public void subscribeToAlias(List<String> aliases) throws MessagingException
@@ -76,7 +76,7 @@ public class MessageProcessingManager implements MessageDispatcher
 				this.topics.add(topic);	
 			}
 			//TODO Start a timer thread
-			restartMessageListener = true;
+			restartEventListener = true;
 		}
 		catch (MessagingException e)
 		{
@@ -90,7 +90,7 @@ public class MessageProcessingManager implements MessageDispatcher
 		logger.info("Unsubscribing to " + topic);
 		this.topics.remove(topic);
 		//TODO Start a timer thread
-		restartMessageListener = true;
+		restartEventListener = true;
 	}
 
 	public void unsubscribeTopics(List<Topic> topics)
@@ -98,18 +98,18 @@ public class MessageProcessingManager implements MessageDispatcher
 		logger.info("Unsubscribing to " + topics);
 		this.topics.removeAll(topics);
 		//TODO Start a timer thread
-		restartMessageListener = true;
+		restartEventListener = true;
 	}
 
-	public void dispatchAllMessages(List<Message> messages) throws Exception
+	public void dispatchAllEvents(List<Event> events) throws Exception
 	{
-		for (Message message : messages)
+		for (Event event : events)
 		{
 			/**
 			 * This is purely for analytics purpose. 
-			 * To make sure 99% of the messages are Notification and 1% is Control. 
+			 * To make sure 99% of the events are Notification and 1% is Control. 
 			 */
-			switch (message.getType())
+			switch (event.getType())
 			{
 			case Control:
 					
@@ -118,16 +118,16 @@ public class MessageProcessingManager implements MessageDispatcher
 			
 			try
 			{
-				MessageProcessor mp = MessageRouter.getInstance().getProcessor(message.getPayloadType());
-				mp.process(message);
+				EventProcessor mp = EventRouter.getInstance().getProcessor(event.getPayloadType());
+				mp.process(event);
 			}
 			catch (Exception e)
 			{
-				logger.error("Unexpected Eror while processing Message : " + message, e);
+				logger.error("Unexpected Eror while processing Event : " + event, e);
 			}
 		}
 		
-		if (restartMessageListener)
+		if (restartEventListener)
 		{
 			//recreate consumer
 			stop();
@@ -137,7 +137,7 @@ public class MessageProcessingManager implements MessageDispatcher
 	
 	public void start()
 	{
-		restartMessageListener = false;
+		restartEventListener = false;
 
 		//create ConsumerProperties from list of Topics
 		ConsumerProperties consumerProps = new ConsumerProperties(UUID.randomUUID().toString()); //clientDetails.getSessionDetails().getUserId());
@@ -154,8 +154,8 @@ public class MessageProcessingManager implements MessageDispatcher
 		
 		if (topics.size() != 0)
 		{
-			messageListener = new MessageListener(clientDetails, consumer, this);
-			Thread thread = new Thread(messageListener);
+			eventListener = new EventListener(clientDetails, consumer, this);
+			Thread thread = new Thread(eventListener);
 			thread.start();
 		}
 		else
@@ -170,6 +170,6 @@ public class MessageProcessingManager implements MessageDispatcher
 		{
 			consumer.close();
 		}
-		messageListener.markForStopping();
+		eventListener.markForStopping();
 	}
 }
