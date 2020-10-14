@@ -16,33 +16,36 @@ public class SubscribeRequestProcessor extends AbstractRequestProcessor<Subscrib
 
 	public SubscribeRequestProcessor()
 	{
-		super(Endpoints.SubscribeToUser.name(), SubscribeRequest.class);
+		super(Endpoints.Subscribe.name(), SubscribeRequest.class);
 		msgService = Locator.getInstance().getMessagingService();
 	}
 
 	@Override
 	public SimpleResponse processRequest(ClientDetails clientDetails, SubscribeRequest subscribeRequest) throws Exception
 	{
-		boolean result = false;
+		boolean result = true;
+		String message = "Subscription was successful.";
 
 		if (subscribeRequest.isUserTopics())
 		{
 			List<Topic> userTopics = msgService.getTopicsForUser(clientDetails.getSessionDetails().getUserId());
 			getNotificationProcessingManager().subscribeToTopics(userTopics);
 			getNotificationProcessingManager().start();
-			result = true;
 		}
 		else if (subscribeRequest.getTopic() != null)
 		{
 			getNotificationProcessingManager().subscribeToTopic(new Topic(subscribeRequest.getTopic()));
-			result = true;
 		}
 		else if (subscribeRequest.getAliases() != null)
 		{
 			getNotificationProcessingManager().subscribeToAlias(subscribeRequest.getAliases());
-			result = true;
+		}
+		else
+		{
+			result = false;
+			message = "None of the mandatory fields are specified.";
 		}
 
-		return new SimpleResponse(result);
+		return new SimpleResponse(result, message);
 	}
 }

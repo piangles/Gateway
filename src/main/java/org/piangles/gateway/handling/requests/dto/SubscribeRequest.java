@@ -4,7 +4,7 @@ import java.util.List;
 
 public class SubscribeRequest
 {
-	private boolean userTopics;
+	private boolean userTopics = false;
 	private String topic;
 	private List<String> aliases;
 

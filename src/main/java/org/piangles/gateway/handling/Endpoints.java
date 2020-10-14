@@ -12,6 +12,5 @@ public enum Endpoints
 	GetUserPreferences,
 	SetUserPreferences,
 	
-	SubscribeToUser,
-	SubscribeToAlias
+	Subscribe,
 }

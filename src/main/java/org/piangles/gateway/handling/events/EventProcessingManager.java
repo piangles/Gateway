@@ -17,6 +17,7 @@ import org.piangles.core.resources.ConsumerProperties;
 import org.piangles.core.resources.KafkaMessagingSystem;
 import org.piangles.core.resources.ResourceException;
 import org.piangles.core.resources.ResourceManager;
+import org.piangles.gateway.Constants;
 import org.piangles.gateway.handling.ClientDetails;
 
 /**
@@ -26,7 +27,7 @@ import org.piangles.gateway.handling.ClientDetails;
  */
 public class EventProcessingManager implements EventDispatcher
 {
-	private static final String COMPONENT_ID = "5d435fe2-7e54-43c3-84d2-8f4addf2dac9";
+	private static final String COMPONENT_ID = "1a465968-c647-4fac-9d25-fbd70fa86fee";
 	private LoggingService logger = Locator.getInstance().getLoggingService();
 	private MessagingService msgService = Locator.getInstance().getMessagingService();
 
@@ -45,15 +46,13 @@ public class EventProcessingManager implements EventDispatcher
 		//TODO ::: Need to fix this.
 		EventRouter.getInstance().init(clientDetails);
 		EventRouter.getInstance().registerEventProcessors();
-		//kms = ResourceManager.getInstance().getKafkaMessagingSystem(new DefaultConfigProvider(Constants.SERVICE_NAME, COMPONENT_ID));
-		kms = ResourceManager.getInstance().getKafkaMessagingSystem(new DefaultConfigProvider("MessagingService", "fd5f51bc-5a14-4675-9df4-982808bb106b"));
+		kms = ResourceManager.getInstance().getKafkaMessagingSystem(new DefaultConfigProvider(Constants.SERVICE_NAME, COMPONENT_ID));
 	}
 
 	public void subscribeToTopic(Topic topic)
 	{
 		logger.info("Subscribing to " + topic);
 		this.topics.add(topic);
-		//TODO Start a timer thread
 		restartEventListener = true;
 	}
 
@@ -61,7 +60,6 @@ public class EventProcessingManager implements EventDispatcher
 	{
 		logger.info("Subscribing to " + topics);
 		this.topics.addAll(topics);
-		//TODO Start a timer thread
 		restartEventListener = true;
 	}
 
@@ -75,7 +73,6 @@ public class EventProcessingManager implements EventDispatcher
 				logger.info("Subscribing to " + topic);
 				this.topics.add(topic);	
 			}
-			//TODO Start a timer thread
 			restartEventListener = true;
 		}
 		catch (MessagingException e)
@@ -89,7 +86,6 @@ public class EventProcessingManager implements EventDispatcher
 	{
 		logger.info("Unsubscribing to " + topic);
 		this.topics.remove(topic);
-		//TODO Start a timer thread
 		restartEventListener = true;
 	}
 
@@ -97,7 +93,6 @@ public class EventProcessingManager implements EventDispatcher
 	{
 		logger.info("Unsubscribing to " + topics);
 		this.topics.removeAll(topics);
-		//TODO Start a timer thread
 		restartEventListener = true;
 	}
 
@@ -115,6 +110,7 @@ public class EventProcessingManager implements EventDispatcher
 					
 			case Notification:	
 			}
+			
 			
 			try
 			{
