@@ -4,5 +4,5 @@ import java.io.IOException;
 
 public interface ClientEndpoint
 {
-	void sendString(String text) throws IOException;
+	void sendMessage(Message message) throws IOException;
 }

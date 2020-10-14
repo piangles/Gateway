@@ -1,11 +1,14 @@
 package org.piangles.gateway.service.impl.jetty;
 
+import java.io.IOException;
+
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.ClientEndpoint;
 import org.piangles.gateway.handling.RequestProcessingManager;
 
@@ -29,7 +32,16 @@ public final class WebSocketLifecycleEventHandler
 	@OnWebSocketConnect
 	public void onConnect(Session session)
 	{
-		ClientEndpoint clientEndpoint = (text) -> {
+		ClientEndpoint clientEndpoint = (message) -> {
+			String text = null;
+			try
+			{
+				text = new String(JSON.getEncoder().encode(message));
+			}
+			catch (Exception e)
+			{
+				throw new IOException(e.getMessage(), e);
+			}
 			session.getRemote().sendString(text);
 		};
 		try

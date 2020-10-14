@@ -1,10 +1,11 @@
 package org.piangles.gateway.handling.requests;
 
-import org.piangles.gateway.handling.ClientDetails;
-import org.piangles.gateway.handling.requests.dto.Response;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
-import org.piangles.core.util.coding.JSON;
+import org.piangles.gateway.Message;
+import org.piangles.gateway.MessageType;
+import org.piangles.gateway.handling.ClientDetails;
+import org.piangles.gateway.handling.requests.dto.Response;
 
 public class ResponseProcessor
 {	
@@ -23,7 +24,7 @@ public class ResponseProcessor
 		
 		try
 		{
-			clientDetails.getClientEndpoint().sendString(new String(JSON.getEncoder().encode(response)));
+			clientDetails.getClientEndpoint().sendMessage(new Message(MessageType.Response, response));
 			logger.info("Response sent to client successfully.");
 		}
 		catch (Exception e)

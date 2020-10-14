@@ -1,7 +1,8 @@
 package org.piangles.gateway.handling.events.processors;
 
 import org.piangles.backbone.services.msg.ControlDetails;
-import org.piangles.core.util.coding.JSON;
+import org.piangles.gateway.Message;
+import org.piangles.gateway.MessageType;
 
 public class PassThruControlEventProcessor extends AbstractEventProcessor<ControlDetails>
 {
@@ -13,6 +14,6 @@ public class PassThruControlEventProcessor extends AbstractEventProcessor<Contro
 	@Override
 	public void processPayload(ControlDetails controlDetails) throws Exception
 	{
-		getClientDetails().getClientEndpoint().sendString(new String(JSON.getEncoder().encode(controlDetails)));
+		getClientDetails().getClientEndpoint().sendMessage(new Message(MessageType.Event, controlDetails));
 	}
 }
