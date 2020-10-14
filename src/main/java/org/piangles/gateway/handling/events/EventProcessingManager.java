@@ -119,7 +119,14 @@ public class EventProcessingManager implements EventDispatcher
 			try
 			{
 				EventProcessor mp = EventRouter.getInstance().getProcessor(event.getPayloadType());
-				mp.process(event);
+				if (mp != null)
+				{
+					mp.process(event);
+				}
+				else
+				{
+					logger.error("Unable to find EventProcessor for:" + event.getPayloadType());
+				}
 			}
 			catch (Exception e)
 			{
