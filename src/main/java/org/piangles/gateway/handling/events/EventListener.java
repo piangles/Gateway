@@ -48,7 +48,6 @@ public final class EventListener implements Runnable
 				for (ConsumerRecord<String, String> record : records)
 				{
 					//Convert the String in Value to Event
-					System.out.println(record.value());
 					Event event = composeEvent(record.value());
 					events.add(event);
 				}
