@@ -1,7 +1,9 @@
 package org.piangles.gateway.handling.events;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -31,6 +33,10 @@ public class EventProcessingManager implements EventDispatcher
 	private LoggingService logger = Locator.getInstance().getLoggingService();
 	private MessagingService msgService = Locator.getInstance().getMessagingService();
 
+	private static Map<KafkaConsumer<String, String>, Long> consumerThreadMap = new HashMap<>();
+	private static Map<Long, KafkaConsumer<String, String>> closedConsumerMap = new HashMap<>();
+
+	
 	private ClientDetails clientDetails = null;
 	private List<Topic> topics = null;
 	private boolean restartEventListener = true;
@@ -154,6 +160,10 @@ public class EventProcessingManager implements EventDispatcher
 		}).collect(Collectors.toList());
 		consumerProps.setTopics(modifiedTopics);
 		consumer = kms.createConsumer(consumerProps);
+		synchronized(consumerThreadMap)
+		{
+			consumerThreadMap.put(consumer, Thread.currentThread().getId());
+		}
 		
 		if (topics.size() != 0)
 		{
@@ -171,7 +181,11 @@ public class EventProcessingManager implements EventDispatcher
 	{
 		if (consumer != null)
 		{
-			consumer.close();
+			synchronized(consumerThreadMap)
+			{
+				Long threadId = consumerThreadMap.remove(consumer);
+				closedConsumerMap.put(threadId, consumer);
+			}
 		}
 		eventListener.markForStopping();
 	}

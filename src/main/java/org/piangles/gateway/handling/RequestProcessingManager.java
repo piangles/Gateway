@@ -36,7 +36,7 @@ public final class RequestProcessingManager
 	
 	private ClientState state = ClientState.PreAuthentication;
 	private ClientDetails clientDetails = null;
-	private EventProcessingManager npm = null;
+	private EventProcessingManager epm = null;
 
 	public RequestProcessingManager(InetSocketAddress remoteAddr, ClientEndpoint clientEndpoint)
 	{
@@ -53,35 +53,22 @@ public final class RequestProcessingManager
 		logger.info(String.format("New connection from : [Host=%s & Port=%d ]", clientDetails.getHostName(), clientDetails.getPort()));
 	}
 
-	// TODO When do we get this?
 	public void onClose(int statusCode, String reason)
 	{
 		logger.info(String.format("Close received for UserId=%s with StatusCode=%d and Reason=%s", clientDetails.getSessionDetails().getUserId(), statusCode, reason));
-		if (npm != null)
+		if (epm != null)
 		{
-			npm.stop();
+			epm.stop();
 		}
 	}
 
-	// TODO When do we get this?
 	public void onError(Throwable t)
 	{
 		logger.error(String.format("Error received for UserId=%s with Message=%s", clientDetails.getSessionDetails().getUserId(), t.getMessage()), t);
-		if (npm != null)
+		if (epm != null)
 		{
-			npm.stop();
+			epm.stop();
 		}
-		//
-		// try
-		// {
-		// sessionMgmtService.unregister(clientDetails.getSessionDetails().getUserId(),
-		// clientDetails.getSessionDetails().getSessionId());
-		// }
-		// catch (SessionManagementException e)
-		// {
-		// logger.error("Exception unregistering session for User [" +
-		// clientDetails + "]", e);
-		// }
 	}
 
 	/**
@@ -163,7 +150,8 @@ public final class RequestProcessingManager
 										new SessionDetails(loginResponse.getUserId(), loginResponse.getSessionId()));
 
 								//Now that client is authenticated, create the MessageProcessingManager
-								npm = new EventProcessingManager(clientDetails);
+								logger.info("Creating EventProcessingManager for: " + clientDetails);
+								epm = new EventProcessingManager(clientDetails);
 							}
 							//Response for Login already goes through RequestProcessingThread
 							response = null;
@@ -212,7 +200,7 @@ public final class RequestProcessingManager
 	private RequestProcessingThread processRequestASynchronously(Request request)
 	{
 		RequestProcessor rp = RequestRouter.getInstance().getRequestProcessor(request.getEndpoint());
-		RequestProcessingThread reqProcThread = new RequestProcessingThread(clientDetails, request, rp, npm);
+		RequestProcessingThread reqProcThread = new RequestProcessingThread(clientDetails, request, rp, epm);
 		reqProcThread.start();
 
 		return reqProcThread;
