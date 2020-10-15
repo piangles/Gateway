@@ -38,7 +38,7 @@ public class ControlPublisher extends Thread implements SessionAwareable
 
 		MessagingService ms = Locator.getInstance().getMessagingService();
 
-		for (int i = 11; i < 20; i++)
+		for (int i = 1; i < 11; i++)
 		{
 			System.out.println("Trying to send message No:" + i);
 			try
