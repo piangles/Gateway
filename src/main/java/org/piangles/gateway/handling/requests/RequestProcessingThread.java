@@ -12,6 +12,7 @@ import org.piangles.core.services.remoting.Traceable;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
 import org.piangles.gateway.handling.events.EventProcessingManager;
+import org.piangles.gateway.handling.events.KafkaConsumerManager;
 import org.piangles.gateway.handling.requests.dto.Request;
 import org.piangles.gateway.handling.requests.dto.Response;
 
@@ -38,6 +39,11 @@ public final class RequestProcessingThread extends Thread implements Traceable, 
 	public void run()
 	{
 		logger.info("Processing request for Endpoint : " + request.getEndpoint());
+		
+		/**
+		 * Close any Consumer that is marked for closing which was created on this thread.
+		 */
+		KafkaConsumerManager.getInstance().closeAnyMarked();
 
 		boolean validSession = false;
 		/**
