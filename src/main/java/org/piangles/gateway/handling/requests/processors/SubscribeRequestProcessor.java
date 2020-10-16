@@ -30,7 +30,6 @@ public class SubscribeRequestProcessor extends AbstractRequestProcessor<Subscrib
 		{
 			List<Topic> userTopics = msgService.getTopicsForUser(clientDetails.getSessionDetails().getUserId());
 			getNotificationProcessingManager().subscribeToTopics(userTopics);
-			getNotificationProcessingManager().start();
 		}
 		else if (subscribeRequest.getTopic() != null)
 		{
@@ -45,6 +44,13 @@ public class SubscribeRequestProcessor extends AbstractRequestProcessor<Subscrib
 			result = false;
 			message = "None of the mandatory fields are specified.";
 		}
+
+		/**
+		 * Restart the notification processing manager to stop any previous
+		 * event listeners and start a new one.
+		 * TODO : May be we just need a refresh method.
+		 */
+		getNotificationProcessingManager().restart();
 
 		return new SimpleResponse(result, message);
 	}

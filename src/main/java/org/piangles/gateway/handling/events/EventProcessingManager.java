@@ -138,13 +138,18 @@ public class EventProcessingManager implements EventDispatcher
 		
 		if (restartEventListener)
 		{
-			//recreate consumer
-			stop();
-			start();
+			//restart consumer
+			restart();
 		}
 	}
 	
-	public void start()
+	public void restart()
+	{
+		stop();
+		start();
+	}
+	
+	private void start()
 	{
 		restartEventListener = false;
 
