@@ -39,6 +39,7 @@ public final class EventListener implements Runnable
 	@Override
 	public void run()
 	{
+		logger.info("Started listening for events for: " + clientDetails);
 		while (!stopRequested.get())
 		{
 			try
