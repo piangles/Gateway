@@ -1,9 +1,7 @@
 package org.piangles.gateway.handling.events;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -25,7 +23,7 @@ import org.piangles.gateway.handling.ClientDetails;
 /**
  * 
  *
- *	TODO : Need to synchronize this class properly
+ * TODO : Need to synchronize this class properly
  */
 public class EventProcessingManager implements EventDispatcher
 {
@@ -33,23 +31,19 @@ public class EventProcessingManager implements EventDispatcher
 	private LoggingService logger = Locator.getInstance().getLoggingService();
 	private MessagingService msgService = Locator.getInstance().getMessagingService();
 
-	private static Map<KafkaConsumer<String, String>, Long> consumerThreadMap = new HashMap<>();
-	private static Map<Long, KafkaConsumer<String, String>> closedConsumerMap = new HashMap<>();
-
-	
 	private ClientDetails clientDetails = null;
 	private List<Topic> topics = null;
 	private boolean restartEventListener = true;
 	private KafkaMessagingSystem kms = null;
-	private KafkaConsumer<String, String> consumer = null;	
+	private KafkaConsumer<String, String> consumer = null;
 	private EventListener eventListener = null;
 
 	public EventProcessingManager(ClientDetails clientDetails) throws ResourceException
 	{
 		this.clientDetails = clientDetails;
 		topics = new ArrayList<Topic>();
-		
-		//TODO ::: Need to fix this.
+
+		// TODO ::: Need to fix this.
 		EventRouter.getInstance().init(clientDetails);
 		EventRouter.getInstance().registerEventProcessors();
 		kms = ResourceManager.getInstance().getKafkaMessagingSystem(new DefaultConfigProvider(Constants.SERVICE_NAME, COMPONENT_ID));
@@ -77,7 +71,7 @@ public class EventProcessingManager implements EventDispatcher
 			for (Topic topic : aliasTopics)
 			{
 				logger.info("Subscribing to " + topic);
-				this.topics.add(topic);	
+				this.topics.add(topic);
 			}
 			restartEventListener = true;
 		}
@@ -107,17 +101,16 @@ public class EventProcessingManager implements EventDispatcher
 		for (Event event : events)
 		{
 			/**
-			 * This is purely for analytics purpose. 
-			 * To make sure 99% of the events are Notification and 1% is Control. 
+			 * This is purely for analytics purpose. To make sure 99% of the
+			 * events are Notification and 1% is Control.
 			 */
 			switch (event.getType())
 			{
 			case Control:
-					
-			case Notification:	
+
+			case Notification:
 			}
-			
-			
+
 			try
 			{
 				EventProcessor mp = EventRouter.getInstance().getProcessor(event.getPayloadType());
@@ -135,27 +128,27 @@ public class EventProcessingManager implements EventDispatcher
 				logger.error("Unexpected Eror while processing Event : " + event, e);
 			}
 		}
-		
+
 		if (restartEventListener)
 		{
-			//restart consumer
+			// restart consumer
 			restart();
 		}
 	}
-	
+
 	public void restart()
 	{
 		stop();
 		start();
 	}
-	
+
 	private void start()
 	{
 		restartEventListener = false;
 
-		//create ConsumerProperties from list of Topics
-		ConsumerProperties consumerProps = new ConsumerProperties(UUID.randomUUID().toString()); //clientDetails.getSessionDetails().getUserId());
-		List<ConsumerProperties.Topic> modifiedTopics = topics.stream().map(topic -> { 
+		// create ConsumerProperties from list of Topics
+		ConsumerProperties consumerProps = new ConsumerProperties(UUID.randomUUID().toString()); // clientDetails.getSessionDetails().getUserId());
+		List<ConsumerProperties.Topic> modifiedTopics = topics.stream().map(topic -> {
 			int partiton = 0;
 			if (!topic.isPartioned())
 			{
@@ -165,11 +158,8 @@ public class EventProcessingManager implements EventDispatcher
 		}).collect(Collectors.toList());
 		consumerProps.setTopics(modifiedTopics);
 		consumer = kms.createConsumer(consumerProps);
-		synchronized(consumerThreadMap)
-		{
-			consumerThreadMap.put(consumer, Thread.currentThread().getId());
-		}
-		
+		KafkaConsumerManager.getInstance().addNewConsumer(consumer);
+
 		if (topics.size() != 0)
 		{
 			eventListener = new EventListener(clientDetails, consumer, this);
@@ -181,17 +171,10 @@ public class EventProcessingManager implements EventDispatcher
 			logger.info("No topics to listen for: " + clientDetails);
 		}
 	}
-	
+
 	public void stop()
 	{
-		if (consumer != null)
-		{
-			synchronized(consumerThreadMap)
-			{
-				Long threadId = consumerThreadMap.remove(consumer);
-				closedConsumerMap.put(threadId, consumer);
-			}
-		}
+		KafkaConsumerManager.getInstance().closeOrMarkForClose(consumer);
 		eventListener.markForStopping();
 	}
 }
