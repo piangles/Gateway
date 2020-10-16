@@ -175,6 +175,9 @@ public class EventProcessingManager implements EventDispatcher
 	public void stop()
 	{
 		KafkaConsumerManager.getInstance().closeOrMarkForClose(consumer);
-		eventListener.markForStopping();
+		if (eventListener != null)
+		{
+			eventListener.markForStopping();
+		}
 	}
 }
