@@ -1,14 +1,15 @@
 package org.piangles.gateway.handling.requests.processors;
 
+import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.auth.AuthenticationResponse;
+import org.piangles.backbone.services.auth.AuthenticationService;
+import org.piangles.backbone.services.auth.Credential;
+import org.piangles.backbone.services.session.SessionDetails;
+import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
 import org.piangles.gateway.handling.requests.dto.LoginRequest;
 import org.piangles.gateway.handling.requests.dto.LoginResponse;
-import org.piangles.backbone.services.Locator;
-import org.piangles.backbone.services.auth.AuthenticationResponse;
-import org.piangles.backbone.services.auth.AuthenticationService;
-import org.piangles.backbone.services.session.SessionDetails;
-import org.piangles.backbone.services.session.SessionManagementService;
 
 public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginRequest, LoginResponse>
 {
@@ -49,7 +50,7 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 
 		if (loginRequest.getPassword() != null) //Authenticate using login and password
 		{
-			AuthenticationResponse authResponse = authService.authenticate(loginRequest.getLoginId(), loginRequest.getPassword());
+			AuthenticationResponse authResponse = authService.authenticate(new Credential(loginRequest.getLoginId(), loginRequest.getPassword()));
 			
 			if (authResponse.isAuthenticated())
 			{
