@@ -88,7 +88,7 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 		return true;
 	}
 	
-	protected final EventProcessingManager getNotificationProcessingManager()
+	protected final EventProcessingManager getEventProcessingManager()
 	{
 		EventProcessingManager npm = null;
 		Object currentThread = Thread.currentThread();

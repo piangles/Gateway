@@ -29,15 +29,20 @@ public class SubscribeRequestProcessor extends AbstractRequestProcessor<Subscrib
 		if (subscribeRequest.isUserTopics())
 		{
 			List<Topic> userTopics = msgService.getTopicsForUser(clientDetails.getSessionDetails().getUserId());
-			getNotificationProcessingManager().subscribeToTopics(userTopics);
+			if (userTopics != null)
+			{
+				getEventProcessingManager().subscribeToTopics(userTopics);
+			}
+			result = false;
+			message = "User does not have any associated topics.";
 		}
 		else if (subscribeRequest.getTopic() != null)
 		{
-			getNotificationProcessingManager().subscribeToTopic(new Topic(subscribeRequest.getTopic()));
+			getEventProcessingManager().subscribeToTopic(new Topic(subscribeRequest.getTopic()));
 		}
 		else if (subscribeRequest.getAliases() != null)
 		{
-			getNotificationProcessingManager().subscribeToAlias(subscribeRequest.getAliases());
+			getEventProcessingManager().subscribeToAlias(subscribeRequest.getAliases());
 		}
 		else
 		{
@@ -50,7 +55,7 @@ public class SubscribeRequestProcessor extends AbstractRequestProcessor<Subscrib
 		 * event listeners and start a new one.
 		 * TODO : May be we just need a refresh method.
 		 */
-		getNotificationProcessingManager().restart();
+		getEventProcessingManager().restart();
 
 		return new SimpleResponse(result, message);
 	}
