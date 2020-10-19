@@ -4,6 +4,7 @@ import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.auth.AuthenticationResponse;
 import org.piangles.backbone.services.auth.AuthenticationService;
 import org.piangles.backbone.services.auth.Credential;
+import org.piangles.backbone.services.auth.FailureReason;
 import org.piangles.backbone.services.session.SessionDetails;
 import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.gateway.handling.ClientDetails;
@@ -55,7 +56,11 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 			if (authResponse.isAuthenticated())
 			{
 				SessionDetails sessionDetails = sessionMgmtService.register(authResponse.getUserId());
-				loginResponse = new LoginResponse(authResponse.getUserId(), sessionDetails.getSessionId());
+				loginResponse = new LoginResponse(authResponse.getUserId(), sessionDetails.getSessionId(), authResponse.IsValidatedByToken());
+			}
+			else
+			{
+				loginResponse = new LoginResponse(authResponse.getNoOfAttemptsRemaining(), authResponse.getFailureReason().name());
 			}
 		}
 		else //Authenticate using login and sessionId
@@ -63,15 +68,14 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 			boolean isSessionValid = sessionMgmtService.isValid(loginRequest.getLoginId(), loginRequest.getSessionId());
 			if (isSessionValid)
 			{
-				loginResponse = new LoginResponse(loginRequest.getLoginId(), loginRequest.getSessionId()); 
+				loginResponse = new LoginResponse(loginRequest.getLoginId(), loginRequest.getSessionId(), false); 
+			}
+			else
+			{
+				loginResponse = new LoginResponse(0, FailureReason.InvalidSession.name());
 			}
 		}
 
-		if (loginResponse == null)
-		{
-			loginResponse = new LoginResponse(); 
-		}
-		
 		return loginResponse;
 	}
 	

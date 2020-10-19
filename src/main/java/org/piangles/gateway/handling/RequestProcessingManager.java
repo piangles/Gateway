@@ -1,6 +1,8 @@
 package org.piangles.gateway.handling;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
@@ -16,6 +18,7 @@ import org.piangles.gateway.handling.requests.ResponseProcessor;
 import org.piangles.gateway.handling.requests.dto.LoginResponse;
 import org.piangles.gateway.handling.requests.dto.Request;
 import org.piangles.gateway.handling.requests.dto.Response;
+import org.piangles.gateway.handling.requests.dto.SimpleResponse;
 
 /***
  * This is the entry point for any communication related with client. This Class
@@ -33,13 +36,19 @@ import org.piangles.gateway.handling.requests.dto.Response;
 public final class RequestProcessingManager
 {
 	private LoggingService logger = null;
-	
+
 	private ClientState state = ClientState.PreAuthentication;
 	private ClientDetails clientDetails = null;
 	private EventProcessingManager epm = null;
+	private Map<String, Endpoints> preAuthenticationEndpoints = null;
 
 	public RequestProcessingManager(InetSocketAddress remoteAddr, ClientEndpoint clientEndpoint)
 	{
+		preAuthenticationEndpoints = new HashMap<String, Endpoints>();
+		preAuthenticationEndpoints.put(Endpoints.SignUp.name(), Endpoints.SignUp);
+		preAuthenticationEndpoints.put(Endpoints.Login.name(), Endpoints.Login);
+		preAuthenticationEndpoints.put(Endpoints.GenerateResetToken.name(), Endpoints.GenerateResetToken);
+
 		/*
 		 * UserId initially is the combination of the address and the port. But
 		 * will change later through the transformation of loginId to
@@ -79,16 +88,16 @@ public final class RequestProcessingManager
 		Request request = null;
 		Response response = null;
 
-		//Step 1 : Log the receipt of the Raw Message, not the message itself.
+		// Step 1 : Log the receipt of the Raw Message, not the message itself.
 		logger.info("Message receieved from userId : " + clientDetails.getSessionDetails().getUserId());
 
-		//Step 2 : Decode the raw message to Request.
+		// Step 2 : Decode the raw message to Request.
 		String endpoint = null;
 		RequestProcessor requestProcessor = null;
 		try
 		{
 			request = JSON.getDecoder().decode(message.getBytes(), Request.class);
-			endpoint = request.getEndpoint(); 
+			endpoint = request.getEndpoint();
 			requestProcessor = RequestRouter.getInstance().getRequestProcessor(endpoint);
 		}
 		catch (Exception e)
@@ -97,39 +106,54 @@ public final class RequestProcessingManager
 			response = new Response(null, null, false, "Request could not be decoded because of : " + e.getMessage());
 		}
 
-		//Step 3 : Validate the request - so we not losing precious CPU/IO resources
+		// Step 3 : Validate the request - so we not losing precious CPU/IO
+		// resources
 		if (requestProcessor == null)
 		{
 			String errorMessage = "This endpoint " + request.getEndpoint() + " is not supported.";
 			logger.warn(errorMessage);
 			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
 		}
-		else if (state == ClientState.PreAuthentication && !Endpoints.Login.name().equals(request.getEndpoint()))
+		else if (state == ClientState.PreAuthentication && !preAuthenticationEndpoints.containsKey(request.getEndpoint()))
 		{
 			String errorMessage = "This endpoint " + request.getEndpoint() + " requires authentication.";
 			logger.warn(errorMessage);
 			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
 		}
-		else if (	!(state == ClientState.PreAuthentication && Endpoints.Login.name().equals(request.getEndpoint())) && 
-					(clientDetails.getSessionDetails() != null && !StringUtils.equals(clientDetails.getSessionDetails().getSessionId(), request.getSessionId()))
-				)
+		else if (state == ClientState.MidAuthentication && !Endpoints.ChangePassword.name().equals(request.getEndpoint()))
+		{
+			// This is the part that makes sure we only accept ChangePassword
+			String errorMessage = "This endpoint " + request.getEndpoint() + " requires password to be updated.";
+			logger.warn(errorMessage);
+			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
+		}
+		else if (!(state == ClientState.PreAuthentication && preAuthenticationEndpoints.containsKey(request.getEndpoint()))
+				&& (clientDetails.getSessionDetails() != null && !StringUtils.equals(clientDetails.getSessionDetails().getSessionId(), request.getSessionId())))
 		{
 			String errorMessage = "SessionId between client and server does not match.";
 			logger.warn(errorMessage);
 			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
 		}
-		
-		//Step 4 : Process the request only if the above conditions have not passed
+
+		// Step 4 : Process the request only if the above conditions have not
+		// passed
 		if (response == null && requestProcessor.isAsyncProcessor())
 		{
 			processRequestASynchronously(request);
 		}
-		else if (response == null && !requestProcessor.isAsyncProcessor()) //Request will be processed synchronously
+		else if (response == null && !requestProcessor.isAsyncProcessor()) // Request
+																			// will
+																			// be
+																			// processed
+																			// synchronously
 		{
 			try
 			{
 				response = processRequestSynchronously(request);
-				
+
+				/**
+				 * Post the Request being processed Synchronously
+				 */
 				switch (state)
 				{
 				case PreAuthentication:
@@ -140,30 +164,64 @@ public final class RequestProcessingManager
 							LoginResponse loginResponse = JSON.getDecoder().decode(response.getAppResponseAsString().getBytes(), LoginResponse.class);
 							if (loginResponse.isAuthenticated())
 							{
-								state = ClientState.PostAuthentication;
-								
-								//Now create a new client details from the original one but with new SessionDetails.
-								//ClientDetails and SessionDetails are immutable. ClientDetails construction is only
-								//visible to this package for security reasons.
-								clientDetails = new ClientDetails(clientDetails.getRemoteAddress(), 
-										clientDetails.getClientEndpoint(), 
+								if (loginResponse.isAuthenticatedByToken())
+								{
+									state = ClientState.MidAuthentication;
+								}
+								else
+								{
+									state = ClientState.PostAuthentication;
+								}
+
+								// Now create a new client details from the
+								// original one but with new SessionDetails.
+								// ClientDetails and SessionDetails are
+								// immutable. ClientDetails construction is only
+								// visible to this package for security reasons.
+								clientDetails = new ClientDetails(clientDetails.getRemoteAddress(), clientDetails.getClientEndpoint(),
 										new SessionDetails(loginResponse.getUserId(), loginResponse.getSessionId()));
 
-								//Now that client is authenticated, create the MessageProcessingManager
+								// Now that client is authenticated, create the
+								// MessageProcessingManager
 								logger.info("Creating EventProcessingManager for: " + clientDetails);
 								epm = new EventProcessingManager(clientDetails);
 							}
-							//Response for Login already goes through RequestProcessingThread
+							// Response for Login already goes through
+							// RequestProcessingThread
 							response = null;
 						}
 						catch (Exception e)
 						{
-							//Probability is zero
+							// Probability is zero
 							logger.error("InternalError-LoginResponse could not be decoded for client: " + clientDetails.getSessionDetails().getUserId(), e);
 							response = new Response(request.getTraceId(), request.getEndpoint(), false, "InternalError - LoginResponse could not be decoded.");
 						}
 					}
-
+					break;
+				case MidAuthentication:
+					if (Endpoints.ChangePassword.name().equals(request.getEndpoint()) && response.isRequestSuccessful())
+					{
+						try
+						{
+							SimpleResponse simpleResponse = JSON.getDecoder().decode(response.getAppResponseAsString().getBytes(), SimpleResponse.class);
+							if (simpleResponse.isAppRequestSuccessful())
+							{
+								state = ClientState.PostAuthentication;
+							}
+							else
+							{
+								// Log and keep it as is.
+								logger.info("ChangePassword was not successful because of:" + simpleResponse.getAppResponseMessage());
+							}
+							response = null;
+						}
+						catch (Exception e)
+						{
+							// Probability is zero
+							logger.error("InternalError-LoginResponse could not be decoded for client: " + clientDetails.getSessionDetails().getUserId(), e);
+							response = new Response(request.getTraceId(), request.getEndpoint(), false, "InternalError - ChangePassword could not be decoded.");
+						}
+					}
 					break;
 				case PostAuthentication:
 					if (request.getEndpoint().equals("Logout"))
@@ -180,7 +238,7 @@ public final class RequestProcessingManager
 				response = new Response(request.getTraceId(), request.getEndpoint(), false, "Could not process request because of : " + e.getMessage());
 			}
 		}
-		
+
 		/**
 		 * This is the Exception response
 		 */
