@@ -2,13 +2,19 @@ package org.piangles.gateway.handling;
 
 public enum Endpoints
 {
+	SignUp,
 	Login,
+	GenerateResetToken,
+	
+	ChangePassword,
+	Logout,
+	
 	Ping,
 	KeepSessionAlive,
-	Logout,
 
+	GetProfile,
 	GetConfiguration,
-	
+
 	GetUserPreferences,
 	SetUserPreferences,
 	
