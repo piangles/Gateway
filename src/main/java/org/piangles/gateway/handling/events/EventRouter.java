@@ -3,19 +3,16 @@ package org.piangles.gateway.handling.events;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.events.processors.PassThruControlEventProcessor;
-import org.piangles.gateway.handling.requests.RequestProcessor;
+import org.piangles.gateway.handling.events.processors.PassThruNotificationEventProcessor;
 
 public class EventRouter
 {
 	private static EventRouter self = null;
-	private ClientDetails clientDetails = null;
 	private Map<String, EventProcessor> eventProcessorMap;
 
-	void init(ClientDetails clientDetails)
+	private EventRouter()
 	{
-		this.clientDetails = clientDetails;
 		eventProcessorMap = new HashMap<String, EventProcessor>();
 	}
 
@@ -35,11 +32,16 @@ public class EventRouter
 		return self;
 	}
 
-	public void registerEventProcessors()
+	public void registerPassThruControlEventProcessor()
 	{
 		registerProcessor(new PassThruControlEventProcessor());
 	}
-	
+
+	public void registerPassThruNotificationEventProcessor(String type)
+	{
+		registerProcessor(new PassThruNotificationEventProcessor(type));
+	}
+
 	public EventProcessor getProcessor(String type)
 	{
 		return eventProcessorMap.get(type);
@@ -51,7 +53,6 @@ public class EventRouter
 		{
 			throw new RuntimeException("Event Router already has a registered endpoint : " + eventProcessor.getType());
 		}
-		eventProcessor.init(clientDetails);
 		eventProcessorMap.put(eventProcessor.getType(), eventProcessor);
 	}
 }

@@ -5,7 +5,6 @@ import org.piangles.gateway.handling.ClientDetails;
 
 public interface EventProcessor
 {
-	public void init(ClientDetails clientDetails);
 	public String getType();
-	public void process(Event event);
+	public void process(ClientDetails clientDetails, Event event);
 }

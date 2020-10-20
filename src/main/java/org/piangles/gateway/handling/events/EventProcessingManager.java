@@ -42,9 +42,6 @@ public class EventProcessingManager implements EventDispatcher
 		this.clientDetails = clientDetails;
 		topics = new ArrayList<Topic>();
 
-		//TODO ::: Need to fix this.
-		EventRouter.getInstance().init(clientDetails);
-		EventRouter.getInstance().registerEventProcessors();
 		kms = ResourceManager.getInstance().getKafkaMessagingSystem(new DefaultConfigProvider(Constants.SERVICE_NAME, COMPONENT_ID));
 	}
 
@@ -115,7 +112,7 @@ public class EventProcessingManager implements EventDispatcher
 				EventProcessor mp = EventRouter.getInstance().getProcessor(event.getPayloadType());
 				if (mp != null)
 				{
-					mp.process(event);
+					mp.process(clientDetails, event);
 				}
 				else
 				{

@@ -12,13 +12,6 @@ import org.piangles.gateway.handling.events.EventProcessor;
 public class PassThruControlEventProcessor implements EventProcessor
 {
 	private LoggingService logger = Locator.getInstance().getLoggingService();
-	private ClientDetails clientDetails = null;
-
-	@Override
-	public void init(ClientDetails clientDetails)
-	{
-		this.clientDetails = clientDetails;
-	}
 
 	@Override
 	public String getType()
@@ -27,7 +20,7 @@ public class PassThruControlEventProcessor implements EventProcessor
 	}
 
 	@Override
-	public void process(Event event)
+	public void process(ClientDetails clientDetails, Event event)
 	{
 		try
 		{

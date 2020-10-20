@@ -12,7 +12,6 @@ public class PassThruNotificationEventProcessor implements EventProcessor
 {
 	private LoggingService logger = Locator.getInstance().getLoggingService();
 	private String type = null;
-	private ClientDetails clientDetails = null;
 
 	public PassThruNotificationEventProcessor(String type)
 	{
@@ -20,19 +19,13 @@ public class PassThruNotificationEventProcessor implements EventProcessor
 	}
 	
 	@Override
-	public void init(ClientDetails clientDetails)
-	{
-		this.clientDetails = clientDetails;
-	}
-
-	@Override
 	public String getType()
 	{
 		return type;
 	}
 
 	@Override
-	public void process(Event event)
+	public void process(ClientDetails clientDetails, Event event)
 	{
 		try
 		{
