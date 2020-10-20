@@ -14,9 +14,6 @@ import org.piangles.backbone.services.msg.Event;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.handling.ClientDetails;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
 public final class EventListener implements Runnable
 {
 	private static final int DEFAULT_WAIT_TIME = 100;
@@ -49,7 +46,7 @@ public final class EventListener implements Runnable
 				for (ConsumerRecord<String, String> record : records)
 				{
 					//Convert the String in Value to Event
-					Event event = composeEvent(record.value());
+					Event event = JSON.getDecoder().decode(record.value().getBytes(), Event.class);
 					events.add(event);
 				}
 				eventDispatcher.dispatchAllEvents(events);
@@ -72,16 +69,5 @@ public final class EventListener implements Runnable
 	{
 		logger.info("Stop listening for events requested for: " + clientDetails);
 		stopRequested.set(true);
-	}
-	
-	private Event composeEvent(String eventAsStr) throws Exception
-	{
-		Event event = JSON.getDecoder().decode(eventAsStr.getBytes(), Event.class);
-		JsonObject jsonObject = new Gson().toJsonTree(event.getPayload()).getAsJsonObject();
-		Class<?> payloadClass = Class.forName(event.getPayloadType());
-		Object payload = JSON.getDecoder().decode(jsonObject.toString().getBytes(), payloadClass);
-		event.setPayload(payload);
-
-		return event;
 	}
 }

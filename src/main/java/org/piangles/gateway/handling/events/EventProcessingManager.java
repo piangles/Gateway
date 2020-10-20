@@ -2,7 +2,6 @@ package org.piangles.gateway.handling.events;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -43,7 +42,7 @@ public class EventProcessingManager implements EventDispatcher
 		this.clientDetails = clientDetails;
 		topics = new ArrayList<Topic>();
 
-		// TODO ::: Need to fix this.
+		//TODO ::: Need to fix this.
 		EventRouter.getInstance().init(clientDetails);
 		EventRouter.getInstance().registerEventProcessors();
 		kms = ResourceManager.getInstance().getKafkaMessagingSystem(new DefaultConfigProvider(Constants.SERVICE_NAME, COMPONENT_ID));
@@ -147,7 +146,7 @@ public class EventProcessingManager implements EventDispatcher
 		restartEventListener = false;
 
 		// create ConsumerProperties from list of Topics
-		ConsumerProperties consumerProps = new ConsumerProperties(UUID.randomUUID().toString()); // clientDetails.getSessionDetails().getUserId());
+		ConsumerProperties consumerProps = new ConsumerProperties(clientDetails.getSessionDetails().getUserId());
 		List<ConsumerProperties.Topic> modifiedTopics = topics.stream().map(topic -> {
 			int partiton = 0;
 			if (!topic.isPartioned())

@@ -3,6 +3,7 @@ package org.piangles.gateway.handling.events.processors;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.msg.Event;
+import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.events.EventProcessor;
 
@@ -31,7 +32,7 @@ public abstract class AbstractEventProcessor<T> implements EventProcessor
 	{
 		try
 		{
-			processPayload((T)event.getPayload());			
+			processPayload(convertPayload(event));			
 		}
 		catch(Exception expt)
 		{
@@ -45,4 +46,12 @@ public abstract class AbstractEventProcessor<T> implements EventProcessor
 	}
 	
 	public abstract void processPayload(T payload) throws Exception;
+	
+	private T convertPayload(Event event) throws Exception
+	{
+		Class<?> payloadClass = Class.forName(event.getPayloadType());
+		Object payload = JSON.getDecoder().decode(((String)event.getPayload()).getBytes(), payloadClass);
+		
+		return (T)payload;
+	}
 }
