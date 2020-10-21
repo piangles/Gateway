@@ -5,7 +5,10 @@ import java.util.Map;
 
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
+import org.piangles.backbone.services.msg.ControlDetails;
+import org.piangles.backbone.services.msg.Event;
 import org.piangles.backbone.services.msg.EventType;
+import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.handling.events.processors.PassThruControlEventProcessor;
 import org.piangles.gateway.handling.events.processors.PassThruNotificationEventProcessor;
 
@@ -15,6 +18,8 @@ public class EventRouter
 	private static EventRouter self = null;
 	
 	private boolean automaticPassThru = false;
+	private EventProcessor passThruControlProcessor = null;
+	private EventProcessor passThruNotificationProcessor = null;
 	private Map<String, EventProcessor> eventProcessorMap;
 
 	private EventRouter()
@@ -38,6 +43,56 @@ public class EventRouter
 		return self;
 	}
 
+	public EventProcessor getProcessor(Event event) throws Exception
+	{	
+		/**
+		 * This is purely for analytics purpose. To make sure 99% of the
+		 * events are Notification and 1% is Control.
+		 */
+		String processorId = null;
+		switch (event.getType())
+		{
+		case Control:
+			ControlDetails controlDetails = JSON.getDecoder().decode(((String)event.getPayload()).getBytes(), ControlDetails.class);
+			processorId = createControlEventProcessorId(controlDetails.getType());
+			break;
+		case Notification:
+			processorId = event.getPayloadType();
+			break;
+		}
+		
+		EventProcessor ep = eventProcessorMap.get(processorId);
+		if (ep == null && automaticPassThru)
+		{
+			logger.info("EventProcessor for:" + processorId + "not found however automaticPassThru enabled.");
+			if (event.getType() == EventType.Control)
+			{
+				ep = passThruControlProcessor;
+			}
+			else
+			{
+				ep = passThruNotificationProcessor;
+			}
+		}
+		else
+		{
+			logger.error("Unable to find EventProcessor for:" + processorId);
+		}
+
+
+		return ep;
+	}
+
+	public void registerControlProcessor(String contolPayloadType, EventProcessor eventProcessor)
+	{
+		register(createControlEventProcessorId(contolPayloadType), eventProcessor);
+	}
+
+	public void registerNotificationProcessor(EventProcessor eventProcessor)
+	{
+		register(eventProcessor.getType(), eventProcessor);
+	}
+
 	public void registerPassThruProcessor(EventType type, String payloadType)
 	{
 		String processorId = null;
@@ -46,7 +101,7 @@ public class EventRouter
 		if (type == EventType.Control)
 		{
 			ep = new PassThruControlEventProcessor();
-			processorId = ep.getType() + ":" + payloadType; 
+			processorId = createControlEventProcessorId(payloadType); 
 			
 		}
 		else if (type == EventType.Notification)
@@ -57,23 +112,12 @@ public class EventRouter
 		register(processorId, ep);
 	}
 
-	public EventProcessor getProcessor(String type)
-	{
-		return eventProcessorMap.get(type);
-	}
-
-	public void registerProcessor(EventProcessor eventProcessor)
-	{
-		register(eventProcessor.getType(), eventProcessor);
-	}
-	
 	private void register(String processorId, EventProcessor eventProcessor)
 	{
 		if (eventProcessorMap.containsKey(processorId))
 		{
 			throw new RuntimeException("Event Router already has a registered endpoint : " + eventProcessor.getType());
 		}
-		System.out.println("Registering EventProcessor for Id:" + processorId);
 		logger.info("Registering EventProcessor for Id:" + processorId);
 		eventProcessorMap.put(processorId, eventProcessor);
 	}
@@ -81,10 +125,17 @@ public class EventRouter
 	public void enableAutomaticPassThru()
 	{
 		automaticPassThru = true;
+		passThruControlProcessor = new PassThruControlEventProcessor();
+		passThruNotificationProcessor = new PassThruNotificationEventProcessor("AutoPassThru");
 	}
 	
 	public boolean isAutomaticPassThru()
 	{
 		return automaticPassThru;
+	}
+	
+	private String createControlEventProcessorId(String controlPayloadType)
+	{
+		return ControlDetails.class.getCanonicalName() + ":" + controlPayloadType;
 	}
 }

@@ -22,7 +22,7 @@ import org.piangles.gateway.handling.ClientDetails;
 /**
  * 
  *
- * TODO : Need to synchronize this class properly
+ * TODO : Need to synchronize this class properly or pause and stop consumer
  */
 public class EventProcessingManager implements EventDispatcher
 {
@@ -96,27 +96,12 @@ public class EventProcessingManager implements EventDispatcher
 	{
 		for (Event event : events)
 		{
-			/**
-			 * This is purely for analytics purpose. To make sure 99% of the
-			 * events are Notification and 1% is Control.
-			 */
-			switch (event.getType())
-			{
-			case Control:
-
-			case Notification:
-			}
-
 			try
 			{
-				EventProcessor mp = EventRouter.getInstance().getProcessor(event.getPayloadType());
+				EventProcessor mp = EventRouter.getInstance().getProcessor(event);
 				if (mp != null)
 				{
 					mp.process(clientDetails, event);
-				}
-				else
-				{
-					logger.error("Unable to find EventProcessor for:" + event.getPayloadType());
 				}
 			}
 			catch (Exception e)
