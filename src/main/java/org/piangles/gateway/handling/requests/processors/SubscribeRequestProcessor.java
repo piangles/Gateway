@@ -33,8 +33,11 @@ public class SubscribeRequestProcessor extends AbstractRequestProcessor<Subscrib
 			{
 				getEventProcessingManager().subscribeToTopics(userTopics);
 			}
-			result = false;
-			message = "User does not have any associated topics.";
+			else
+			{
+				result = false;
+				message = "User does not have any associated topics.";
+			}
 		}
 		else if (subscribeRequest.getTopic() != null)
 		{

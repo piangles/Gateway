@@ -3,6 +3,7 @@ package org.piangles.gateway.handling.events;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.piangles.backbone.services.msg.EventType;
 import org.piangles.gateway.handling.events.processors.PassThruControlEventProcessor;
 import org.piangles.gateway.handling.events.processors.PassThruNotificationEventProcessor;
 
@@ -32,14 +33,23 @@ public class EventRouter
 		return self;
 	}
 
-	public void registerPassThruControlEventProcessor()
+	public void registerPassThruProcessor(EventType type, String payloadType)
 	{
-		registerProcessor(new PassThruControlEventProcessor());
-	}
-
-	public void registerPassThruNotificationEventProcessor(String type)
-	{
-		registerProcessor(new PassThruNotificationEventProcessor(type));
+		String processorId = null;
+		EventProcessor ep = null;
+		
+		if (type == EventType.Control)
+		{
+			ep = new PassThruControlEventProcessor();
+			processorId = ep.getType() + ":" + payloadType; 
+			
+		}
+		else if (type == EventType.Notification)
+		{
+			processorId = payloadType;
+			ep = new PassThruNotificationEventProcessor(payloadType);
+		}
+		register(processorId, ep);
 	}
 
 	public EventProcessor getProcessor(String type)
@@ -49,10 +59,15 @@ public class EventRouter
 
 	public void registerProcessor(EventProcessor eventProcessor)
 	{
-		if (eventProcessorMap.containsKey(eventProcessor.getType()))
+		register(eventProcessor.getType(), eventProcessor);
+	}
+	
+	private void register(String processorId, EventProcessor eventProcessor)
+	{
+		if (eventProcessorMap.containsKey(processorId))
 		{
 			throw new RuntimeException("Event Router already has a registered endpoint : " + eventProcessor.getType());
 		}
-		eventProcessorMap.put(eventProcessor.getType(), eventProcessor);
+		eventProcessorMap.put(processorId, eventProcessor);
 	}
 }
