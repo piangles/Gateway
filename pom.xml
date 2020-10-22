@@ -45,17 +45,36 @@
 			<version>1.1</version>
 			<scope>provided</scope>
 		</dependency>
+
 		<!-- To run javax.websocket in embedded server -->
 		<dependency>
 			<groupId>org.eclipse.jetty.websocket</groupId>
 			<artifactId>javax-websocket-server-impl</artifactId>
-			<version>9.2.7.v20150116</version>
+			<version>9.4.32.v20200930</version>
 		</dependency>
+
 		<!-- To run javax.websocket client -->
 		<dependency>
 			<groupId>org.eclipse.jetty.websocket</groupId>
 			<artifactId>javax-websocket-client-impl</artifactId>
-			<version>9.2.7.v20150116</version>
+			<version>9.4.32.v20200930</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>9.4.32.v20200930</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-servlets</artifactId>
+			<version>9.4.32.v20200930</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-util</artifactId>
+			<version>9.4.32.v20200930</version>
 		</dependency>
 
 		<dependency>
