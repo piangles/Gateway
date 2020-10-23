@@ -108,13 +108,31 @@ public final class RequestProcessingManager
 
 		// Step 3 : Validate the request - so we not losing precious CPU/IO
 		// resources
-		if (requestProcessor == null)
+		if (response != null && requestProcessor == null)
 		{
 			String errorMessage = "This endpoint " + request.getEndpoint() + " is not supported.";
 			logger.warn(errorMessage);
 			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
 		}
-		else if (state == ClientState.PreAuthentication && !preAuthenticationEndpoints.containsKey(request.getEndpoint()))
+
+		if (response == null) //Reuest was able to decoded and found a requestProcessor
+		{
+			response = processRequest(request, requestProcessor);
+		}
+
+		/**
+		 * This is the Exception response
+		 */
+		if (response != null)
+		{
+			ResponseProcessor.processResponse(clientDetails, response);
+		}
+	}
+
+	private Response processRequest(Request request, RequestProcessor requestProcessor)
+	{
+		Response response = null;
+		if (state == ClientState.PreAuthentication && !preAuthenticationEndpoints.containsKey(request.getEndpoint()))
 		{
 			String errorMessage = "This endpoint " + request.getEndpoint() + " requires authentication.";
 			logger.warn(errorMessage);
@@ -141,12 +159,9 @@ public final class RequestProcessingManager
 		{
 			processRequestASynchronously(request);
 		}
-		else if (response == null && !requestProcessor.isAsyncProcessor()) // Request
-																			// will
-																			// be
-																			// processed
-																			// synchronously
+		else if (response == null && !requestProcessor.isAsyncProcessor())
 		{
+			//Request will be processed synchronously
 			try
 			{
 				response = processRequestSynchronously(request);
@@ -238,16 +253,10 @@ public final class RequestProcessingManager
 				response = new Response(request.getTraceId(), request.getEndpoint(), false, "Could not process request because of : " + e.getMessage());
 			}
 		}
-
-		/**
-		 * This is the Exception response
-		 */
-		if (response != null)
-		{
-			ResponseProcessor.processResponse(clientDetails, response);
-		}
+		
+		return response;
 	}
-
+	
 	private Response processRequestSynchronously(Request request) throws Exception
 	{
 		RequestProcessingThread reqProcThread = processRequestASynchronously(request);
