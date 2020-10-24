@@ -39,13 +39,15 @@ public class SubscribeRequestProcessor extends AbstractRequestProcessor<Subscrib
 				message = "User does not have any associated topics.";
 			}
 		}
+		else if (subscribeRequest.getAliases() != null)
+		{
+			List<Topic> aliasTopics = msgService.getTopicsForAliases(subscribeRequest.getAliases());
+
+			getEventProcessingManager().subscribeToTopics(aliasTopics);
+		}
 		else if (subscribeRequest.getTopic() != null)
 		{
 			getEventProcessingManager().subscribeToTopic(new Topic(subscribeRequest.getTopic()));
-		}
-		else if (subscribeRequest.getAliases() != null)
-		{
-			getEventProcessingManager().subscribeToAlias(subscribeRequest.getAliases());
 		}
 		else
 		{

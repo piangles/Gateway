@@ -9,8 +9,6 @@ import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.config.DefaultConfigProvider;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.msg.Event;
-import org.piangles.backbone.services.msg.MessagingException;
-import org.piangles.backbone.services.msg.MessagingService;
 import org.piangles.backbone.services.msg.Topic;
 import org.piangles.core.resources.ConsumerProperties;
 import org.piangles.core.resources.KafkaMessagingSystem;
@@ -21,14 +19,13 @@ import org.piangles.gateway.handling.ClientDetails;
 
 /**
  * 
- *
+ * 
  * TODO : Need to synchronize this class properly or pause and stop consumer
  */
 public class EventProcessingManager implements EventDispatcher
 {
 	private static final String COMPONENT_ID = "1a465968-c647-4fac-9d25-fbd70fa86fee";
 	private LoggingService logger = Locator.getInstance().getLoggingService();
-	private MessagingService msgService = Locator.getInstance().getMessagingService();
 
 	private ClientDetails clientDetails = null;
 	private List<Topic> topics = null;
@@ -57,25 +54,6 @@ public class EventProcessingManager implements EventDispatcher
 		logger.info("Subscribing to " + topics);
 		this.topics.addAll(topics);
 		restartEventListener = true;
-	}
-
-	public void subscribeToAlias(List<String> aliases) throws MessagingException
-	{
-		try
-		{
-			List<Topic> aliasTopics = msgService.getTopicsForAliases(aliases);
-			for (Topic topic : aliasTopics)
-			{
-				logger.info("Subscribing to " + topic);
-				this.topics.add(topic);
-			}
-			restartEventListener = true;
-		}
-		catch (MessagingException e)
-		{
-			logger.error("Unable to convert from alias to topic:", e);
-			throw e;
-		}
 	}
 
 	public void unsubscribeTopic(Topic topic)
@@ -127,22 +105,27 @@ public class EventProcessingManager implements EventDispatcher
 	{
 		restartEventListener = false;
 
-		// create ConsumerProperties from list of Topics
-		ConsumerProperties consumerProps = new ConsumerProperties(clientDetails.getSessionDetails().getUserId());
-		List<ConsumerProperties.Topic> modifiedTopics = topics.stream().map(topic -> {
-			int partiton = 0;
-			if (!topic.isPartioned())
-			{
-				partiton = 0;
-			}
-			return consumerProps.new Topic(topic.getTopicName(), partiton);
-		}).collect(Collectors.toList());
-		consumerProps.setTopics(modifiedTopics);
-		consumer = kms.createConsumer(consumerProps);
-		KafkaConsumerManager.getInstance().addNewConsumer(consumer);
-
 		if (topics.size() != 0)
 		{
+			// create ConsumerProperties from list of Topics
+			ConsumerProperties consumerProps = new ConsumerProperties(clientDetails.getSessionDetails().getUserId());
+			List<ConsumerProperties.Topic> modifiedTopics = topics.stream().map(topic -> {
+				int partiton = -1;
+				if (topic.isPartioned())
+				{
+					partiton = topic.getPartition();
+				}
+				else
+				{
+					partiton = 0;
+				}
+				return consumerProps.new Topic(topic.getTopicName(), partiton);
+			}).collect(Collectors.toList());
+			
+			consumerProps.setTopics(modifiedTopics);
+			consumer = kms.createConsumer(consumerProps);
+			KafkaConsumerManager.getInstance().addNewConsumer(consumer);
+
 			eventListener = new EventListener(clientDetails, consumer, this);
 			Thread thread = new Thread(eventListener);
 			thread.start();
