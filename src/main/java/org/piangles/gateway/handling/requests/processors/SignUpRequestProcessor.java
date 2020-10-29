@@ -8,6 +8,7 @@ import org.piangles.backbone.services.profile.BasicUserProfile;
 import org.piangles.backbone.services.profile.UserProfileService;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
+import org.piangles.gateway.handling.requests.dto.Request;
 import org.piangles.gateway.handling.requests.dto.SignUpRequest;
 import org.piangles.gateway.handling.requests.dto.SimpleResponse;
 
@@ -22,17 +23,17 @@ public final class SignUpRequestProcessor extends AbstractRequestProcessor<SignU
 	}
 	
 	@Override
-	public SimpleResponse processRequest(ClientDetails clientDetails, SignUpRequest request) throws Exception
+	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, SignUpRequest signupRequest) throws Exception
 	{
 		SimpleResponse response = null;
 		AuthenticationResponse authResponse = null;
 		
-		authResponse = authService.validatePasswordStrength(request.getPassword());
+		authResponse = authService.validatePasswordStrength(signupRequest.getPassword());
 		if (authResponse.isRequestSuccessful())
 		{
-			String userId = profileService.createProfile(new BasicUserProfile(request.getFirstName(), request.getLastName(), request.getEmailId()));
+			String userId = profileService.createProfile(new BasicUserProfile(signupRequest.getFirstName(), signupRequest.getLastName(), signupRequest.getEmailId()));
 			
-			authResponse = authService.createAuthenticationEntry(userId, new Credential(request.getEmailId(), request.getPassword()));
+			authResponse = authService.createAuthenticationEntry(userId, new Credential(signupRequest.getEmailId(), signupRequest.getPassword()));
 		
 			response = new SimpleResponse(authResponse.isRequestSuccessful());
 		}

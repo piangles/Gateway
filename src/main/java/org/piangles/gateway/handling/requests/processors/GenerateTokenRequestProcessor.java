@@ -5,6 +5,7 @@ import org.piangles.backbone.services.auth.AuthenticationService;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
 import org.piangles.gateway.handling.requests.dto.GenerateTokenRequest;
+import org.piangles.gateway.handling.requests.dto.Request;
 import org.piangles.gateway.handling.requests.dto.SimpleResponse;
 
 public final class GenerateTokenRequestProcessor extends AbstractRequestProcessor<GenerateTokenRequest, SimpleResponse>
@@ -17,7 +18,7 @@ public final class GenerateTokenRequestProcessor extends AbstractRequestProcesso
 	}
 	
 	@Override
-	public SimpleResponse processRequest(ClientDetails clientDetails, GenerateTokenRequest tokenRequest) throws Exception
+	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, GenerateTokenRequest tokenRequest) throws Exception
 	{
 		boolean result = true;
 		String message = "Please check your registered email for the token.";

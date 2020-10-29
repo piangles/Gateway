@@ -6,6 +6,7 @@ import org.piangles.backbone.services.auth.AuthenticationService;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
 import org.piangles.gateway.handling.requests.dto.ChangePasswordRequest;
+import org.piangles.gateway.handling.requests.dto.Request;
 import org.piangles.gateway.handling.requests.dto.SimpleResponse;
 
 public class ChangePasswordRequestProcessor extends AbstractRequestProcessor<ChangePasswordRequest, SimpleResponse>
@@ -18,11 +19,11 @@ public class ChangePasswordRequestProcessor extends AbstractRequestProcessor<Cha
 	}
 	
 	@Override
-	public SimpleResponse processRequest(ClientDetails clientDetails, ChangePasswordRequest request) throws Exception
+	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, ChangePasswordRequest chgPassRequest) throws Exception
 	{
 		SimpleResponse response = null;
 		AuthenticationResponse authResponse = authService.changePassword(clientDetails.getSessionDetails().getUserId(), 
-																	request.getOldPassword(), request.getNewPassword());
+																	chgPassRequest.getOldPassword(), chgPassRequest.getNewPassword());
 		if (authResponse.isRequestSuccessful())
 		{
 			response = new SimpleResponse(true);

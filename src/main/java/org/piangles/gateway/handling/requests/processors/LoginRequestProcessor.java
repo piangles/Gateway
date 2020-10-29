@@ -11,6 +11,7 @@ import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
 import org.piangles.gateway.handling.requests.dto.LoginRequest;
 import org.piangles.gateway.handling.requests.dto.LoginResponse;
+import org.piangles.gateway.handling.requests.dto.Request;
 
 public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginRequest, LoginResponse>
 {
@@ -41,7 +42,7 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 	 * 
 	 */
 	@Override
-	public LoginResponse processRequest(ClientDetails clientDetails, LoginRequest loginRequest) throws Exception
+	protected LoginResponse processRequest(ClientDetails clientDetails, Request request, LoginRequest loginRequest) throws Exception
 	{
 		LoginResponse loginResponse = null;
 		if (loginRequest.getLoginId() == null || (loginRequest.getPassword() == null && loginRequest.getSessionId() == null))

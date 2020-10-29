@@ -7,6 +7,7 @@ import org.piangles.backbone.services.prefs.UserPreference;
 import org.piangles.backbone.services.prefs.UserPreferenceService;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
+import org.piangles.gateway.handling.requests.dto.Request;
 import org.piangles.gateway.handling.requests.dto.SimpleResponse;
 
 public class SetUserPreferenceRequestProcessor extends AbstractRequestProcessor<Properties, SimpleResponse>
@@ -19,7 +20,7 @@ public class SetUserPreferenceRequestProcessor extends AbstractRequestProcessor<
 	}
 	
 	@Override
-	public SimpleResponse processRequest(ClientDetails clientDetails, Properties props) throws Exception
+	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, Properties props) throws Exception
 	{
 		UserPreference prefs = new UserPreference(props);
 		

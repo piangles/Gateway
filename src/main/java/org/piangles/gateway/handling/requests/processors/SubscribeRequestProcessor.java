@@ -1,12 +1,17 @@
 package org.piangles.gateway.handling.requests.processors;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.msg.MessagingService;
 import org.piangles.backbone.services.msg.Topic;
 import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
+import org.piangles.gateway.handling.requests.dto.Request;
 import org.piangles.gateway.handling.requests.dto.SimpleResponse;
 import org.piangles.gateway.handling.requests.dto.SubscribeRequest;
 
@@ -21,19 +26,16 @@ public class SubscribeRequestProcessor extends AbstractRequestProcessor<Subscrib
 	}
 
 	@Override
-	public SimpleResponse processRequest(ClientDetails clientDetails, SubscribeRequest subscribeRequest) throws Exception
+	public SimpleResponse processRequest(ClientDetails clientDetails, Request request, SubscribeRequest subscribeRequest) throws Exception
 	{
 		boolean result = true;
 		String message = "Subscription was successful.";
+		List<Topic> topics = null;
 
 		if (subscribeRequest.isUserTopics())
 		{
-			List<Topic> userTopics = msgService.getTopicsForUser(clientDetails.getSessionDetails().getUserId());
-			if (userTopics != null)
-			{
-				getEventProcessingManager().subscribeToTopics(userTopics);
-			}
-			else
+			topics = msgService.getTopicsForUser(clientDetails.getSessionDetails().getUserId());
+			if (topics == null)
 			{
 				result = false;
 				message = "User does not have any associated topics.";
@@ -41,13 +43,18 @@ public class SubscribeRequestProcessor extends AbstractRequestProcessor<Subscrib
 		}
 		else if (subscribeRequest.getAliases() != null)
 		{
-			List<Topic> aliasTopics = msgService.getTopicsForAliases(subscribeRequest.getAliases());
-
-			getEventProcessingManager().subscribeToTopics(aliasTopics);
+			topics = msgService.getTopicsForAliases(subscribeRequest.getAliases());
+			if (topics == null)
+			{
+				result = false;
+				message = "Alias does not have any associated topics.";
+			}
 		}
 		else if (subscribeRequest.getTopic() != null)
 		{
-			getEventProcessingManager().subscribeToTopic(new Topic(subscribeRequest.getTopic()));
+			topics = new ArrayList<>();
+			Topic topic = msgService.getTopic(subscribeRequest.getTopic());
+			topics.add(topic);
 		}
 		else
 		{
@@ -60,7 +67,14 @@ public class SubscribeRequestProcessor extends AbstractRequestProcessor<Subscrib
 		 * event listeners and start a new one.
 		 * TODO : May be we just need a refresh method.
 		 */
-		getEventProcessingManager().restart();
+		if (topics != null)
+		{
+			Map<Topic, UUID> topicTraceIdMap = new HashMap<>();
+			
+			topics.stream().forEach(topic -> topicTraceIdMap.put(topic, request.getTraceId()));
+			getEventProcessingManager().subscribeToTopics(topicTraceIdMap);
+			getEventProcessingManager().restart();
+		}
 
 		return new SimpleResponse(result, message);
 	}

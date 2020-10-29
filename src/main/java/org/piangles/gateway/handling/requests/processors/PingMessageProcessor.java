@@ -4,6 +4,7 @@ import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
 import org.piangles.gateway.handling.requests.dto.Ping;
 import org.piangles.gateway.handling.requests.dto.Pong;
+import org.piangles.gateway.handling.requests.dto.Request;
 
 public final class PingMessageProcessor extends AbstractRequestProcessor<Ping, Pong>
 {
@@ -13,7 +14,7 @@ public final class PingMessageProcessor extends AbstractRequestProcessor<Ping, P
 	}
 
 	@Override
-	public Pong processRequest(ClientDetails clientDetails, Ping ping) throws Exception
+	protected Pong processRequest(ClientDetails clientDetails, Request request, Ping ping) throws Exception
 	{
 		return new Pong(ping.getSequenceNo(), ping.getTimeStamp());
 	}

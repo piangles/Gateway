@@ -63,7 +63,7 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 //			response = new Response(request.getTraceId(), request.getEndpoint(), false, "Request failed validation because of : " + e.getMessage());
 //		}
 
-		AppResp appResponse = processRequest(clientDetails, appRequest);
+		AppResp appResponse = processRequest(clientDetails, request, appRequest);
 		
 		String appResponseAsStr = new String(JSON.getEncoder().encode(appResponse));
 		
@@ -99,5 +99,5 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 		return npm;
 	}
 	
-	public abstract AppResp processRequest(ClientDetails clientDetails, AppReq request) throws Exception;
+	protected abstract AppResp processRequest(ClientDetails clientDetails, Request request, AppReq appRequest) throws Exception;
 }

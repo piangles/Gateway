@@ -2,12 +2,13 @@ package org.piangles.gateway.handling.requests.processors;
 
 import java.util.Properties;
 
-import org.piangles.gateway.handling.ClientDetails;
-import org.piangles.gateway.handling.Endpoints;
-import org.piangles.gateway.handling.requests.dto.EmptyRequest;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.prefs.UserPreference;
 import org.piangles.backbone.services.prefs.UserPreferenceService;
+import org.piangles.gateway.handling.ClientDetails;
+import org.piangles.gateway.handling.Endpoints;
+import org.piangles.gateway.handling.requests.dto.EmptyRequest;
+import org.piangles.gateway.handling.requests.dto.Request;
 
 public class GetUserPreferenceRequestProcessor extends AbstractRequestProcessor<EmptyRequest, Properties>
 {
@@ -19,7 +20,7 @@ public class GetUserPreferenceRequestProcessor extends AbstractRequestProcessor<
 	}
 	
 	@Override
-	public Properties processRequest(ClientDetails clientDetails, EmptyRequest emptyRequest) throws Exception
+	protected Properties processRequest(ClientDetails clientDetails, Request request, EmptyRequest emptyRequest) throws Exception
 	{
 		Properties props = null;
 		UserPreference prefs = upService.retrieveUserPreference(clientDetails.getSessionDetails().getUserId());
