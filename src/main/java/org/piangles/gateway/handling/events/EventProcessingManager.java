@@ -1,7 +1,9 @@
 package org.piangles.gateway.handling.events;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -28,7 +30,7 @@ public class EventProcessingManager implements EventDispatcher
 	private LoggingService logger = Locator.getInstance().getLoggingService();
 
 	private ClientDetails clientDetails = null;
-	private List<Topic> topics = null;
+	private Map<Topic, UUID> topicTraceIdMap = null;
 	private boolean restartEventListener = true;
 	private KafkaMessagingSystem kms = null;
 	private KafkaConsumer<String, String> consumer = null;
@@ -37,48 +39,50 @@ public class EventProcessingManager implements EventDispatcher
 	public EventProcessingManager(ClientDetails clientDetails) throws ResourceException
 	{
 		this.clientDetails = clientDetails;
-		topics = new ArrayList<Topic>();
+		topicTraceIdMap = new HashMap<>();
 
 		kms = ResourceManager.getInstance().getKafkaMessagingSystem(new DefaultConfigProvider(Constants.SERVICE_NAME, COMPONENT_ID));
 	}
 
-	public void subscribeToTopic(Topic topic)
+	public void subscribeToTopic(Topic topic, UUID traceId)
 	{
 		logger.info("Subscribing to " + topic);
-		this.topics.add(topic);
+		topicTraceIdMap.put(topic, traceId);
 		restartEventListener = true;
 	}
 
-	public void subscribeToTopics(List<Topic> topics)
+	public void subscribeToTopics(Map<Topic, UUID> topicTraceIdMap)
 	{
-		logger.info("Subscribing to " + topics);
-		this.topics.addAll(topics);
+		logger.info("Subscribing to " + topicTraceIdMap.keySet());
+		this.topicTraceIdMap.putAll(topicTraceIdMap);
 		restartEventListener = true;
 	}
 
 	public void unsubscribeTopic(Topic topic)
 	{
 		logger.info("Unsubscribing to " + topic);
-		this.topics.remove(topic);
+		topicTraceIdMap.remove(topic);
 		restartEventListener = true;
 	}
 
 	public void unsubscribeTopics(List<Topic> topics)
 	{
 		logger.info("Unsubscribing to " + topics);
-		this.topics.removeAll(topics);
+		topics.stream().forEach(topic -> topicTraceIdMap.remove(topics));
 		restartEventListener = true;
 	}
 
-	public void dispatchAllEvents(List<Event> events) throws Exception
+	public void dispatchAllEvents(Map<Event, Topic> topicEventMap) throws Exception
 	{
-		for (Event event : events)
+		for (Map.Entry<Event, Topic> entry : topicEventMap.entrySet())
 		{
+			Event event = entry.getKey();
 			try
 			{
 				EventProcessor mp = EventRouter.getInstance().getProcessor(event);
 				if (mp != null)
 				{
+					event.setTraceId(topicTraceIdMap.get(entry.getValue()));
 					mp.process(clientDetails, event);
 				}
 			}
@@ -105,11 +109,11 @@ public class EventProcessingManager implements EventDispatcher
 	{
 		restartEventListener = false;
 
-		if (topics.size() != 0)
+		if (topicTraceIdMap.size() != 0)
 		{
 			// create ConsumerProperties from list of Topics
 			ConsumerProperties consumerProps = new ConsumerProperties(clientDetails.getSessionDetails().getUserId());
-			List<ConsumerProperties.Topic> modifiedTopics = topics.stream().map(topic -> {
+			List<ConsumerProperties.Topic> modifiedTopics = topicTraceIdMap.keySet().stream().map(topic -> {
 				int partiton = -1;
 				if (topic.isPartioned())
 				{

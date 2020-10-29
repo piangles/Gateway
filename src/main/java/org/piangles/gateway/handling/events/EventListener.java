@@ -1,8 +1,8 @@
 package org.piangles.gateway.handling.events;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -11,6 +11,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.msg.Event;
+import org.piangles.backbone.services.msg.Topic;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.handling.ClientDetails;
 
@@ -42,14 +43,14 @@ public final class EventListener implements Runnable
 			try
 			{
 				ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(DEFAULT_WAIT_TIME));
-				List<Event> events = new ArrayList<Event>();
+				Map<Event, Topic> eventTopicMap = new HashMap<>();
 				for (ConsumerRecord<String, String> record : records)
 				{
 					//Convert the String in Value to Event
 					Event event = JSON.getDecoder().decode(record.value().getBytes(), Event.class);
-					events.add(event);
+					eventTopicMap.put(event, new Topic(record.topic(), record.partition()));
 				}
-				eventDispatcher.dispatchAllEvents(events);
+				eventDispatcher.dispatchAllEvents(eventTopicMap);
 			}
 			catch (Exception e)
 			{

@@ -1,10 +1,11 @@
 package org.piangles.gateway.handling.events;
 
-import java.util.List;
+import java.util.Map;
 
 import org.piangles.backbone.services.msg.Event;
+import org.piangles.backbone.services.msg.Topic;
 
 public interface EventDispatcher
 {
-	public void dispatchAllEvents(List<Event> events) throws Exception;
+	public void dispatchAllEvents(Map<Event, Topic> topicEventMap) throws Exception;
 }
