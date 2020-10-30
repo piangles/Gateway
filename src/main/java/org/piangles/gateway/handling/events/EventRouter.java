@@ -64,7 +64,8 @@ public class EventRouter
 		EventProcessor ep = eventProcessorMap.get(processorId);
 		if (ep == null && automaticPassThru)
 		{
-			logger.info("EventProcessor for:" + processorId + "not found however automaticPassThru enabled.");
+			//System.out.println("EventProcessor for:" + processorId + "not found however automaticPassThru enabled.");
+			//logger.debug("EventProcessor for:" + processorId + "not found however automaticPassThru enabled.");
 			if (event.getType() == EventType.Control)
 			{
 				ep = passThruControlProcessor;
@@ -131,6 +132,7 @@ public class EventRouter
 	
 	public boolean isAutomaticPassThru()
 	{
+		logger.info("AutomaticPassThru enabled:  PassThru EventProcessor will be used when processorId is not found.");
 		return automaticPassThru;
 	}
 	

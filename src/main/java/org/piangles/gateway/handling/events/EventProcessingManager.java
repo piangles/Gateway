@@ -29,8 +29,11 @@ public class EventProcessingManager implements EventDispatcher
 	private static final String COMPONENT_ID = "1a465968-c647-4fac-9d25-fbd70fa86fee";
 	private LoggingService logger = Locator.getInstance().getLoggingService();
 
+	
+	/** TODO on reconnect need to either reuse or recreate EventProcessingManager with CLientDetails and topicTradeId**/
 	private ClientDetails clientDetails = null;
 	private Map<Topic, UUID> topicTraceIdMap = null;
+	
 	private boolean restartEventListener = true;
 	private KafkaMessagingSystem kms = null;
 	private KafkaConsumer<String, String> consumer = null;
@@ -123,7 +126,7 @@ public class EventProcessingManager implements EventDispatcher
 				{
 					partiton = 0;
 				}
-				return consumerProps.new Topic(topic.getTopicName(), partiton);
+				return consumerProps.new Topic(topic.getTopicName(), partiton, topic.isCompacted());
 			}).collect(Collectors.toList());
 			
 			consumerProps.setTopics(modifiedTopics);
