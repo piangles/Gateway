@@ -65,7 +65,6 @@ public class SubscribeRequestProcessor extends AbstractRequestProcessor<Subscrib
 		/**
 		 * Restart the notification processing manager to stop any previous
 		 * event listeners and start a new one.
-		 * TODO : May be we just need a refresh method.
 		 */
 		if (topics != null)
 		{
