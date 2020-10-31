@@ -75,9 +75,9 @@ public class EventProcessingManager implements EventDispatcher
 		restartEventListener = true;
 	}
 
-	public void dispatchAllEvents(Map<Event, Topic> topicEventMap) throws Exception
+	public void dispatchAllEvents(Map<Event, Topic> toBeDispactedTopicEventMap) throws Exception
 	{
-		for (Map.Entry<Event, Topic> entry : topicEventMap.entrySet())
+		for (Map.Entry<Event, Topic> entry : toBeDispactedTopicEventMap.entrySet())
 		{
 			Event event = entry.getKey();
 			try
@@ -117,16 +117,7 @@ public class EventProcessingManager implements EventDispatcher
 			// create ConsumerProperties from list of Topics
 			ConsumerProperties consumerProps = new ConsumerProperties(clientDetails.getSessionDetails().getUserId());
 			List<ConsumerProperties.Topic> modifiedTopics = topicTraceIdMap.keySet().stream().map(topic -> {
-				int partiton = -1;
-				if (topic.isPartioned())
-				{
-					partiton = topic.getPartition();
-				}
-				else
-				{
-					partiton = 0;
-				}
-				return consumerProps.new Topic(topic.getTopicName(), partiton, topic.isCompacted());
+				return consumerProps.new Topic(topic.getTopicName(), topic.getPartition(), topic.isCompacted());
 			}).collect(Collectors.toList());
 			
 			consumerProps.setTopics(modifiedTopics);
