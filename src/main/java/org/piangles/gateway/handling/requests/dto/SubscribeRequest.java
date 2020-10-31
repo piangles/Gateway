@@ -5,7 +5,7 @@ import java.util.List;
 public class SubscribeRequest
 {
 	private boolean userTopics = false;
-	private String topic;
+	private String topic;//TODO Will need to change to Topic. Currently will work only for Default partition.
 	private List<String> aliases;
 
 	public SubscribeRequest()

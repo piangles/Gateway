@@ -52,6 +52,11 @@ public class SubscribeRequestProcessor extends AbstractRequestProcessor<Subscrib
 		}
 		else if (subscribeRequest.getTopic() != null)
 		{
+			/**
+			 * The reason we make a call to Messaging service is to check
+			 * 1. If the topic has parition (TODO: until we change the Subscribe Request to have Topic instead of just topicName)
+			 * 2. Equally important if it log compacted.
+			 */
 			topics = new ArrayList<>();
 			Topic topic = msgService.getTopic(subscribeRequest.getTopic());
 			topics.add(topic);
