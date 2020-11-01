@@ -21,8 +21,8 @@ import org.piangles.gateway.handling.ClientDetails;
 
 /**
  * 
- * 
- * TODO : Need to synchronize this class properly or pause and stop consumer
+ * “People only see what you allow them to see.” 
+ * —Dr. Jennifer Melfi in Sopranos
  */
 public class EventProcessingManager implements EventDispatcher
 {
@@ -47,35 +47,36 @@ public class EventProcessingManager implements EventDispatcher
 		kms = ResourceManager.getInstance().getKafkaMessagingSystem(new DefaultConfigProvider(Constants.SERVICE_NAME, COMPONENT_ID));
 	}
 
-	public void subscribeToTopic(Topic topic, UUID traceId)
+	public synchronized void restart()
 	{
-		logger.info("Subscribing to " + topic);
-		topicTraceIdMap.put(topic, traceId);
-		restartEventListener = true;
+		stop();
+		start();
 	}
 
-	public void subscribeToTopics(Map<Topic, UUID> topicTraceIdMap)
+	public synchronized void stop()
+	{
+		KafkaConsumerManager.getInstance().closeOrMarkForClose(consumer);
+		if (eventListener != null)
+		{
+			eventListener.markForStopping();
+		}
+	}
+
+	public synchronized void subscribeToTopics(Map<Topic, UUID> topicTraceIdMap)
 	{
 		logger.info("Subscribing to " + topicTraceIdMap.keySet());
 		this.topicTraceIdMap.putAll(topicTraceIdMap);
 		restartEventListener = true;
 	}
 
-	public void unsubscribeTopic(Topic topic)
-	{
-		logger.info("Unsubscribing to " + topic);
-		topicTraceIdMap.remove(topic);
-		restartEventListener = true;
-	}
-
-	public void unsubscribeTopics(List<Topic> topics)
+	public synchronized void unsubscribeTopics(List<Topic> topics)
 	{
 		logger.info("Unsubscribing to " + topics);
 		topics.stream().forEach(topic -> topicTraceIdMap.remove(topics));
 		restartEventListener = true;
 	}
 
-	public void dispatchAllEvents(Map<Event, Topic> toBeDispactedTopicEventMap) throws Exception
+	public synchronized void dispatchAllEvents(Map<Event, Topic> toBeDispactedTopicEventMap) throws Exception
 	{
 		for (Map.Entry<Event, Topic> entry : toBeDispactedTopicEventMap.entrySet())
 		{
@@ -102,12 +103,6 @@ public class EventProcessingManager implements EventDispatcher
 		}
 	}
 
-	public void restart()
-	{
-		stop();
-		start();
-	}
-
 	private void start()
 	{
 		restartEventListener = false;
@@ -131,15 +126,6 @@ public class EventProcessingManager implements EventDispatcher
 		else
 		{
 			logger.info("No topics to listen for: " + clientDetails);
-		}
-	}
-
-	public void stop()
-	{
-		KafkaConsumerManager.getInstance().closeOrMarkForClose(consumer);
-		if (eventListener != null)
-		{
-			eventListener.markForStopping();
 		}
 	}
 }
