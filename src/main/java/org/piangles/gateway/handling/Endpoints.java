@@ -12,7 +12,7 @@ public enum Endpoints
 	Ping,
 	KeepSessionAlive,
 
-	GetProfile,
+	GetUserProfile,
 	GetConfiguration,
 
 	GetUserPreferences,
