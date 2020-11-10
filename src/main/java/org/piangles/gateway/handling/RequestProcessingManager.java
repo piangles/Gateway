@@ -106,22 +106,20 @@ public final class RequestProcessingManager
 			response = new Response(null, null, false, "Request could not be decoded because of : " + e.getMessage());
 		}
 
-		// Step 3 : Validate the request - so we not losing precious CPU/IO
-		// resources
-		if (response != null && requestProcessor == null)
+		// Step 3 : Request was able to decoded and found a requestProcessor
+		if (request != null && requestProcessor != null)
+		{
+			response = processRequest(request, requestProcessor);
+		}
+		else if (request != null)
 		{
 			String errorMessage = "This endpoint " + request.getEndpoint() + " is not supported.";
 			logger.warn(errorMessage);
 			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
 		}
 
-		if (response == null) //Reuest was able to decoded and found a requestProcessor
-		{
-			response = processRequest(request, requestProcessor);
-		}
-
 		/**
-		 * This is the Exception response
+		 * This is the Exception Response
 		 */
 		if (response != null)
 		{
@@ -148,6 +146,10 @@ public final class RequestProcessingManager
 		else if (!(state == ClientState.PreAuthentication && preAuthenticationEndpoints.containsKey(request.getEndpoint()))
 				&& (clientDetails.getSessionDetails() != null && !StringUtils.equals(clientDetails.getSessionDetails().getSessionId(), request.getSessionId())))
 		{
+			if (clientDetails.getSessionDetails() != null)
+				System.out.println("clientDetails.getSessionDetails::" + clientDetails.getSessionDetails().getSessionId() + "::Request" + request.getSessionId());
+			else
+				System.out.println("clientDetails.getSessionDetails is null");
 			String errorMessage = "SessionId between client and server does not match.";
 			logger.warn(errorMessage);
 			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);

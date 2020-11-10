@@ -4,9 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.piangles.gateway.handling.requests.processors.ChangePasswordRequestProcessor;
-import org.piangles.gateway.handling.requests.processors.ConfigRequestProcessor;
+import org.piangles.gateway.handling.requests.processors.GetConfigRequestProcessor;
 import org.piangles.gateway.handling.requests.processors.GenerateTokenRequestProcessor;
 import org.piangles.gateway.handling.requests.processors.GetUserPreferenceRequestProcessor;
+import org.piangles.gateway.handling.requests.processors.GetUserProfileRequestProcessor;
 import org.piangles.gateway.handling.requests.processors.KeepSessionAliveRequestProcessor;
 import org.piangles.gateway.handling.requests.processors.LoginRequestProcessor;
 import org.piangles.gateway.handling.requests.processors.LogoutRequestProcessor;
@@ -27,15 +28,19 @@ public class RequestRouter
 		registerRequestProcessor(new SignUpRequestProcessor());
 		registerRequestProcessor(new LoginRequestProcessor());
 		registerRequestProcessor(new GenerateTokenRequestProcessor());
+		
 		registerRequestProcessor(new ChangePasswordRequestProcessor());
+		registerRequestProcessor(new LogoutRequestProcessor());
 		
 		registerRequestProcessor(new PingMessageProcessor());
-		registerRequestProcessor(new LogoutRequestProcessor());
 		registerRequestProcessor(new KeepSessionAliveRequestProcessor());
-		
-		registerRequestProcessor(new ConfigRequestProcessor());
+
+		registerRequestProcessor(new GetUserProfileRequestProcessor());
+		registerRequestProcessor(new GetConfigRequestProcessor());
+
 		registerRequestProcessor(new GetUserPreferenceRequestProcessor());
 		registerRequestProcessor(new SetUserPreferenceRequestProcessor());
+		
 		registerRequestProcessor(new SubscribeRequestProcessor());
 	}
 

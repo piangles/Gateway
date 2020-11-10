@@ -7,11 +7,11 @@ import org.piangles.gateway.handling.ClientDetails;
 import org.piangles.gateway.handling.Endpoints;
 import org.piangles.gateway.handling.requests.dto.Request;
 
-public class ConfigRequestProcessor extends AbstractRequestProcessor<String, Configuration>
+public class GetConfigRequestProcessor extends AbstractRequestProcessor<String, Configuration>
 {
 	private ConfigService configService = Locator.getInstance().getConfigService();
 	
-	public ConfigRequestProcessor()
+	public GetConfigRequestProcessor()
 	{
 		super(Endpoints.GetConfiguration.name(), String.class);
 	}
