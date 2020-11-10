@@ -33,9 +33,10 @@ public class GatewayServiceImpl implements GatewayService
 		server = new Server(new GatewayThreadPool());
 	}
 
-	public void init(int port) throws Exception
+	public void init(String host, int port) throws Exception
 	{
 		ServerConnector connector = new ServerConnector(server);
+		connector.setHost(host);
 		connector.setPort(port);
 		server.addConnector(connector);
 
