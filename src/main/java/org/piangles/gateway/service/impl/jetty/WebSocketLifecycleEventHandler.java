@@ -42,7 +42,15 @@ public final class WebSocketLifecycleEventHandler
 			{
 				throw new IOException(e.getMessage(), e);
 			}
-			session.getRemote().sendString(text);
+			try
+			{
+				session.getRemote().sendString(text);
+			}
+			catch (IOException e)
+			{
+				session.close();
+				throw e;
+			}
 		};
 		try
 		{
