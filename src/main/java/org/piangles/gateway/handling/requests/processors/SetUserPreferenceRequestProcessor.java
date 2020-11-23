@@ -22,7 +22,7 @@ public class SetUserPreferenceRequestProcessor extends AbstractRequestProcessor<
 	@Override
 	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, Properties props) throws Exception
 	{
-		UserPreference prefs = new UserPreference(props);
+		UserPreference prefs = new UserPreference(clientDetails.getSessionDetails().getUserId(), props);
 		
 		upService.persistUserPreference(clientDetails.getSessionDetails().getUserId(), prefs);
 		
