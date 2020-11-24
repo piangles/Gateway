@@ -1,5 +1,6 @@
 package org.piangles.gateway.handling.requests.processors;
 
+import java.util.Map;
 import java.util.Properties;
 
 import org.piangles.backbone.services.Locator;
@@ -10,7 +11,7 @@ import org.piangles.gateway.handling.Endpoints;
 import org.piangles.gateway.handling.requests.dto.EmptyRequest;
 import org.piangles.gateway.handling.requests.dto.Request;
 
-public class GetUserPreferenceRequestProcessor extends AbstractRequestProcessor<EmptyRequest, Properties>
+public class GetUserPreferenceRequestProcessor extends AbstractRequestProcessor<EmptyRequest, Map<String, Object>>
 {
 	private UserPreferenceService upService = Locator.getInstance().getUserPreferenceService();
 	
@@ -20,14 +21,14 @@ public class GetUserPreferenceRequestProcessor extends AbstractRequestProcessor<
 	}
 	
 	@Override
-	protected Properties processRequest(ClientDetails clientDetails, Request request, EmptyRequest emptyRequest) throws Exception
+	protected Map<String, Object> processRequest(ClientDetails clientDetails, Request request, EmptyRequest emptyRequest) throws Exception
 	{
-		Properties props = null;
+		Map<String, Object> nvPair = null;
 		UserPreference prefs = upService.retrieveUserPreference(clientDetails.getSessionDetails().getUserId());
 		if (prefs != null)
 		{
-			props = prefs.getProperties();
+			nvPair = prefs.getNVPair();
 		}
-		return props; 
+		return nvPair; 
 	}
 }
