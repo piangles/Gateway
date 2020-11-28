@@ -3,6 +3,7 @@ package org.piangles.gateway.handling.requests.processors;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.auth.AuthenticationResponse;
 import org.piangles.backbone.services.auth.AuthenticationService;
+import org.piangles.backbone.services.auth.AuthenticationType;
 import org.piangles.backbone.services.auth.Credential;
 import org.piangles.backbone.services.profile.BasicUserProfile;
 import org.piangles.backbone.services.profile.UserProfileService;
@@ -33,7 +34,7 @@ public final class SignUpRequestProcessor extends AbstractRequestProcessor<SignU
 		{
 			String userId = profileService.createProfile(new BasicUserProfile(signupRequest.getFirstName(), signupRequest.getLastName(), signupRequest.getEmailId(), signupRequest.getPhoneNo()));
 			
-			authResponse = authService.createAuthenticationEntry(userId, new Credential(signupRequest.getEmailId(), signupRequest.getPassword()));
+			authResponse = authService.createAuthenticationEntry(AuthenticationType.Default, userId, new Credential(signupRequest.getEmailId(), signupRequest.getPassword()));
 		
 			response = new SimpleResponse(authResponse.isRequestSuccessful());
 		}
