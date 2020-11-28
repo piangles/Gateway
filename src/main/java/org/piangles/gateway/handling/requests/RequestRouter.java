@@ -32,7 +32,6 @@ public class RequestRouter
 	{
 		logger = Locator.getInstance().getLoggingService();
 
-		
 		/**
 		 * Register all preAuthenticationEndpoints
 		 */
@@ -41,7 +40,6 @@ public class RequestRouter
 		preAuthenticationEndpoints.put(Endpoints.Login.name(), Endpoints.Login);
 		preAuthenticationEndpoints.put(Endpoints.GenerateResetToken.name(), Endpoints.GenerateResetToken);
 
-		
 		/**
 		 * Register all standard endpoints and request processors
 		 */
