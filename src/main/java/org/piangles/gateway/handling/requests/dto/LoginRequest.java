@@ -2,20 +2,27 @@ package org.piangles.gateway.handling.requests.dto;
 
 public final class LoginRequest
 {
-	private String loginId;
-	private String password; //@MaskedValue 
-	private String sessionId;
+	private String authenticationType; //Could be one of [Default,TokenBased,Google]
+	private String id; //Could be one of [emailId or phoneNumber, tokenId(Proprietary or from SSO Providers), userId]
+	private String password; 
+	private String sessionId; //When client app reconnects on disconnect this can be used in combo with userId
 	
-	public LoginRequest(String loginId, String password, String sessionId)
+	public LoginRequest(String authenticationType, String id, String password, String sessionId)
 	{
-		this.loginId = loginId;
+		this.authenticationType = authenticationType;
+		this.id = id;
 		this.password = password;
 		this.sessionId = sessionId;
 	}
 
-	public String getLoginId()
+	public String getAuthenticationType()
 	{
-		return loginId;
+		return authenticationType;
+	}
+	
+	public String getId()
+	{
+		return id;
 	}
 
 	public String getPassword()
@@ -31,6 +38,6 @@ public final class LoginRequest
 	@Override
 	public String toString()
 	{
-		return "LoginRequest [loginId=" + loginId + ", sessionId=" + sessionId + "]";
+		return "LoginRequest [authenticationType=" + authenticationType + ", id=" + id + ", sessionId=" + sessionId + "]";
 	}
 }

@@ -31,7 +31,7 @@ public final class SignUpRequestProcessor extends AbstractRequestProcessor<SignU
 		authResponse = authService.validatePasswordStrength(signupRequest.getPassword());
 		if (authResponse.isRequestSuccessful())
 		{
-			String userId = profileService.createProfile(new BasicUserProfile(signupRequest.getFirstName(), signupRequest.getLastName(), signupRequest.getEmailId()));
+			String userId = profileService.createProfile(new BasicUserProfile(signupRequest.getFirstName(), signupRequest.getLastName(), signupRequest.getEmailId(), signupRequest.getPhoneNo()));
 			
 			authResponse = authService.createAuthenticationEntry(userId, new Credential(signupRequest.getEmailId(), signupRequest.getPassword()));
 		

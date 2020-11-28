@@ -3,6 +3,7 @@ package org.piangles.gateway.handling.requests.processors;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.auth.AuthenticationResponse;
 import org.piangles.backbone.services.auth.AuthenticationService;
+import org.piangles.backbone.services.auth.AuthenticationType;
 import org.piangles.backbone.services.auth.Credential;
 import org.piangles.backbone.services.auth.FailureReason;
 import org.piangles.backbone.services.session.SessionDetails;
@@ -45,14 +46,15 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 	protected LoginResponse processRequest(ClientDetails clientDetails, Request request, LoginRequest loginRequest) throws Exception
 	{
 		LoginResponse loginResponse = null;
-		if (loginRequest.getLoginId() == null || (loginRequest.getPassword() == null && loginRequest.getSessionId() == null))
+		if (loginRequest.getId() == null || (loginRequest.getPassword() == null && loginRequest.getSessionId() == null))
 		{
 			throw new Exception("Invalid LoginRequest request, mandatory fields are absent.");
 		}
 
 		if (loginRequest.getPassword() != null) //Authenticate using login and password
 		{
-			AuthenticationResponse authResponse = authService.authenticate(new Credential(loginRequest.getLoginId(), loginRequest.getPassword()));
+			AuthenticationType type = AuthenticationType.valueOf(loginRequest.getAuthenticationType());
+			AuthenticationResponse authResponse = authService.authenticate(type, new Credential(loginRequest.getId(), loginRequest.getPassword()));
 			
 			if (authResponse.isAuthenticated())
 			{
@@ -66,10 +68,10 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 		}
 		else //Authenticate using login and sessionId
 		{
-			boolean isSessionValid = sessionMgmtService.isValid(loginRequest.getLoginId(), loginRequest.getSessionId());
+			boolean isSessionValid = sessionMgmtService.isValid(loginRequest.getId(), loginRequest.getSessionId());
 			if (isSessionValid)
 			{
-				loginResponse = new LoginResponse(loginRequest.getLoginId(), loginRequest.getSessionId(), false); 
+				loginResponse = new LoginResponse(loginRequest.getId(), loginRequest.getSessionId(), false); 
 			}
 			else
 			{
