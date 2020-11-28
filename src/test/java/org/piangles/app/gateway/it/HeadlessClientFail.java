@@ -29,7 +29,7 @@ public class HeadlessClientFail
 			
 			String sessionId = UUID.randomUUID().toString();
 			SystemInfo systemInfo = new SystemInfo("HeadlessClient", "12345");
-			LoginRequest loginRequest = new LoginRequest("saradhivs", "password", null);
+			LoginRequest loginRequest = new LoginRequest("Default", "saradhivs", "password", null);
 			String loginReqAsStr = new String(JSON.getEncoder().encode(loginRequest));
 			Request request = new Request(sessionId, systemInfo.cloneAndCopy("threadId-123"), "Dummy", loginReqAsStr);
 			

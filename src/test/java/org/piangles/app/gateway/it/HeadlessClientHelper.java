@@ -74,14 +74,14 @@ public class HeadlessClientHelper
 	
 	protected final void login() throws Exception
 	{
-		LoginRequest loginRequest = new LoginRequest("testuser@testmail.com", "password", null);
+		LoginRequest loginRequest = new LoginRequest("Default", "testuser@testmail.com", "password", null);
 
 		createRequestAndSend("Login", loginRequest);
 	}
 
 	protected final void loginWithSession() throws Exception
 	{
-		LoginRequest loginRequest = new LoginRequest("testuser@testmail.com", null, sessionId);
+		LoginRequest loginRequest = new LoginRequest("Default", "testuser@testmail.com", null, sessionId);
 
 		createRequestAndSend("Login", loginRequest);
 	}
