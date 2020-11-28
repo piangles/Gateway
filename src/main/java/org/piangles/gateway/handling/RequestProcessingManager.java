@@ -1,7 +1,6 @@
 package org.piangles.gateway.handling;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,10 +43,7 @@ public final class RequestProcessingManager
 
 	public RequestProcessingManager(InetSocketAddress remoteAddr, ClientEndpoint clientEndpoint)
 	{
-		preAuthenticationEndpoints = new HashMap<String, Endpoints>();
-		preAuthenticationEndpoints.put(Endpoints.SignUp.name(), Endpoints.SignUp);
-		preAuthenticationEndpoints.put(Endpoints.Login.name(), Endpoints.Login);
-		preAuthenticationEndpoints.put(Endpoints.GenerateResetToken.name(), Endpoints.GenerateResetToken);
+		preAuthenticationEndpoints = RequestRouter.getInstance().getPreAuthenticationEndpoints();
 
 		/*
 		 * UserId initially is the combination of the address and the port. But
@@ -190,21 +186,24 @@ public final class RequestProcessingManager
 									state = ClientState.PostAuthentication;
 								}
 
-								// Now create a new client details from the
-								// original one but with new SessionDetails.
-								// ClientDetails and SessionDetails are
-								// immutable. ClientDetails construction is only
-								// visible to this package for security reasons.
+								/**
+								 * Now create a new client details from the original one but 
+								 * with new SessionDetails. ClientDetails and SessionDetails are
+								 * immutable. ClientDetails construction is only visible to this 
+								 * package for security reasons. 
+								 */
 								clientDetails = new ClientDetails(clientDetails.getRemoteAddress(), clientDetails.getClientEndpoint(),
 										new SessionDetails(loginResponse.getUserId(), loginResponse.getSessionId()));
 
-								// Now that client is authenticated, create the
-								// MessageProcessingManager
+								/**
+								 * Now that client is authenticated, create the MessageProcessingManager
+								 */
 								logger.info("Creating EventProcessingManager for: " + clientDetails);
 								epm = new EventProcessingManager(clientDetails);
 							}
-							// Response for Login already goes through
-							// RequestProcessingThread
+							/**
+							 * Response for Login already goes through RequestProcessingThread
+							 */
 							response = null;
 						}
 						catch (Exception e)
