@@ -1,10 +1,14 @@
 package org.piangles.gateway.handling.requests.processors;
 
+import java.util.ArrayList;
+
+import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.auth.AuthenticationResponse;
 import org.piangles.backbone.services.auth.AuthenticationService;
 import org.piangles.backbone.services.auth.AuthenticationType;
 import org.piangles.backbone.services.auth.Credential;
+import org.piangles.backbone.services.auth.FailureReason;
 import org.piangles.backbone.services.profile.BasicUserProfile;
 import org.piangles.backbone.services.profile.UserProfileService;
 import org.piangles.gateway.handling.ClientDetails;
@@ -17,36 +21,49 @@ public final class SignUpRequestProcessor extends AbstractRequestProcessor<SignU
 {
 	private UserProfileService profileService = Locator.getInstance().getUserProfileService();
 	private AuthenticationService authService = Locator.getInstance().getAuthenticationService();
-	
+
 	public SignUpRequestProcessor()
 	{
 		super(Endpoints.SignUp.name(), false, SignUpRequest.class);
 	}
-	
+
 	@Override
 	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, SignUpRequest signupRequest) throws Exception
 	{
 		SimpleResponse response = null;
 		AuthenticationResponse authResponse = null;
-		
-		authResponse = authService.validatePasswordStrength(signupRequest.getPassword());
-		if (authResponse.isRequestSuccessful())
+
+		if (StringUtils.isBlank(signupRequest.getEmailId()) || StringUtils.isBlank(signupRequest.getPassword()))
 		{
-			String userId = profileService.createProfile(new BasicUserProfile(signupRequest.getFirstName(), signupRequest.getLastName(), signupRequest.getEmailId(), signupRequest.getPhoneNo()));
-			
-			authResponse = authService.createAuthenticationEntry(AuthenticationType.Default, userId, new Credential(signupRequest.getEmailId(), signupRequest.getPassword()));
-		
-			response = new SimpleResponse(authResponse.isRequestSuccessful());
+			throw new Exception("Invalid SignUp request, mandatory fields are absent.");
 		}
-		else
+
+		 if (signupRequest.getEmailId().equals(signupRequest.getPassword()))
+		 {
+			 authResponse = new AuthenticationResponse(FailureReason.PasswordDoesNotMeetStrength, new ArrayList<String>());
+			 authResponse.getFailureMessages().add("LoginId and Password cannot be the same.");
+		 }
+		 else
 		{
-			StringBuffer sb = new StringBuffer();
-			authResponse.getFailureMessages().stream().map(msg -> sb.append(msg).append("\n"));
-			response = new SimpleResponse(false, sb.toString());
+			authResponse = authService.validatePasswordStrength(signupRequest.getPassword());
+			if (authResponse.isRequestSuccessful())
+			{
+				String userId = profileService.createProfile(new BasicUserProfile(signupRequest.getFirstName(), signupRequest.getLastName(), signupRequest.getEmailId(), signupRequest.getPhoneNo()));
+
+				authResponse = authService.createAuthenticationEntry(AuthenticationType.Default, userId, new Credential(signupRequest.getEmailId(), signupRequest.getPassword()));
+
+				response = new SimpleResponse(authResponse.isRequestSuccessful());
+			}
+			else
+			{
+				StringBuffer sb = new StringBuffer();
+				authResponse.getFailureMessages().stream().map(msg -> sb.append(msg).append("\n"));
+				response = new SimpleResponse(false, sb.toString());
+			}
 		}
 		return response;
 	}
-	
+
 	@Override
 	public boolean shouldValidateSession()
 	{
