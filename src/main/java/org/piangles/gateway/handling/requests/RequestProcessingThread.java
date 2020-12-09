@@ -88,7 +88,7 @@ public final class RequestProcessingThread extends Thread implements Traceable, 
 
 		try
 		{
-			if (validSession && response == null)
+			if ((!requestProcessor.shouldValidateSession() || validSession) && response == null)
 			{
 				//Finally the actual call to the RequestProcessor
 				response = requestProcessor.processRequest(clientDetails, request);

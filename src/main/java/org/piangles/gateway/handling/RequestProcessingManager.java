@@ -201,10 +201,6 @@ public final class RequestProcessingManager
 								logger.info("Creating EventProcessingManager for: " + clientDetails);
 								epm = new EventProcessingManager(clientDetails);
 							}
-							/**
-							 * Response for Login already goes through RequestProcessingThread
-							 */
-							response = null;
 						}
 						catch (Exception e)
 						{
@@ -212,6 +208,14 @@ public final class RequestProcessingManager
 							logger.error("InternalError-LoginResponse could not be decoded for client: " + clientDetails.getSessionDetails().getUserId(), e);
 							response = new Response(request.getTraceId(), request.getEndpoint(), false, "InternalError - LoginResponse could not be decoded.");
 						}
+					}
+					
+					if (response.isRequestSuccessful())
+					{
+						/**
+						 * Succesful Responses for Synchronous Requests already goes through RequestProcessingThread
+						 */
+						response = null;
 					}
 					break;
 				case MidAuthentication:
