@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.schema.JsonSchema;
-import org.piangles.gateway.handling.requests.dto.ChangePasswordRequest;
+import org.piangles.gateway.handling.requests.dto.Ping;
 
 public final class JsonSchemaGenerator
 {
@@ -16,7 +16,7 @@ public final class JsonSchemaGenerator
 
 	public static void main(String[] args) throws IOException
 	{
-		System.out.println(JsonSchemaGenerator.getJsonSchema(ChangePasswordRequest.class));
+		System.out.println(JsonSchemaGenerator.getJsonSchema(Ping.class));
 	}
 
 	public static String getJsonSchema(Class clazz) throws IOException

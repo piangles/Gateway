@@ -7,8 +7,8 @@ import org.piangles.gateway.handling.requests.RequestRouter;
 import org.piangles.gateway.handling.requests.dto.Request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsonSchema.factories.SchemaFactoryWrapper;
-import com.fasterxml.jackson.databind.jsonSchema.types.JsonSchema;
+import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
+import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 
 public final class EndpointSchemaRequestProcessor extends AbstractRequestProcessor<String, String>
 {
@@ -30,6 +30,10 @@ public final class EndpointSchemaRequestProcessor extends AbstractRequestProcess
 	        mapper.acceptJsonFormatVisitor(rp.getAppReqClass(), visitor);
 	        JsonSchema jsonSchema = visitor.finalSchema();
 	        schema = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonSchema);
+		}
+		else
+		{
+			schema = endpoint + " schema not found.";
 		}
 		
 		return schema;
