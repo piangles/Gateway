@@ -3,11 +3,11 @@ package org.piangles.app.gateway.it;
 import java.net.URI;
 
 import org.piangles.core.util.coding.JSON;
-import org.piangles.gateway.handling.requests.dto.LoginRequest;
-import org.piangles.gateway.handling.requests.dto.LoginResponse;
-import org.piangles.gateway.handling.requests.dto.Request;
-import org.piangles.gateway.handling.requests.dto.Response;
-import org.piangles.gateway.handling.requests.dto.SystemInfo;
+import org.piangles.gateway.requests.dto.LoginRequest;
+import org.piangles.gateway.requests.dto.LoginResponse;
+import org.piangles.gateway.requests.dto.Request;
+import org.piangles.gateway.requests.dto.Response;
+import org.piangles.gateway.requests.dto.SystemInfo;
 
 public class HeadlessClientHelper
 {

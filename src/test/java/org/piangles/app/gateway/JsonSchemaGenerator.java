@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.schema.JsonSchema;
-import org.piangles.gateway.handling.requests.dto.Ping;
+import org.piangles.gateway.requests.dto.Ping;
 
 public final class JsonSchemaGenerator
 {

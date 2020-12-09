@@ -4,9 +4,9 @@ import java.net.URI;
 import java.util.UUID;
 
 import org.piangles.core.util.coding.JSON;
-import org.piangles.gateway.handling.requests.dto.LoginRequest;
-import org.piangles.gateway.handling.requests.dto.Request;
-import org.piangles.gateway.handling.requests.dto.SystemInfo;
+import org.piangles.gateway.requests.dto.LoginRequest;
+import org.piangles.gateway.requests.dto.Request;
+import org.piangles.gateway.requests.dto.SystemInfo;
 
 public class HeadlessClientFail
 {

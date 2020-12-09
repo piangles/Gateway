@@ -2,7 +2,7 @@ package org.piangles.app.gateway;
 
 import java.io.IOException;
 
-import org.piangles.gateway.handling.requests.dto.Ping;
+import org.piangles.gateway.requests.dto.Ping;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;

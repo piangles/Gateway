@@ -10,7 +10,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.ClientEndpoint;
-import org.piangles.gateway.handling.RequestProcessingManager;
+import org.piangles.gateway.requests.RequestProcessingManager;
 
 @WebSocket
 public final class WebSocketLifecycleEventHandler

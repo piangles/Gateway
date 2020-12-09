@@ -3,7 +3,7 @@ package org.piangles.app.gateway;
 import java.util.UUID;
 
 import org.piangles.core.util.coding.JSON;
-import org.piangles.gateway.handling.requests.dto.Request;
+import org.piangles.gateway.requests.dto.Request;
 
 public class UUIDEncodeDecode
 {
