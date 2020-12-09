@@ -75,6 +75,12 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 	{
 		return endpoint;
 	}
+	
+	@Override
+	public final Class<?> getAppReqClass()
+	{
+		return requestClass;
+	}
 
 	@Override
 	public final boolean isAsyncProcessor()

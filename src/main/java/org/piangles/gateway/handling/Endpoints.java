@@ -2,6 +2,9 @@ package org.piangles.gateway.handling;
 
 public enum Endpoints
 {
+	ListEndpoints,
+	EndpointSchema,
+	
 	SignUp,
 	Login,
 	GenerateResetToken,

@@ -2,17 +2,20 @@ package org.piangles.gateway.handling.requests;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.gateway.handling.Endpoints;
 import org.piangles.gateway.handling.requests.processors.ChangePasswordRequestProcessor;
 import org.piangles.gateway.handling.requests.processors.CreateUserProfileRequestProcessor;
+import org.piangles.gateway.handling.requests.processors.EndpointSchemaRequestProcessor;
 import org.piangles.gateway.handling.requests.processors.GenerateTokenRequestProcessor;
 import org.piangles.gateway.handling.requests.processors.GetConfigRequestProcessor;
 import org.piangles.gateway.handling.requests.processors.GetUserPreferenceRequestProcessor;
 import org.piangles.gateway.handling.requests.processors.GetUserProfileRequestProcessor;
 import org.piangles.gateway.handling.requests.processors.KeepSessionAliveRequestProcessor;
+import org.piangles.gateway.handling.requests.processors.ListEndpointsRequestProcessor;
 import org.piangles.gateway.handling.requests.processors.LoginRequestProcessor;
 import org.piangles.gateway.handling.requests.processors.LogoutRequestProcessor;
 import org.piangles.gateway.handling.requests.processors.PingMessageProcessor;
@@ -36,6 +39,9 @@ public class RequestRouter
 		 * Register all preAuthenticationEndpoints
 		 */
 		preAuthenticationEndpoints = new HashMap<String, Endpoints>();
+		preAuthenticationEndpoints.put(Endpoints.ListEndpoints.name(), Endpoints.ListEndpoints);
+		preAuthenticationEndpoints.put(Endpoints.EndpointSchema.name(), Endpoints.EndpointSchema);
+		
 		preAuthenticationEndpoints.put(Endpoints.SignUp.name(), Endpoints.SignUp);
 		preAuthenticationEndpoints.put(Endpoints.Login.name(), Endpoints.Login);
 		preAuthenticationEndpoints.put(Endpoints.GenerateResetToken.name(), Endpoints.GenerateResetToken);
@@ -45,6 +51,9 @@ public class RequestRouter
 		 */
 		endpointRequestProcessorMap = new HashMap<String, RequestProcessor>();
 
+		registerRequestProcessor(new ListEndpointsRequestProcessor());
+		registerRequestProcessor(new EndpointSchemaRequestProcessor());
+		
 		registerRequestProcessor(new SignUpRequestProcessor());
 		registerRequestProcessor(new LoginRequestProcessor());
 		registerRequestProcessor(new GenerateTokenRequestProcessor());
@@ -88,10 +97,20 @@ public class RequestRouter
 	{
 		return preAuthenticationEndpoints;
 	}
+	
+	public Set<String> getRegisteredEndpoints()
+	{
+		return endpointRequestProcessorMap.keySet();
+	}
 
 	public RequestProcessor getRequestProcessor(String endpoint)
 	{
 		return endpointRequestProcessorMap.get(endpoint);
+	}
+	
+	public void clear()
+	{
+		endpointRequestProcessorMap.clear();
 	}
 
 	public void registerRequestProcessor(RequestProcessor rp)
