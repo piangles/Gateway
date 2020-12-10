@@ -138,12 +138,8 @@ public final class RequestProcessingManager
 		else if (!(state == ClientState.PreAuthentication && preAuthenticationEndpoints.containsKey(request.getEndpoint()))
 				&& (clientDetails.getSessionDetails() != null && !StringUtils.equals(clientDetails.getSessionDetails().getSessionId(), request.getSessionId())))
 		{
-			if (clientDetails.getSessionDetails() != null)
-				System.out.println("clientDetails.getSessionDetails::" + clientDetails.getSessionDetails().getSessionId() + "::Request" + request.getSessionId());
-			else
-				System.out.println("clientDetails.getSessionDetails is null");
 			String errorMessage = "SessionId between client and server does not match.";
-			logger.warn(errorMessage);
+			logger.warn(errorMessage + " SessionIds ClientDetails["+clientDetails.getSessionDetails().getSessionId()+"] Request[" + request.getSessionId() + "]");
 			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
 		}
 
@@ -166,6 +162,7 @@ public final class RequestProcessingManager
 				switch (state)
 				{
 				case PreAuthentication:
+					Response errResponse = null;
 					if (Endpoints.Login.name().equals(request.getEndpoint()) && response.isRequestSuccessful())
 					{
 						try
@@ -197,22 +194,21 @@ public final class RequestProcessingManager
 								logger.info("Creating EventProcessingManager for: " + clientDetails);
 								epm = new EventProcessingManager(clientDetails);
 							}
+							
+							/**
+							 * Responses for Synchronous Requests already goes through RequestProcessingThread
+							 */
+							response = null;
 						}
 						catch (Exception e)
 						{
 							// Probability is zero
 							logger.error("InternalError-LoginResponse could not be decoded for client: " + clientDetails.getSessionDetails().getUserId(), e);
-							response = new Response(request.getTraceId(), request.getEndpoint(), false, "InternalError - LoginResponse could not be decoded.");
+							errResponse = new Response(request.getTraceId(), request.getEndpoint(), false, "InternalError - LoginResponse could not be decoded.");
 						}
 					}
 					
-					if (response.isRequestSuccessful())
-					{
-						/**
-						 * Succesful Responses for Synchronous Requests already goes through RequestProcessingThread
-						 */
-						response = null;
-					}
+					response = errResponse;
 					break;
 				case MidAuthentication:
 					if (Endpoints.ChangePassword.name().equals(request.getEndpoint()) && response.isRequestSuccessful())
