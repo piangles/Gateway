@@ -52,9 +52,8 @@ public final class RequestProcessingThread extends Thread implements Traceable, 
 		 * without session validation for performance.
 		 * 
 		 */
-		if (Endpoints.Ping.name().equals(requestProcessor.getEndpoint()) || 
-				Endpoints.Login.name().equals(requestProcessor.getEndpoint())
-			)
+		
+		if (RequestRouter.getInstance().getPreAuthenticationEndpoints().containsKey(requestProcessor.getEndpoint()))
 		{
 			validSession = true;
 		}
@@ -71,29 +70,30 @@ public final class RequestProcessingThread extends Thread implements Traceable, 
 				{
 					sessionMgmtService.makeLastAccessedCurrent(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
 				}
+				else
+				{
+					response = new Response(request.getTraceId(), request.getEndpoint(), false, "Invalid sessionId.");
+				}
 			}
 			catch (SessionManagementException e)
 			{
 				logger.error("Unable to validate Session because of : " + e.getMessage(), e);
+				validSession = false;
 				response = new Response(request.getTraceId(), request.getEndpoint(), false, "Unable to validate Session because of : " + e.getMessage());
 			}
 		}
 		else if (clientDetails.getSessionDetails().getSessionId() != null)
 		{
-			String errorMessage = "RequestProcessor for endpoint " + requestProcessor.getEndpoint() + " has a sessionId but is coded for not validating session.";
-			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
+			validSession = true;
+			logger.warn("RequestProcessor for endpoint " + requestProcessor.getEndpoint() + " has a sessionId but is coded for not validating session.");
 		}
 
 		try
 		{
-			if ((!requestProcessor.shouldValidateSession() || validSession) && response == null)
+			if (validSession)
 			{
 				//Finally the actual call to the RequestProcessor
 				response = requestProcessor.processRequest(clientDetails, request);
-			}
-			else
-			{
-				response = new Response(request.getTraceId(), request.getEndpoint(), false, "Invalid sessionId.");
 			}
 		}
 		catch(Exception e)
