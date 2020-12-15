@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.piangles.core.util.reflect.TypeToken;
 import org.piangles.gateway.requests.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.RequestRouter;
@@ -16,7 +17,7 @@ public final class ListEndpointsRequestProcessor extends AbstractRequestProcesso
 	private Map<String, Endpoints> metadataEndpoints = null;
 	public ListEndpointsRequestProcessor()
 	{
-		super(Endpoints.ListEndpoints.name(), false, EmptyRequest.class, null);
+		super(Endpoints.ListEndpoints.name(), false, EmptyRequest.class, new TypeToken<List<String>>() {}.getActualClass());
 		
 		metadataEndpoints = new HashMap<>();
 		populate(Endpoints.ListEndpoints);

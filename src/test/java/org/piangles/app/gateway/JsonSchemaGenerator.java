@@ -1,10 +1,12 @@
 package org.piangles.app.gateway;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.schema.JsonSchema;
+import org.piangles.core.util.reflect.TypeToken;
 import org.piangles.gateway.requests.dto.Ping;
 
 public final class JsonSchemaGenerator
@@ -16,6 +18,8 @@ public final class JsonSchemaGenerator
 
 	public static void main(String[] args) throws IOException
 	{
+		System.out.println(JsonSchemaGenerator.getJsonSchema(new TypeToken<List<String>>(){}.getActualClass()));
+		
 		System.out.println(JsonSchemaGenerator.getJsonSchema(Ping.class));
 	}
 
@@ -27,5 +31,4 @@ public final class JsonSchemaGenerator
 		JsonSchema schema = mapper.generateJsonSchema(clazz);
 		return mapper.defaultPrettyPrintingWriter().writeValueAsString(schema);
 	}
-
 }

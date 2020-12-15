@@ -15,17 +15,17 @@ import org.piangles.gateway.requests.dto.SimpleResponse;
 public final class DefaultStreamRequestProcessor<AppReq, SI, SO> extends AbstractRequestProcessor<AppReq, SimpleResponse>
 {
 	private LoggingService logger = Locator.getInstance().getLoggingService();
-	private StreamRequestProcessor<AppReq, SI> srp = null;
+	private StreamCreator<AppReq, SI> srp = null;
 	private StreamProcessor<SI, SO> processor = null;
 
-	public DefaultStreamRequestProcessor(String endpoint, Class<AppReq> requestClass, StreamRequestProcessor<AppReq, SI> srp)
+	public DefaultStreamRequestProcessor(StreamCreator<AppReq, SI> srp)
 	{
-		this(endpoint, requestClass, srp, new PassThruStreamProcessor<SI, SO>());
+		this(srp, new PassThruStreamProcessor<SI, SO>());
 	}
 
-	public DefaultStreamRequestProcessor(String endpoint, Class<AppReq> requestClass, StreamRequestProcessor<AppReq, SI> srp, StreamProcessor<SI, SO> processor)
+	public DefaultStreamRequestProcessor(StreamCreator<AppReq, SI> srp, StreamProcessor<SI, SO> processor)
 	{
-		super(endpoint, requestClass, SimpleResponse.class);
+		super(srp.getEndpoint(), srp.getRequestClass(), SimpleResponse.class);
 		this.srp = srp;
 		this.processor = processor;
 	}
