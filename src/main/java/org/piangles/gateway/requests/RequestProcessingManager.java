@@ -115,7 +115,7 @@ public final class RequestProcessingManager
 		 */
 		if (response != null)
 		{
-			ResponseProcessor.processResponse(clientDetails, response);
+			ResponseSender.sendResponse(clientDetails, response);
 		}
 	}
 

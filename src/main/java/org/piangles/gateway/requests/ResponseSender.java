@@ -6,11 +6,11 @@ import org.piangles.gateway.Message;
 import org.piangles.gateway.MessageType;
 import org.piangles.gateway.requests.dto.Response;
 
-public class ResponseProcessor
+public final class ResponseSender
 {	
 	private static LoggingService logger = Locator.getInstance().getLoggingService();
 	
-	public static void processResponse(ClientDetails clientDetails, Response response)
+	public static void sendResponse(ClientDetails clientDetails, Response response)
 	{
 		if (response.isRequestSuccessful())
 		{

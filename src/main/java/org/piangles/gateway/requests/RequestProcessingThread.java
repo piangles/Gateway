@@ -1,20 +1,16 @@
 package org.piangles.gateway.requests;
 
-import java.util.UUID;
-
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.session.SessionManagementException;
 import org.piangles.backbone.services.session.SessionManagementService;
-import org.piangles.core.services.remoting.SessionAwareable;
-import org.piangles.core.services.remoting.SessionDetails;
-import org.piangles.core.services.remoting.Traceable;
+import org.piangles.core.services.remoting.AbstractContextAwareThread;
 import org.piangles.gateway.events.EventProcessingManager;
 import org.piangles.gateway.events.KafkaConsumerManager;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.Response;
 
-public final class RequestProcessingThread extends Thread implements Traceable, SessionAwareable
+public final class RequestProcessingThread extends AbstractContextAwareThread
 {
 	private ClientDetails clientDetails = null;
 	private Request request = null;
@@ -27,6 +23,8 @@ public final class RequestProcessingThread extends Thread implements Traceable, 
 	
 	public RequestProcessingThread(ClientDetails clientDetails, Request request, RequestProcessor requestProcessor, EventProcessingManager mpm)
 	{
+		super.init(clientDetails.getSessionDetails(), request.getTraceId());
+
 		this.clientDetails = clientDetails;
 		this.request = request;
 		this.requestProcessor = requestProcessor;
@@ -106,15 +104,9 @@ public final class RequestProcessingThread extends Thread implements Traceable, 
 			logger.error("Unhandled Exception while processing request because of : " + e.getMessage(), e);
 			response = new Response(getTraceId(), request.getEndpoint(), false, e.getMessage());
 		}
-		ResponseProcessor.processResponse(clientDetails, response);
+		ResponseSender.sendResponse(clientDetails, response);
 	}
 
-	@Override
-	public UUID getTraceId()
-	{
-		return request.getTraceId();
-	}
-	
 	public Response getResponse()
 	{
 		return response;
@@ -123,11 +115,5 @@ public final class RequestProcessingThread extends Thread implements Traceable, 
 	public EventProcessingManager getMessageProcessingManager()
 	{
 		return mpm;
-	}
-
-	@Override
-	public SessionDetails getSessionDetails()
-	{
-		return clientDetails.getSessionDetails();
 	}
 }
