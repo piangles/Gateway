@@ -16,7 +16,7 @@ public class SetUserPreferenceRequestProcessor extends AbstractRequestProcessor<
 	
 	public SetUserPreferenceRequestProcessor()
 	{
-		super(Endpoints.SetUserPreferences.name(), Map.class);
+		super(Endpoints.SetUserPreferences.name(), Map.class, SimpleResponse.class);
 	}
 	
 	@Override

@@ -14,7 +14,7 @@ public final class LogoutRequestProcessor extends AbstractRequestProcessor<Empty
 	
 	public LogoutRequestProcessor()
 	{
-		super(Endpoints.Logout.name(), EmptyRequest.class);
+		super(Endpoints.Logout.name(), EmptyRequest.class, SimpleResponse.class);
 	}
 	
 	@Override

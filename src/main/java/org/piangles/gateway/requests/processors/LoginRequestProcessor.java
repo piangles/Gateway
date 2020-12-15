@@ -21,7 +21,7 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 	
 	public LoginRequestProcessor()
 	{
-		super(Endpoints.Login.name(), false, LoginRequest.class);
+		super(Endpoints.Login.name(), false, LoginRequest.class, LoginResponse.class);
 	}
 	
 	/**

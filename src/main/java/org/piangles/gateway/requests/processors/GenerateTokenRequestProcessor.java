@@ -14,7 +14,7 @@ public final class GenerateTokenRequestProcessor extends AbstractRequestProcesso
 	
 	public GenerateTokenRequestProcessor()
 	{
-		super(Endpoints.GenerateResetToken.name(), false, GenerateTokenRequest.class);
+		super(Endpoints.GenerateResetToken.name(), false, GenerateTokenRequest.class, SimpleResponse.class);
 	}
 	
 	@Override

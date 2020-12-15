@@ -29,17 +29,19 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 	private String endpoint;
 	private boolean asyncProcessor;
 	private Class<AppReq> requestClass = null;
+	private Class<AppResp> responseClass = null;
 	
-	public AbstractRequestProcessor(String endpoint, Class<AppReq> requestClass)
+	public AbstractRequestProcessor(String endpoint, Class<AppReq> requestClass, Class<AppResp> responseClass)
 	{
-		this(endpoint, true, requestClass);
+		this(endpoint, true, requestClass, responseClass);
 	}
 
-	public AbstractRequestProcessor(String endpoint, boolean asyncHandler, Class<AppReq> requestClass)
+	public AbstractRequestProcessor(String endpoint, boolean asyncHandler, Class<AppReq> requestClass, Class<AppResp> responseClass)
 	{
 		this.endpoint = endpoint;
 		this.asyncProcessor = asyncHandler; 
 		this.requestClass = requestClass;
+		this.responseClass = responseClass;
 	}
 	
 	@Override
@@ -77,9 +79,15 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 	}
 	
 	@Override
-	public final Class<?> getAppReqClass()
+	public final Class<?> getRequestClass()
 	{
 		return requestClass;
+	}
+
+	@Override
+	public final Class<?> getResponseClass()
+	{
+		return responseClass;
 	}
 
 	@Override

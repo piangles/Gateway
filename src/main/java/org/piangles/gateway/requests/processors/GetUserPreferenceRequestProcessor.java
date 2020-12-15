@@ -1,8 +1,5 @@
 package org.piangles.gateway.requests.processors;
 
-import java.util.Map;
-import java.util.Properties;
-
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.prefs.UserPreference;
 import org.piangles.backbone.services.prefs.UserPreferenceService;
@@ -11,24 +8,18 @@ import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.EmptyRequest;
 import org.piangles.gateway.requests.dto.Request;
 
-public class GetUserPreferenceRequestProcessor extends AbstractRequestProcessor<EmptyRequest, Map<String, Object>>
+public class GetUserPreferenceRequestProcessor extends AbstractRequestProcessor<EmptyRequest, UserPreference>
 {
 	private UserPreferenceService upService = Locator.getInstance().getUserPreferenceService();
 	
 	public GetUserPreferenceRequestProcessor()
 	{
-		super(Endpoints.GetUserPreferences.name(), EmptyRequest.class);
+		super(Endpoints.GetUserPreferences.name(), EmptyRequest.class, UserPreference.class);
 	}
 	
 	@Override
-	protected Map<String, Object> processRequest(ClientDetails clientDetails, Request request, EmptyRequest emptyRequest) throws Exception
+	protected UserPreference processRequest(ClientDetails clientDetails, Request request, EmptyRequest emptyRequest) throws Exception
 	{
-		Map<String, Object> nvPair = null;
-		UserPreference prefs = upService.retrieveUserPreference(clientDetails.getSessionDetails().getUserId());
-		if (prefs != null)
-		{
-			nvPair = prefs.getNVPair();
-		}
-		return nvPair; 
+		return upService.retrieveUserPreference(clientDetails.getSessionDetails().getUserId()); 
 	}
 }

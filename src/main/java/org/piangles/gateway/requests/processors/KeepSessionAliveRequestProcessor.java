@@ -10,7 +10,7 @@ public final class KeepSessionAliveRequestProcessor extends AbstractRequestProce
 {
 	public KeepSessionAliveRequestProcessor()
 	{
-		super(Endpoints.KeepSessionAlive.name(), EmptyRequest.class);
+		super(Endpoints.KeepSessionAlive.name(), EmptyRequest.class, SimpleResponse.class);
 	}
 	
 	@Override

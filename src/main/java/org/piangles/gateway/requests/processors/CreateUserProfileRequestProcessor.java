@@ -14,7 +14,7 @@ public class CreateUserProfileRequestProcessor extends AbstractRequestProcessor<
 	
 	public CreateUserProfileRequestProcessor()
 	{
-		super(Endpoints.CreateUserProfile.name(), BasicUserProfile.class);
+		super(Endpoints.CreateUserProfile.name(), BasicUserProfile.class, SimpleResponse.class);
 	}
 
 	@Override

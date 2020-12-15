@@ -24,7 +24,7 @@ public final class SignUpRequestProcessor extends AbstractRequestProcessor<SignU
 
 	public SignUpRequestProcessor()
 	{
-		super(Endpoints.SignUp.name(), false, SignUpRequest.class);
+		super(Endpoints.SignUp.name(), false, SignUpRequest.class, SimpleResponse.class);
 	}
 
 	@Override
