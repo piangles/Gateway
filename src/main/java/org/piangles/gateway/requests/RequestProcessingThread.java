@@ -51,7 +51,7 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 		 * 
 		 */
 		
-		if (RequestRouter.getInstance().getPreAuthenticationEndpoints().containsKey(requestProcessor.getEndpoint()))
+		if (RequestRouter.getInstance().isPreAuthenticationEndpoint(requestProcessor.getEndpoint().name()))
 		{
 			validSession = true;
 		}

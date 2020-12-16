@@ -36,11 +36,11 @@ public final class RequestProcessingManager
 	private ClientState state = ClientState.PreAuthentication;
 	private ClientDetails clientDetails = null;
 	private EventProcessingManager epm = null;
-	private Map<String, Endpoints> preAuthenticationEndpoints = null;
+	//private Map<String, Endpoints> preAuthenticationEndpoints = null;
 
 	public RequestProcessingManager(InetSocketAddress remoteAddr, ClientEndpoint clientEndpoint)
 	{
-		preAuthenticationEndpoints = RequestRouter.getInstance().getPreAuthenticationEndpoints();
+		//preAuthenticationEndpoints = RequestRouter.getInstance().getPreAuthenticationEndpoints();
 
 		/*
 		 * UserId initially is the combination of the address and the port. But
@@ -123,7 +123,7 @@ public final class RequestProcessingManager
 	private Response processRequest(Request request, RequestProcessor requestProcessor)
 	{
 		Response response = null;
-		if (state == ClientState.PreAuthentication && !preAuthenticationEndpoints.containsKey(request.getEndpoint()))
+		if (state == ClientState.PreAuthentication && !RequestRouter.getInstance().isPreAuthenticationEndpoint(request.getEndpoint()))
 		{
 			String errorMessage = "This endpoint " + request.getEndpoint() + " requires authentication.";
 			logger.warn(errorMessage);
@@ -136,7 +136,7 @@ public final class RequestProcessingManager
 			logger.warn(errorMessage);
 			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
 		}
-		else if (!(state == ClientState.PreAuthentication && preAuthenticationEndpoints.containsKey(request.getEndpoint()))
+		else if (!(state == ClientState.PreAuthentication && RequestRouter.getInstance().isPreAuthenticationEndpoint(request.getEndpoint()))
 				&& (clientDetails.getSessionDetails() != null && !StringUtils.equals(clientDetails.getSessionDetails().getSessionId(), request.getSessionId())))
 		{
 			String errorMessage = "SessionId between client and server does not match.";

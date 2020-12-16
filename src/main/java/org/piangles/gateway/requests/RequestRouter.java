@@ -92,9 +92,9 @@ public class RequestRouter
 		return self;
 	}
 	
-	public Map<String, Endpoints> getPreAuthenticationEndpoints()
+	public boolean isPreAuthenticationEndpoint(String endpoint)
 	{
-		return preAuthenticationEndpoints;
+		return preAuthenticationEndpoints.containsKey(endpoint);
 	}
 	
 	public Set<String> getRegisteredEndpoints()
