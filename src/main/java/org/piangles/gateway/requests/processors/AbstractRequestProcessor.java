@@ -31,7 +31,6 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 	 */
 	private Enum<?> endpoint;
 	private CommunicationPattern communicationPattern;
-	private boolean asyncProcessor;
 	private Class<AppReq> requestClass = null;
 	private Class<AppResp> responseClass = null;
 	

@@ -13,9 +13,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 
-public final class EndpointSchemaRequestProcessor extends AbstractRequestProcessor<String, EndpointMetadata>
+public final class EndpointMetadataRequestProcessor extends AbstractRequestProcessor<String, EndpointMetadata>
 {
-	public EndpointSchemaRequestProcessor()
+	public EndpointMetadataRequestProcessor()
 	{
 		super(Endpoints.EndpointMetadata, CommunicationPattern.RequestResponse, String.class, EndpointMetadata.class);
 	}

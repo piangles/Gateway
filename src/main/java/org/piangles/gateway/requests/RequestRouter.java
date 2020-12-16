@@ -8,7 +8,7 @@ import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.gateway.requests.processors.ChangePasswordRequestProcessor;
 import org.piangles.gateway.requests.processors.CreateUserProfileRequestProcessor;
-import org.piangles.gateway.requests.processors.EndpointSchemaRequestProcessor;
+import org.piangles.gateway.requests.processors.EndpointMetadataRequestProcessor;
 import org.piangles.gateway.requests.processors.GenerateTokenRequestProcessor;
 import org.piangles.gateway.requests.processors.GetConfigRequestProcessor;
 import org.piangles.gateway.requests.processors.GetUserPreferenceRequestProcessor;
@@ -51,7 +51,7 @@ public class RequestRouter
 		endpointRequestProcessorMap = new HashMap<String, RequestProcessor>();
 
 		registerRequestProcessor(new ListEndpointsRequestProcessor());
-		registerRequestProcessor(new EndpointSchemaRequestProcessor());
+		registerRequestProcessor(new EndpointMetadataRequestProcessor());
 		
 		registerRequestProcessor(new SignUpRequestProcessor());
 		registerRequestProcessor(new LoginRequestProcessor());
@@ -80,7 +80,7 @@ public class RequestRouter
 	{
 		if (self == null)
 		{
-			synchronized (RequestProcessor.class)
+			synchronized (RequestRouter.class)
 			{
 				if (self == null)
 				{

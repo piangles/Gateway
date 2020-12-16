@@ -94,13 +94,14 @@ public class GatewayServiceImpl implements GatewayService
         wsfilter.addMapping(new ServletPathSpec("/api/"),new WebSocketCreatorImpl());
         
 		server.setHandler(defaultContext);
-		
-		server.start();
-		server.dump(System.err);
 	}
 
 	public void startProcessingRequests() throws Exception
 	{
+		System.out.println("GatewayService is being started...");
+		server.start();
+		server.dump(System.err);
+		System.out.println("GatewayService has started and is ready to process requests.");
 		server.join();
 	}
 

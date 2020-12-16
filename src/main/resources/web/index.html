@@ -2,12 +2,46 @@
 <html>
 <head>
 <title>API Metadata</title>
+<style>
+div {
+	margin-bottom: 10px;
+}
+
+textarea { vertical-align: top; }
+
+label {
+	display: inline-block;
+	width: 150px;
+	font-weight:bold;
+}
+</style>
 </head>
 <body>
 	<h1>API Metadata</h1>
 	<div id="content">
-		<label for="endpointList">Choose an Endpoint</label> <select id=endpointList onchange="getEndpointMetadata()"><option>Choose an
-				Endpoint</option></select>
+		<div>
+			<label for="endpointList">Choose an Endpoint</label> <select id=endpointList onchange="getEndpointMetadata()"><option>Choose an
+					Endpoint</option></select>
+		</div>
+		<div>
+			<label for=description>Description</label>
+			<textarea id=description readonly rows="2" cols="50"></textarea>
+		</div>
+		<div>
+			<label for=communication>Communication</label>
+			<textarea id=communication readonly rows="2" cols="100"></textarea>
+		</div>
+		<div>
+			<label for=validSessionRequired>ValidSession Needed</label> <input type="text" id=validSessionRequired readonly />
+		</div>
+		<div>
+			<label for=requestSchema>Request Schema</label>
+			<textarea id=requestSchema readonly rows="20" cols="75"></textarea>
+		</div>
+		<div>
+			<label for=responseSchema>Response Schema</label>
+			<textarea id=responseSchema readonly rows="20" cols="75"></textarea>
+		</div>
 	</div>
 
 	<script type="text/javascript">
@@ -89,8 +123,6 @@
 		   	{
 		    	appResponse = response.errorMessage;
 		   	}
-		    console.log("App Response:" + appResponse);
-
 		 
 		    if (response.endpoint == "ListEndpoints")
 		   	{
@@ -109,14 +141,22 @@
 		            el.value = opt;
 		            endpointList.appendChild(el);
 		        }
+		        getEndpointMetadata();
 		   	}
-		    else if (response.endpoint == "EndpointSchema")
+		    else if (response.endpoint == "EndpointMetadata")
 		   	{
-		    	var responseArea = document.getElementById("response");
-/* 		    	var xsdArea = document.getElementById("jsonXSD");
-		    	xsdArea.value = appResponse;
-		    	responseArea.value = "";
- */		   	}
+		    	var description = document.getElementById("description");
+		    	var communication = document.getElementById("communication");
+		    	var validSessionRequired = document.getElementById("validSessionRequired");
+		    	var requestSchema = document.getElementById("requestSchema");
+		    	var responseSchema = document.getElementById("responseSchema");
+		    	
+		    	description.value = (appResponse.description==null) ? "" : appResponse.description;
+		    	communication.value = appResponse.communicationPattern;
+		    	validSessionRequired.value = appResponse.validSessionNeeded ? "Yes" : "No";
+		    	requestSchema.value = appResponse.requestSchema;
+		    	responseSchema.value = appResponse.responseSchema;
+		   	}
 		};
 	</script>
 </body>
