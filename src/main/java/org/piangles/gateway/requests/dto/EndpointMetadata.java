@@ -3,16 +3,18 @@ package org.piangles.gateway.requests.dto;
 public final class EndpointMetadata
 {
 	private String endpoint;
-	private boolean synchronousProcessor;
-	private boolean sessionValidation;
+	private String description;
+	private String communicationPattern;
+	private boolean validSessionNeeded;
 	private String requestSchema;
-	private String responseSchema;
+	private String responseSchema; //TODO Would need Stream /Event details 
 	
-	public EndpointMetadata(String endpoint, boolean synchronousProcessor, boolean sessionValidation, String requestSchema, String responseSchema)
+	public EndpointMetadata(String endpoint, String description, String communicationPattern, boolean validSessionNeeded, String requestSchema, String responseSchema)
 	{
 		this.endpoint = endpoint;
-		this.synchronousProcessor = synchronousProcessor;
-		this.sessionValidation = sessionValidation;
+		this.description = description;
+		this.communicationPattern = communicationPattern;
+		this.validSessionNeeded = validSessionNeeded;
 		this.requestSchema = requestSchema;
 		this.responseSchema = responseSchema;
 	}
@@ -22,14 +24,19 @@ public final class EndpointMetadata
 		return endpoint;
 	}
 
-	public boolean isSynchronousProcessor()
+	public String getDescription()
 	{
-		return synchronousProcessor;
+		return description;
 	}
 
-	public boolean isSessionValidation()
+	public String getCommunicationPattern()
 	{
-		return sessionValidation;
+		return communicationPattern;
+	}
+
+	public boolean isValidSessionNeeded()
+	{
+		return validSessionNeeded;
 	}
 
 	public String getRequestSchema()

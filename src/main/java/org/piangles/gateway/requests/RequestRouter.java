@@ -39,7 +39,7 @@ public class RequestRouter
 		 */
 		preAuthenticationEndpoints = new HashMap<String, Endpoints>();
 		preAuthenticationEndpoints.put(Endpoints.ListEndpoints.name(), Endpoints.ListEndpoints);
-		preAuthenticationEndpoints.put(Endpoints.EndpointSchema.name(), Endpoints.EndpointSchema);
+		preAuthenticationEndpoints.put(Endpoints.EndpointMetadata.name(), Endpoints.EndpointMetadata);
 		
 		preAuthenticationEndpoints.put(Endpoints.SignUp.name(), Endpoints.SignUp);
 		preAuthenticationEndpoints.put(Endpoints.Login.name(), Endpoints.Login);
@@ -120,6 +120,6 @@ public class RequestRouter
 			logger.warn("Request Router already has a registered endpoint : " + rp.getEndpoint() + " : " + existingRP.getClass().getCanonicalName());
 			logger.warn("Overriding " + rp.getEndpoint() + " with : " + rp.getClass().getCanonicalName());
 		}
-		endpointRequestProcessorMap.put(rp.getEndpoint(), rp);
+		endpointRequestProcessorMap.put(rp.getEndpoint().name(), rp);
 	}
 }

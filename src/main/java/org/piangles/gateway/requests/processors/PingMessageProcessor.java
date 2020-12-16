@@ -10,7 +10,7 @@ public final class PingMessageProcessor extends AbstractRequestProcessor<Ping, P
 {
 	public PingMessageProcessor()
 	{
-		super(Endpoints.Ping.name(), Ping.class, Pong.class);
+		super(Endpoints.Ping, Ping.class, Pong.class);
 	}
 
 	@Override

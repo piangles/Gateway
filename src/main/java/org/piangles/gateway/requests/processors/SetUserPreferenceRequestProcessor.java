@@ -17,7 +17,7 @@ public class SetUserPreferenceRequestProcessor extends AbstractRequestProcessor<
 	
 	public SetUserPreferenceRequestProcessor()
 	{
-		super(Endpoints.SetUserPreferences.name(), new TypeToken<Map<String, Object>>() {}.getActualClass(), SimpleResponse.class);
+		super(Endpoints.SetUserPreferences, new TypeToken<Map<String, Object>>() {}.getActualClass(), SimpleResponse.class);
 	}
 	
 	@Override

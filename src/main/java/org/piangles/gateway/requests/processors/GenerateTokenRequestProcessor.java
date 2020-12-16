@@ -2,6 +2,7 @@ package org.piangles.gateway.requests.processors;
 
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.auth.AuthenticationService;
+import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.requests.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.GenerateTokenRequest;
@@ -14,7 +15,7 @@ public final class GenerateTokenRequestProcessor extends AbstractRequestProcesso
 	
 	public GenerateTokenRequestProcessor()
 	{
-		super(Endpoints.GenerateResetToken.name(), false, GenerateTokenRequest.class, SimpleResponse.class);
+		super(Endpoints.GenerateResetToken, CommunicationPattern.RequestResponse, GenerateTokenRequest.class, SimpleResponse.class);
 	}
 	
 	@Override

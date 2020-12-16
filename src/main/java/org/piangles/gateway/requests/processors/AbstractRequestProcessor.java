@@ -1,6 +1,7 @@
 package org.piangles.gateway.requests.processors;
 
 import org.piangles.core.util.coding.JSON;
+import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.events.EventProcessingManager;
 import org.piangles.gateway.requests.ClientDetails;
 import org.piangles.gateway.requests.RequestProcessingThread;
@@ -24,22 +25,25 @@ import org.piangles.gateway.requests.dto.Response;
  */
 public abstract class AbstractRequestProcessor<AppReq,AppResp> implements RequestProcessor  
 {
-	//There should not be any instance specific variables
-	//there will only one instance of the derived class per server
-	private String endpoint;
+	/**
+	 * There should not be any instance specific variables
+	 * there will only one instance of the derived class per server
+	 */
+	private Enum<?> endpoint;
+	private CommunicationPattern communicationPattern;
 	private boolean asyncProcessor;
 	private Class<AppReq> requestClass = null;
 	private Class<AppResp> responseClass = null;
 	
-	public AbstractRequestProcessor(String endpoint, Class<AppReq> requestClass, Class<AppResp> responseClass)
+	public AbstractRequestProcessor(Enum<?> endpoint, Class<AppReq> requestClass, Class<AppResp> responseClass)
 	{
-		this(endpoint, true, requestClass, responseClass);
+		this(endpoint, CommunicationPattern.RequestAsynchronousResponse, requestClass, responseClass);
 	}
 
-	public AbstractRequestProcessor(String endpoint, boolean asyncHandler, Class<AppReq> requestClass, Class<AppResp> responseClass)
+	public AbstractRequestProcessor(Enum<?> endpoint, CommunicationPattern communicationPattern, Class<AppReq> requestClass, Class<AppResp> responseClass)
 	{
 		this.endpoint = endpoint;
-		this.asyncProcessor = asyncHandler; 
+		this.communicationPattern = communicationPattern;
 		this.requestClass = requestClass;
 		this.responseClass = responseClass;
 	}
@@ -73,7 +77,7 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 	}
 	
 	@Override
-	public final String getEndpoint()
+	public final Enum<?> getEndpoint()
 	{
 		return endpoint;
 	}
@@ -91,11 +95,11 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 	}
 
 	@Override
-	public final boolean isAsyncProcessor()
+	public final CommunicationPattern getCommunicationPattern()
 	{
-		return asyncProcessor;
+		return communicationPattern;
 	}
-
+	
 	@Override
 	public boolean shouldValidateSession()
 	{

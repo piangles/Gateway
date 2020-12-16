@@ -16,7 +16,7 @@ public class GetUserPreferenceRequestProcessor extends AbstractRequestProcessor<
 	
 	public GetUserPreferenceRequestProcessor()
 	{
-		super(Endpoints.GetUserPreferences.name(), EmptyRequest.class, new TypeToken<Map<String, Object>>() {}.getActualClass());
+		super(Endpoints.GetUserPreferences, EmptyRequest.class, new TypeToken<Map<String, Object>>() {}.getActualClass());
 	}
 	
 	@Override

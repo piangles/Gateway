@@ -13,7 +13,7 @@ public class GetConfigRequestProcessor extends AbstractRequestProcessor<String, 
 	
 	public GetConfigRequestProcessor()
 	{
-		super(Endpoints.GetConfiguration.name(), String.class, Configuration.class);
+		super(Endpoints.GetConfiguration, String.class, Configuration.class);
 	}
 	
 	@Override

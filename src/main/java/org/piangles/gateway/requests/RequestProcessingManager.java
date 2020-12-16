@@ -9,6 +9,7 @@ import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.ClientEndpoint;
+import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.events.EventProcessingManager;
 import org.piangles.gateway.requests.dto.LoginResponse;
 import org.piangles.gateway.requests.dto.Request;
@@ -145,11 +146,11 @@ public final class RequestProcessingManager
 
 		// Step 4 : Process the request only if the above conditions have not
 		// passed
-		if (response == null && requestProcessor.isAsyncProcessor())
+		if (response == null && isAsyncProcessor(requestProcessor))
 		{
 			processRequestASynchronously(request);
 		}
-		else if (response == null && !requestProcessor.isAsyncProcessor())
+		else if (response == null && !isAsyncProcessor(requestProcessor))
 		{
 			//Request will be processed synchronously
 			try
@@ -254,6 +255,11 @@ public final class RequestProcessingManager
 		return response;
 	}
 	
+	private boolean isAsyncProcessor(RequestProcessor requestProcessor)
+	{
+		return !CommunicationPattern.RequestResponse.equals(requestProcessor.getCommunicationPattern());
+	}
+
 	private Response processRequestSynchronously(Request request) throws Exception
 	{
 		RequestProcessingThread reqProcThread = processRequestASynchronously(request);

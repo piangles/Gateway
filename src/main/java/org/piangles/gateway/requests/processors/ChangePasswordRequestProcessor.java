@@ -15,7 +15,7 @@ public class ChangePasswordRequestProcessor extends AbstractRequestProcessor<Cha
 	
 	public ChangePasswordRequestProcessor()
 	{
-		super(Endpoints.ChangePassword.name(), ChangePasswordRequest.class, SimpleResponse.class);
+		super(Endpoints.ChangePassword, ChangePasswordRequest.class, SimpleResponse.class);
 	}
 	
 	@Override

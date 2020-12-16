@@ -2,6 +2,7 @@ package org.piangles.gateway.requests.processors;
 
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.session.SessionManagementService;
+import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.requests.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.EmptyRequest;
@@ -14,7 +15,7 @@ public final class LogoutRequestProcessor extends AbstractRequestProcessor<Empty
 	
 	public LogoutRequestProcessor()
 	{
-		super(Endpoints.Logout.name(), EmptyRequest.class, SimpleResponse.class);
+		super(Endpoints.Logout, CommunicationPattern.RequestResponse, EmptyRequest.class, SimpleResponse.class);
 	}
 	
 	@Override

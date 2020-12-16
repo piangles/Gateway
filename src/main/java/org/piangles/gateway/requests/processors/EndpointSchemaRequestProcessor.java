@@ -1,5 +1,7 @@
 package org.piangles.gateway.requests.processors;
 
+import org.piangles.core.annotation.Description;
+import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.requests.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.RequestProcessor;
@@ -15,7 +17,7 @@ public final class EndpointSchemaRequestProcessor extends AbstractRequestProcess
 {
 	public EndpointSchemaRequestProcessor()
 	{
-		super(Endpoints.EndpointSchema.name(), false, String.class, EndpointMetadata.class);
+		super(Endpoints.EndpointMetadata, CommunicationPattern.RequestResponse, String.class, EndpointMetadata.class);
 	}
 	
 	@Override
@@ -26,10 +28,19 @@ public final class EndpointSchemaRequestProcessor extends AbstractRequestProcess
 		
 		if (rp != null)
 		{
+			Enum<?> enm = rp.getEndpoint();
+			Description desc = enm.getClass().getField(enm.name()).getAnnotation(Description.class);
+			String description = null;
+			if (desc != null)
+			{
+				description = desc.content();
+			}
+			
 			metadata = new EndpointMetadata(
 					endpoint, 
-					rp.isAsyncProcessor(), 
-					rp.shouldValidateSession(), 
+					description,
+					rp.getCommunicationPattern().name() + " : " + rp.getCommunicationPattern().description(),
+					rp.shouldValidateSession(),
 					getSchema(rp.getRequestClass()), 
 					getSchema(rp.getResponseClass())); 
 		}

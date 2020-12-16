@@ -8,6 +8,7 @@ import org.piangles.backbone.services.auth.Credential;
 import org.piangles.backbone.services.auth.FailureReason;
 import org.piangles.backbone.services.session.SessionDetails;
 import org.piangles.backbone.services.session.SessionManagementService;
+import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.requests.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.LoginRequest;
@@ -21,7 +22,7 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 	
 	public LoginRequestProcessor()
 	{
-		super(Endpoints.Login.name(), false, LoginRequest.class, LoginResponse.class);
+		super(Endpoints.Login, CommunicationPattern.RequestResponse, LoginRequest.class, LoginResponse.class);
 	}
 	
 	/**

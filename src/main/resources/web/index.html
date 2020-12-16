@@ -6,22 +6,29 @@
 <body>
 	<h1>API Metadata</h1>
 	<div id="content">
-		<label for="endpointList">Choose an Endpoint</label> <select id=endpointList onchange="getEndpointSchema()"><option>Choose an
+		<label for="endpointList">Choose an Endpoint</label> <select id=endpointList onchange="getEndpointMetadata()"><option>Choose an
 				Endpoint</option></select>
 	</div>
 
 	<script type="text/javascript">
-	class Request {
-		constructor(sessionId, endPoint, appRequestAsString) {
-			this.createdTime = 'Oct 12, 2020 4:46:33 PM';//new Date(); Wed Dec 09 2020 07:45:47 GMT-0500 (Eastern Standard Time)
-			this.traceId = CreateUUID();
+		var SESSION_ID = "";
+		var currentLocation = window.location;
+		var url = "ws://" + currentLocation.hostname + ":" + currentLocation.port + "/api/";
+		var ws = new WebSocket(url);
 
-			this.sessionId = sessionId;
-			
-			this.endPoint = endPoint;
-			this.appRequestAsString = appRequestAsString;
-		}
-	}	
+		console.log("Websocket : " + url)
+
+		class Request {
+			constructor(sessionId, endPoint, appRequestAsString) {
+				this.createdTime = 'Oct 12, 2020 4:46:33 PM';//new Date(); Wed Dec 09 2020 07:45:47 GMT-0500 (Eastern Standard Time)
+				this.traceId = CreateUUID();
+	
+				this.sessionId = sessionId;
+				
+				this.endPoint = endPoint;
+				this.appRequestAsString = appRequestAsString;
+			}
+		}	
 	
 		function CreateUUID() {
 			return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -44,5 +51,72 @@
 
 			sendRequest(endpointList.value, reqArea.value);
 		}
+		
+		function getEndpointMetadata(){
+			var endpointList = document.getElementById("endpointList");
+			console.log("Sending request for Metadata for: " + endpointList.value);
+			
+			sendRequest("EndpointMetadata", endpointList.value);
+		}
+		
+		this.ws.onopen = (e) => {
+			if (e.target.readyState !== WebSocket.OPEN) return;
+
+			sendRequest("ListEndpoints", "{}");
+		}
+
+		this.ws.onmessage = function(msgevent) {
+		    var message = JSON.parse(msgevent.data);
+		    
+/* 		    if (message.messageType == "Event"){
+		    	var event = JSON.parse(message.payload);
+		     	var streamingArea = document.getElementById("streaming");
+		    	streamingArea.value = event + "\n\n--------------------------------\n\n" + streamingArea.value;
+		    	return;
+		    }
+ */		    //It is a Response
+		    console.log("Raw Response:" + message.payload);
+
+		    var response = JSON.parse(message.payload);
+		    console.log("Received Response for endpoint :" + response.endpoint);
+		    
+		    var appResponse;
+		    if (response.requestSuccessful)
+		   	{
+		    	appResponse = JSON.parse(response.appResponseAsString);
+		   	}
+		    else
+		   	{
+		    	appResponse = response.errorMessage;
+		   	}
+		    console.log("App Response:" + appResponse);
+
+		 
+		    if (response.endpoint == "ListEndpoints")
+		   	{
+		        var endpointList = document.getElementById("endpointList");
+		        
+		        var length = endpointList.options.length;
+		        for (i = length-1; i >= 0; i--) {
+		        	endpointList.options[i] = null;
+		        }
+		        
+		        appResponse.sort();
+		        for(var i = 0; i < appResponse.length; i++) {
+		            var opt = appResponse[i];
+		            var el = document.createElement("option");
+		            el.textContent = opt;
+		            el.value = opt;
+		            endpointList.appendChild(el);
+		        }
+		   	}
+		    else if (response.endpoint == "EndpointSchema")
+		   	{
+		    	var responseArea = document.getElementById("response");
+/* 		    	var xsdArea = document.getElementById("jsonXSD");
+		    	xsdArea.value = appResponse;
+		    	responseArea.value = "";
+ */		   	}
+		};
 	</script>
 </body>

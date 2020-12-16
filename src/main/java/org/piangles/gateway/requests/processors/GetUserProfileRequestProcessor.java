@@ -14,7 +14,7 @@ public class GetUserProfileRequestProcessor extends AbstractRequestProcessor<Emp
 	
 	public GetUserProfileRequestProcessor()
 	{
-		super(Endpoints.GetUserProfile.name(), EmptyRequest.class, BasicUserProfile.class);
+		super(Endpoints.GetUserProfile, EmptyRequest.class, BasicUserProfile.class);
 	}
 	
 	@Override

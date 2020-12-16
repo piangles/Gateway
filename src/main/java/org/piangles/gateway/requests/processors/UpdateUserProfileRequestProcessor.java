@@ -14,7 +14,7 @@ public class UpdateUserProfileRequestProcessor extends AbstractRequestProcessor<
 	
 	public UpdateUserProfileRequestProcessor()
 	{
-		super(Endpoints.UpdateUserProfile.name(), BasicUserProfile.class, SimpleResponse.class);
+		super(Endpoints.UpdateUserProfile, BasicUserProfile.class, SimpleResponse.class);
 	}
 
 	@Override
