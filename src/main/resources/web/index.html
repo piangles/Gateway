@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>API Metadata</title>
+</head>
+<body>
+	<h1>API Metadata</h1>
+	<div id="content">
+		<label for="endpointList">Choose an Endpoint</label> <select id=endpointList onchange="getEndpointSchema()"><option>Choose an
+				Endpoint</option></select>
+	</div>
+
+	<script type="text/javascript">
+	class Request {
+		constructor(sessionId, endPoint, appRequestAsString) {
+			this.createdTime = 'Oct 12, 2020 4:46:33 PM';//new Date(); Wed Dec 09 2020 07:45:47 GMT-0500 (Eastern Standard Time)
+			this.traceId = CreateUUID();
+
+			this.sessionId = sessionId;
+			
+			this.endPoint = endPoint;
+			this.appRequestAsString = appRequestAsString;
+		}
+	}	
+	
+		function CreateUUID() {
+			return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+				var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+				return v.toString(16);
+			});
+		}
+
+		function sendRequest(endpoint, appRequest) {
+			let
+			request = new Request(SESSION_ID, endpoint, appRequest);
+			console.log("Sending Request : " + JSON.stringify(request));
+
+			ws.send(JSON.stringify(request));
+		}
+
+		function submitEndpointRequest() {
+			var endpointList = document.getElementById("endpointList");
+			var reqArea = document.getElementById("request")
+
+			sendRequest(endpointList.value, reqArea.value);
+		}
+	</script>
+</body>
