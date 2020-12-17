@@ -1,5 +1,7 @@
 package org.piangles.gateway.requests.processors;
 
+import java.util.Optional;
+
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.core.stream.PassThruStreamProcessor;
@@ -38,9 +40,17 @@ public final class DefaultStreamRequestProcessor<AppReq, SI, SO> extends Abstrac
 		stream.processAsync((payload) -> {
 			try
 			{
-				SO output = processor.process(payload);
+				Optional<SO> output = processor.process(payload);
 
-				String appResponseAsStr = new String(JSON.getEncoder().encode(output));
+				String appResponseAsStr = null;
+				if (output.isPresent())
+				{
+					appResponseAsStr = new String(JSON.getEncoder().encode(output.get()));
+				}
+				else
+				{
+					logger.info("Reached EndOfStream for Request : " + request.getTraceId().toString());
+				}
 				
 				Response response = new Response(request.getTraceId(), request.getEndpoint(), true, appResponseAsStr);
 				ResponseSender.sendResponse(clientDetails, response);
