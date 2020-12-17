@@ -18,7 +18,7 @@ import org.piangles.gateway.requests.processors.ListEndpointsRequestProcessor;
 import org.piangles.gateway.requests.processors.LoginRequestProcessor;
 import org.piangles.gateway.requests.processors.LogoutRequestProcessor;
 import org.piangles.gateway.requests.processors.PingMessageProcessor;
-import org.piangles.gateway.requests.processors.SetUserPreferenceRequestProcessor;
+import org.piangles.gateway.requests.processors.UpdateUserPreferenceRequestProcessor;
 import org.piangles.gateway.requests.processors.SignUpRequestProcessor;
 import org.piangles.gateway.requests.processors.SubscribeRequestProcessor;
 import org.piangles.gateway.requests.processors.UpdateUserProfileRequestProcessor;
@@ -71,7 +71,7 @@ public class RequestRouter
 		registerRequestProcessor(new GetConfigRequestProcessor());
 
 		registerRequestProcessor(new GetUserPreferenceRequestProcessor());
-		registerRequestProcessor(new SetUserPreferenceRequestProcessor());
+		registerRequestProcessor(new UpdateUserPreferenceRequestProcessor());
 		
 		registerRequestProcessor(new SubscribeRequestProcessor());
 	}

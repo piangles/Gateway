@@ -11,13 +11,13 @@ import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.SimpleResponse;
 
-public class SetUserPreferenceRequestProcessor extends AbstractRequestProcessor<Map<String, Object>, SimpleResponse>
+public class UpdateUserPreferenceRequestProcessor extends AbstractRequestProcessor<Map<String, Object>, SimpleResponse>
 {
 	private UserPreferenceService upService = Locator.getInstance().getUserPreferenceService();
 	
-	public SetUserPreferenceRequestProcessor()
+	public UpdateUserPreferenceRequestProcessor()
 	{
-		super(Endpoints.SetUserPreferences, new TypeToken<Map<String, Object>>() {}.getActualClass(), SimpleResponse.class);
+		super(Endpoints.UpdateUserPreferences, new TypeToken<Map<String, Object>>() {}.getActualClass(), SimpleResponse.class);
 	}
 	
 	@Override
