@@ -114,7 +114,7 @@ public class RequestRouter
 
 	public void registerRequestProcessor(RequestProcessor rp)
 	{
-		RequestProcessor existingRP = endpointRequestProcessorMap.get(rp.getEndpoint()); 
+		RequestProcessor existingRP = endpointRequestProcessorMap.get(rp.getEndpoint().name()); 
 		if (existingRP != null)
 		{
 			logger.warn("Request Router already has a registered endpoint : " + rp.getEndpoint() + " : " + existingRP.getClass().getCanonicalName());
