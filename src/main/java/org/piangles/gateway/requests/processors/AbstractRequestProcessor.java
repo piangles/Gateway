@@ -25,6 +25,7 @@ import org.piangles.gateway.requests.dto.Response;
  */
 public abstract class AbstractRequestProcessor<AppReq,AppResp> implements RequestProcessor  
 {
+	private static final String EMPTY_APP_REQUEST_ERR = "App Request cannot be null for this endpoint.";
 	/**
 	 * There should not be any instance specific variables
 	 * there will only one instance of the derived class per server
@@ -68,11 +69,22 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 //			response = new Response(request.getTraceId(), request.getEndpoint(), false, "Request failed validation because of : " + e.getMessage());
 //		}
 
-		AppResp appResponse = processRequest(clientDetails, request, appRequest);
+		Response response = null;
+		if (!EmptyRequest.class.equals(requestClass) && appRequest == null)
+		{
+			response = new Response(request.getTraceId(), request.getEndpoint(), false, EMPTY_APP_REQUEST_ERR);
+		}
+		else
+		{
+			AppResp appResponse = processRequest(clientDetails, request, appRequest);
+
+			//appResponse cannot be null
+			String appResponseAsStr = new String(JSON.getEncoder().encode(appResponse));
+
+			response = new Response(request.getTraceId(), request.getEndpoint(), true, appResponseAsStr);
+		}
 		
-		String appResponseAsStr = new String(JSON.getEncoder().encode(appResponse));
-		
-		return new Response(request.getTraceId(), request.getEndpoint(), true, appResponseAsStr);
+		return response;
 	}
 	
 	@Override
