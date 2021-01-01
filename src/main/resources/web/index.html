@@ -7,7 +7,7 @@ div {
 	margin-bottom: 10px;
 }
 
-textarea { vertical-align: top; }
+textarea { vertical-align: top; resize:none;}
 
 label {
 	display: inline-block;
@@ -16,12 +16,16 @@ label {
 }
 </style>
 </head>
-<body>
+<body onload="onLoad();">
 	<h1>API Metadata</h1>
 	<div id="content">
 		<div>
 			<label for="endpointList">Choose an Endpoint</label> <select id=endpointList onchange="getEndpointMetadata()"><option>Choose an
 					Endpoint</option></select>
+		</div>
+		<div>
+			<label for=requestStatus>Request Status</label>
+			<textarea id=requestStatus readonly rows="1" cols="75"></textarea>
 		</div>
 		<div>
 			<label for=description>Description</label>
@@ -47,9 +51,17 @@ label {
 	<script type="text/javascript">
 		var SESSION_ID = "";
 		var currentLocation = window.location;
+
+		var endpointList;
+		var requestStatus;
+		var description;
+    	var communication;
+    	var validSessionRequired;
+    	var requestSchema;
+    	var responseSchema;
+
 		var url = "ws://" + currentLocation.hostname + ":" + currentLocation.port + "/api/";
 		var ws = new WebSocket(url);
-
 		console.log("Websocket : " + url)
 
 		class Request {
@@ -64,6 +76,24 @@ label {
 			}
 		}	
 	
+		function onLoad() {
+			endpointList = document.getElementById("endpointList");
+			requestStatus = document.getElementById("requestStatus");
+	    	description = document.getElementById("description");
+	    	communication = document.getElementById("communication");
+	    	validSessionRequired = document.getElementById("validSessionRequired");
+	    	requestSchema = document.getElementById("requestSchema");
+	    	responseSchema = document.getElementById("responseSchema");
+		}
+		
+		function clear() {
+	    	description.value = "";
+	    	communication.value = "";
+	    	validSessionRequired.value = "";
+	    	requestSchema.value = "";
+	    	responseSchema.value = "";
+		}
+		
 		function CreateUUID() {
 			return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
 				var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -79,15 +109,7 @@ label {
 			ws.send(JSON.stringify(request));
 		}
 
-		function submitEndpointRequest() {
-			var endpointList = document.getElementById("endpointList");
-			var reqArea = document.getElementById("request")
-
-			sendRequest(endpointList.value, reqArea.value);
-		}
-		
 		function getEndpointMetadata(){
-			var endpointList = document.getElementById("endpointList");
 			console.log("Sending request for Metadata for: " + endpointList.value);
 			
 			sendRequest("EndpointMetadata", endpointList.value);
@@ -95,8 +117,12 @@ label {
 		
 		this.ws.onopen = (e) => {
 			if (e.target.readyState !== WebSocket.OPEN) return;
-
 			sendRequest("ListEndpoints", "{}");
+		}
+		
+		this.ws.onclose = (e) => {
+			requestStatus.value = "*** Websocket to Server is CLOSED. ***"
+			clear();
 		}
 
 		this.ws.onmessage = function(msgevent) {
@@ -117,45 +143,40 @@ label {
 		    var appResponse;
 		    if (response.requestSuccessful)
 		   	{
+		    	requestStatus.value = "Request for endpoint : " + response.endpoint + " was successful.";
+		    	
 		    	appResponse = JSON.parse(response.appResponseAsString);
+		    	
+			    if (response.endpoint == "ListEndpoints")
+			   	{
+			        var length = endpointList.options.length;
+			        for (i = length-1; i >= 0; i--) {
+			        	endpointList.options[i] = null;
+			        }
+			        
+			        appResponse.sort();
+			        for(var i = 0; i < appResponse.length; i++) {
+			            var opt = appResponse[i];
+			            var el = document.createElement("option");
+			            el.textContent = opt;
+			            el.value = opt;
+			            endpointList.appendChild(el);
+			        }
+			        getEndpointMetadata();
+			   	}
+			    else if (response.endpoint == "EndpointMetadata")
+			   	{
+			    	description.value = (appResponse.description==null) ? "" : appResponse.description;
+			    	communication.value = appResponse.communicationPattern;
+			    	validSessionRequired.value = appResponse.validSessionNeeded ? "Yes" : "No";
+			    	requestSchema.value = appResponse.requestSchema;
+			    	responseSchema.value = appResponse.responseSchema;
+			   	}
 		   	}
 		    else
 		   	{
-		    	appResponse = response.errorMessage;
-		   	}
-		 
-		    if (response.endpoint == "ListEndpoints")
-		   	{
-		        var endpointList = document.getElementById("endpointList");
-		        
-		        var length = endpointList.options.length;
-		        for (i = length-1; i >= 0; i--) {
-		        	endpointList.options[i] = null;
-		        }
-		        
-		        appResponse.sort();
-		        for(var i = 0; i < appResponse.length; i++) {
-		            var opt = appResponse[i];
-		            var el = document.createElement("option");
-		            el.textContent = opt;
-		            el.value = opt;
-		            endpointList.appendChild(el);
-		        }
-		        getEndpointMetadata();
-		   	}
-		    else if (response.endpoint == "EndpointMetadata")
-		   	{
-		    	var description = document.getElementById("description");
-		    	var communication = document.getElementById("communication");
-		    	var validSessionRequired = document.getElementById("validSessionRequired");
-		    	var requestSchema = document.getElementById("requestSchema");
-		    	var responseSchema = document.getElementById("responseSchema");
-		    	
-		    	description.value = (appResponse.description==null) ? "" : appResponse.description;
-		    	communication.value = appResponse.communicationPattern;
-		    	validSessionRequired.value = appResponse.validSessionNeeded ? "Yes" : "No";
-		    	requestSchema.value = appResponse.requestSchema;
-		    	responseSchema.value = appResponse.responseSchema;
+		    	requestStatus.value = "Request for endpoint : " + response.endpoint + " was not successful. Because of " + response.errorMessage;
+		    	clear();
 		   	}
 		};
 	</script>

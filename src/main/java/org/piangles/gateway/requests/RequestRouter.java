@@ -50,30 +50,30 @@ public class RequestRouter
 		 */
 		endpointRequestProcessorMap = new HashMap<String, RequestProcessor>();
 
-		registerRequestProcessor(new ListEndpointsRequestProcessor());
-		registerRequestProcessor(new EndpointMetadataRequestProcessor());
+		registerRequestProcessor(createRequestProcessor(ListEndpointsRequestProcessor.class));
+		registerRequestProcessor(createRequestProcessor(EndpointMetadataRequestProcessor.class));
 		
-		registerRequestProcessor(new SignUpRequestProcessor());
-		registerRequestProcessor(new LoginRequestProcessor());
-		registerRequestProcessor(new GenerateTokenRequestProcessor());
+		registerRequestProcessor(createRequestProcessor(SignUpRequestProcessor.class));
+		registerRequestProcessor(createRequestProcessor(LoginRequestProcessor.class));
+		registerRequestProcessor(createRequestProcessor(GenerateTokenRequestProcessor.class));
 		
-		registerRequestProcessor(new ChangePasswordRequestProcessor());
-		registerRequestProcessor(new LogoutRequestProcessor());
+		registerRequestProcessor(createRequestProcessor(ChangePasswordRequestProcessor.class));
+		registerRequestProcessor(createRequestProcessor(LogoutRequestProcessor.class));
 		
-		registerRequestProcessor(new PingMessageProcessor());
-		registerRequestProcessor(new KeepSessionAliveRequestProcessor());
+		registerRequestProcessor(createRequestProcessor(PingMessageProcessor.class));
+		registerRequestProcessor(createRequestProcessor(KeepSessionAliveRequestProcessor.class));
 
-		registerRequestProcessor(new CreateUserProfileRequestProcessor());
-		registerRequestProcessor(new UpdateUserProfileRequestProcessor());
-		registerRequestProcessor(new GetUserProfileRequestProcessor());
+		registerRequestProcessor(createRequestProcessor(CreateUserProfileRequestProcessor.class));
+		registerRequestProcessor(createRequestProcessor(UpdateUserProfileRequestProcessor.class));
+		registerRequestProcessor(createRequestProcessor(GetUserProfileRequestProcessor.class));
 		
 		
-		registerRequestProcessor(new GetConfigRequestProcessor());
+		registerRequestProcessor(createRequestProcessor(GetConfigRequestProcessor.class));
 
-		registerRequestProcessor(new GetUserPreferenceRequestProcessor());
-		registerRequestProcessor(new UpdateUserPreferenceRequestProcessor());
+		registerRequestProcessor(createRequestProcessor(GetUserPreferenceRequestProcessor.class));
+		registerRequestProcessor(createRequestProcessor(UpdateUserPreferenceRequestProcessor.class));
 		
-		registerRequestProcessor(new SubscribeRequestProcessor());
+		registerRequestProcessor(createRequestProcessor(SubscribeRequestProcessor.class));
 	}
 
 	public static RequestRouter getInstance()
@@ -114,12 +114,31 @@ public class RequestRouter
 
 	public void registerRequestProcessor(RequestProcessor rp)
 	{
-		RequestProcessor existingRP = endpointRequestProcessorMap.get(rp.getEndpoint().name()); 
-		if (existingRP != null)
+		if (rp != null)
 		{
-			logger.warn("Request Router already has a registered endpoint : " + rp.getEndpoint() + " : " + existingRP.getClass().getCanonicalName());
-			logger.warn("Overriding " + rp.getEndpoint() + " with : " + rp.getClass().getCanonicalName());
+			RequestProcessor existingRP = endpointRequestProcessorMap.get(rp.getEndpoint().name()); 
+			if (existingRP != null)
+			{
+				logger.warn("Request Router already has a registered endpoint : " + rp.getEndpoint() + " : " + existingRP.getClass().getCanonicalName());
+				logger.warn("Overriding " + rp.getEndpoint() + " with : " + rp.getClass().getCanonicalName());
+			}
+			endpointRequestProcessorMap.put(rp.getEndpoint().name(), rp);
 		}
-		endpointRequestProcessorMap.put(rp.getEndpoint().name(), rp);
+	}
+	
+	private RequestProcessor createRequestProcessor(Class<?> rpClass)
+	{
+		RequestProcessor rp = null;
+		
+		try
+		{
+			rp = (RequestProcessor)rpClass.newInstance();
+		}
+		catch (InstantiationException | IllegalAccessException e)
+		{
+			logger.warn("Unable to create " + rpClass.getCanonicalName() + " because of : " + e.getMessage());
+		}
+		
+		return rp;
 	}
 }

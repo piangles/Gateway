@@ -1,6 +1,7 @@
 package org.piangles.gateway.service.impl.jetty;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 import javax.servlet.DispatcherType;
 
@@ -16,18 +17,23 @@ import org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
 import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
+import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.core.services.remoting.SessionAwareable;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.services.remoting.SessionDetailsCreator;
 import org.piangles.gateway.Constants;
 import org.piangles.gateway.GatewayService;
+import org.piangles.gateway.requests.RequestRouter;
 
 public class GatewayServiceImpl implements GatewayService
 {
+	private LoggingService logger = null;
 	private Server server = null;
 
 	public GatewayServiceImpl()
 	{
+		logger = Locator.getInstance().getLoggingService();
 		/**
 		 * Jetty HTTP Servlet Server.
 		 * This class is the main class for the Jetty HTTP Servlet server.
@@ -99,9 +105,17 @@ public class GatewayServiceImpl implements GatewayService
 	public void startProcessingRequests() throws Exception
 	{
 		System.out.println("GatewayService is being started...");
+		logger.info("GatewayService is being started...");
+		Set<String> endpoints = RequestRouter.getInstance().getRegisteredEndpoints();
+		for (String endpoint : endpoints)
+		{
+			System.out.println("Registered endpoint : " + endpoint);
+			logger.info("Registered endpoint : " + endpoint);
+		}
 		server.start();
 		server.dump(System.err);
 		System.out.println("GatewayService has started and is ready to process requests.");
+		logger.info("GatewayService has started and is ready to process requests.");
 		server.join();
 	}
 
