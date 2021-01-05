@@ -19,24 +19,17 @@
  
 package org.piangles.app.gateway;
 
-import org.piangles.backbone.services.msg.Event;
 import org.piangles.core.util.coding.JSON;
+import org.piangles.gateway.requests.dto.SignUpRequest;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
-public class TestEventProcessor
+public class HandcraftedJsonTest
 {
 	public static void main(String[] args) throws Exception
 	{
-		String eventAsStr = "{\"type\":\"Control\",\"primaryKey\":\"1(This is specific to app)\",\"payloadType\":\"org.piangles.backbone.services.msg.ControlDetails\",\"payload\":{\"type\":\"Hello World\",\"action\":\"Add\",\"content\":\"This is the content\"}}";
-
-		Event event = JSON.getDecoder().decode(eventAsStr.getBytes(), Event.class);
-		JsonObject jsonObject = new Gson().toJsonTree(event.getPayload()).getAsJsonObject();
-		Class<?> payloadClass = Class.forName(event.getPayloadType());
-		Object payload = JSON.getDecoder().decode(jsonObject.toString().getBytes(), payloadClass);
-		event.setPayload(payload);
+		SignUpRequest req = new SignUpRequest("Test", "Name", "test@mail.com", "", "");
+		System.out.println(new String(JSON.getEncoder().encode(req)));
 		
-		System.out.println(event);
+		req = JSON.getDecoder().decode("{\"emailId\":\"test@mail.com\"}".getBytes(), SignUpRequest.class);
+		System.out.println(req.getEmailId());
 	}
 }

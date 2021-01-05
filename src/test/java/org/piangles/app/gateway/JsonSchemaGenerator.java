@@ -30,11 +30,6 @@ import org.piangles.gateway.requests.dto.Ping;
 
 public final class JsonSchemaGenerator
 {
-
-	private JsonSchemaGenerator()
-	{
-	};
-
 	public static void main(String[] args) throws IOException
 	{
 		System.out.println(JsonSchemaGenerator.getJsonSchema(new TypeToken<List<String>>(){}.getActualClass()));
