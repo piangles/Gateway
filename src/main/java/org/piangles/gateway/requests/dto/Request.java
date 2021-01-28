@@ -24,7 +24,8 @@ import java.util.UUID;
 
 public final class Request
 {
-	private Date createdTime = null;
+	private Date issuedTime = null;
+	private long transitTime;
 	private UUID traceId = null;
 
 	/**
@@ -40,7 +41,7 @@ public final class Request
 	
 	public Request(String sessionId, SystemInfo systemInfo, String endPoint, String appRequestAsString)
 	{
-		this.createdTime = new Date();
+		this.issuedTime = new Date();
 		this.traceId = UUID.randomUUID();
 
 		this.sessionId = sessionId;
@@ -50,9 +51,19 @@ public final class Request
 		this.appRequestAsString = appRequestAsString;
 	}
 
-	public Date getCreatedTime()
+	public Date getIssuedTime()
 	{
-		return createdTime;
+		return issuedTime;
+	}
+
+	public void markTransitTime()
+	{
+		transitTime = System.currentTimeMillis() - issuedTime.getTime(); 
+	}
+	
+	public long getTransitTime()
+	{
+		return transitTime;
 	}
 
 	public UUID getTraceId()
@@ -83,6 +94,6 @@ public final class Request
 	@Override
 	public String toString()
 	{
-		return "Request [createdTime=" + createdTime + ", traceId=" + traceId + ", sessionId=" + sessionId + ", systemInfo=" + systemInfo + ", endPoint=" + endPoint + "]";
+		return "Request [issuedTime=" + issuedTime + ", traceId=" + traceId + ", sessionId=" + sessionId + ", systemInfo=" + systemInfo + ", endPoint=" + endPoint + "]";
 	}
 }

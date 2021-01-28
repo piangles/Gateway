@@ -89,14 +89,14 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 				}
 				else
 				{
-					response = new Response(request.getTraceId(), request.getEndpoint(), false, "Invalid sessionId.");
+					response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, "Invalid sessionId.");
 				}
 			}
 			catch (SessionManagementException e)
 			{
 				logger.error("Unable to validate Session because of : " + e.getMessage(), e);
 				validSession = false;
-				response = new Response(request.getTraceId(), request.getEndpoint(), false, "Unable to validate Session because of : " + e.getMessage());
+				response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, "Unable to validate Session because of : " + e.getMessage());
 			}
 		}
 		else if (clientDetails.getSessionDetails().getSessionId() != null)
@@ -116,12 +116,12 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 		catch(Exception e)
 		{
 			logger.warn("Exception while processing request because of : " + e.getMessage(), e);
-			response = new Response(getTraceId(), request.getEndpoint(), false, e.getMessage());
+			response = new Response(getTraceId(), request.getEndpoint(), request.getTransitTime(), false, e.getMessage());
 		}
 		catch(Throwable e)
 		{
 			logger.error("Unhandled Exception while processing request because of : " + e.getMessage(), e);
-			response = new Response(getTraceId(), request.getEndpoint(), false, e.getMessage());
+			response = new Response(getTraceId(), request.getEndpoint(), request.getTransitTime(), false, e.getMessage());
 		}
 		ResponseSender.sendResponse(clientDetails, response);
 	}

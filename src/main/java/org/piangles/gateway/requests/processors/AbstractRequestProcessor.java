@@ -91,7 +91,7 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 		Response response = null;
 		if (!EmptyRequest.class.equals(requestClass) && appRequest == null)
 		{
-			response = new Response(request.getTraceId(), request.getEndpoint(), false, EMPTY_APP_REQUEST_ERR);
+			response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, EMPTY_APP_REQUEST_ERR);
 		}
 		else
 		{
@@ -100,7 +100,7 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 			//appResponse cannot be null
 			String appResponseAsStr = new String(JSON.getEncoder().encode(appResponse));
 
-			response = new Response(request.getTraceId(), request.getEndpoint(), true, appResponseAsStr);
+			response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), true, appResponseAsStr);
 		}
 		
 		return response;

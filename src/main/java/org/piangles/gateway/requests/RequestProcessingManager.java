@@ -20,7 +20,6 @@
 package org.piangles.gateway.requests;
 
 import java.net.InetSocketAddress;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
@@ -109,13 +108,14 @@ public final class RequestProcessingManager
 		try
 		{
 			request = JSON.getDecoder().decode(message.getBytes(), Request.class);
+			request.markTransitTime();
 			endpoint = request.getEndpoint();
 			requestProcessor = RequestRouter.getInstance().getRequestProcessor(endpoint);
 		}
 		catch (Exception e)
 		{
 			logger.warn("Message receieved from userId : " + clientDetails.getSessionDetails().getUserId() + " could not be decoded.", e);
-			response = new Response(null, null, false, "Request could not be decoded because of : " + e.getMessage());
+			response = new Response(null, null, 0, false, "Request could not be decoded because of : " + e.getMessage());
 		}
 
 		// Step 3 : Request was able to decoded and found a requestProcessor
@@ -127,7 +127,7 @@ public final class RequestProcessingManager
 		{
 			String errorMessage = "This endpoint " + request.getEndpoint() + " is not supported.";
 			logger.warn(errorMessage);
-			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
+			response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, errorMessage);
 		}
 
 		/**
@@ -146,21 +146,21 @@ public final class RequestProcessingManager
 		{
 			String errorMessage = "This endpoint " + request.getEndpoint() + " requires authentication.";
 			logger.warn(errorMessage);
-			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
+			response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, errorMessage);
 		}
 		else if (state == ClientState.MidAuthentication && !Endpoints.ChangePassword.name().equals(request.getEndpoint()))
 		{
 			// This is the part that makes sure we only accept ChangePassword
 			String errorMessage = "This endpoint " + request.getEndpoint() + " requires password to be updated.";
 			logger.warn(errorMessage);
-			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
+			response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, errorMessage);
 		}
 		else if (!(state == ClientState.PreAuthentication && RequestRouter.getInstance().isPreAuthenticationEndpoint(request.getEndpoint()))
 				&& (clientDetails.getSessionDetails() != null && !StringUtils.equals(clientDetails.getSessionDetails().getSessionId(), request.getSessionId())))
 		{
 			String errorMessage = "SessionId between client and server does not match.";
 			logger.warn(errorMessage + " SessionIds ClientDetails["+clientDetails.getSessionDetails().getSessionId()+"] Request[" + request.getSessionId() + "]");
-			response = new Response(request.getTraceId(), request.getEndpoint(), false, errorMessage);
+			response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, errorMessage);
 		}
 
 		// Step 4 : Process the request only if the above conditions have not
@@ -224,7 +224,7 @@ public final class RequestProcessingManager
 						{
 							// Probability is zero
 							logger.error("InternalError-LoginResponse could not be decoded for client: " + clientDetails.getSessionDetails().getUserId(), e);
-							errResponse = new Response(request.getTraceId(), request.getEndpoint(), false, "InternalError - LoginResponse could not be decoded.");
+							errResponse = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, "InternalError - LoginResponse could not be decoded.");
 						}
 					}
 					
@@ -251,7 +251,7 @@ public final class RequestProcessingManager
 						{
 							// Probability is zero
 							logger.error("InternalError-LoginResponse could not be decoded for client: " + clientDetails.getSessionDetails().getUserId(), e);
-							response = new Response(request.getTraceId(), request.getEndpoint(), false, "InternalError - ChangePassword could not be decoded.");
+							response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, "InternalError - ChangePassword could not be decoded.");
 						}
 					}
 					break;
@@ -267,7 +267,7 @@ public final class RequestProcessingManager
 			{
 				// Probability is low
 				logger.error("Error in RequestProcessingThread because of : " + e.getMessage(), e);
-				response = new Response(request.getTraceId(), request.getEndpoint(), false, "Could not process request because of : " + e.getMessage());
+				response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, "Could not process request because of : " + e.getMessage());
 			}
 		}
 		

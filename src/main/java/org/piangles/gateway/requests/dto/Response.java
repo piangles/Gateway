@@ -24,7 +24,8 @@ import java.util.UUID;
 
 public final class Response
 {
-	private Date createdTime = null;
+	private Date issuedTime = null;
+	private long requestTransitTime;
 	private UUID traceId = null;
 
 	/**
@@ -46,9 +47,11 @@ public final class Response
 	private String errorMessage;
 	private String appResponseAsString = null;
 
-	public Response(UUID traceId, String endpoint, boolean requestSuccessful, String payload)
+	public Response(UUID traceId, String endpoint, long requestTransitTime, boolean requestSuccessful, String payload)
 	{
-		this.createdTime = new Date();
+		this.issuedTime = new Date();
+		this.requestTransitTime = requestTransitTime;
+		
 		this.traceId = traceId;
 		this.endpoint = endpoint;
 
@@ -61,6 +64,11 @@ public final class Response
 		{
 			this.errorMessage = payload; 
 		}
+	}
+	
+	public Date getIssuedTime()
+	{
+		return issuedTime;
 	}
 	
 	public UUID getTraceId()
@@ -87,10 +95,15 @@ public final class Response
 	{
 		return appResponseAsString;
 	}
+	
+	public long getRequestTransitTime()
+	{
+		return requestTransitTime;
+	}
 
 	@Override
 	public String toString()
 	{
-		return "Response [createdTime=" + createdTime + ", traceId=" + traceId + ", requestSuccessful=" + requestSuccessful + ", errorMessage=" + errorMessage + "]";
+		return "Response [issuedTime=" + issuedTime + ", requestTransitTime=" + requestTransitTime + ", traceId=" + traceId + ", requestSuccessful=" + requestSuccessful + ", errorMessage=" + errorMessage + "]";
 	}
 }

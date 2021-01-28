@@ -71,7 +71,7 @@ public final class DefaultStreamRequestProcessor<AppReq, SI, SO> extends Abstrac
 					logger.info("Reached EndOfStream for Request : " + request.getTraceId().toString());
 				}
 				
-				Response response = new Response(request.getTraceId(), request.getEndpoint(), true, appResponseAsStr);
+				Response response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), true, appResponseAsStr);
 				ResponseSender.sendResponse(clientDetails, response);
 			}
 			catch (Exception e)
