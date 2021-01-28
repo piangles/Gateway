@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
+import org.piangles.gateway.requests.processors.AutoSuggestRequestProcessor;
 import org.piangles.gateway.requests.processors.ChangePasswordRequestProcessor;
 import org.piangles.gateway.requests.processors.CreateUserProfileRequestProcessor;
 import org.piangles.gateway.requests.processors.EndpointMetadataRequestProcessor;
@@ -93,6 +94,7 @@ public class RequestRouter
 		registerRequestProcessor(createRequestProcessor(UpdateUserPreferenceRequestProcessor.class));
 		
 		registerRequestProcessor(createRequestProcessor(SubscribeRequestProcessor.class));
+		registerRequestProcessor(createRequestProcessor(AutoSuggestRequestProcessor.class));
 	}
 
 	public static RequestRouter getInstance()

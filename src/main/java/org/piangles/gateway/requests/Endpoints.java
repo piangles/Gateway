@@ -62,4 +62,7 @@ public enum Endpoints
 
 	@Description(content="Registers the current connection to receive application and system notifications.")
 	Subscribe,
+	
+	@Description(content="Given what user typed, this returns back auto/smart suggestions.")
+	AutoSuggest,
 }
