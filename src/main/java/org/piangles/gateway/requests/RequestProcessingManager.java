@@ -23,11 +23,16 @@ import java.net.InetSocketAddress;
 
 import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.geo.GeoLocation;
+import org.piangles.backbone.services.geo.GeoLocationService;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.ClientEndpoint;
 import org.piangles.gateway.CommunicationPattern;
+import org.piangles.gateway.client.ClientDetails;
+import org.piangles.gateway.client.ClientState;
+import org.piangles.gateway.client.Location;
 import org.piangles.gateway.events.EventProcessingManager;
 import org.piangles.gateway.requests.dto.LoginResponse;
 import org.piangles.gateway.requests.dto.Request;
@@ -50,25 +55,24 @@ import org.piangles.gateway.requests.dto.SimpleResponse;
 public final class RequestProcessingManager
 {
 	private LoggingService logger = null;
+	private GeoLocationService geolocationService = null;
 
 	private ClientState state = ClientState.PreAuthentication;
 	private ClientDetails clientDetails = null;
 	private EventProcessingManager epm = null;
-	//private Map<String, Endpoints> preAuthenticationEndpoints = null;
 
 	public RequestProcessingManager(InetSocketAddress remoteAddr, ClientEndpoint clientEndpoint)
 	{
-		//preAuthenticationEndpoints = RequestRouter.getInstance().getPreAuthenticationEndpoints();
-
 		/*
 		 * UserId initially is the combination of the address and the port. But
 		 * will change later through the transformation of loginId to
 		 * syntheticUserId. SessionId will also be null
 		 */
 		logger = Locator.getInstance().getLoggingService();
+		geolocationService = Locator.getInstance().getGeoLocationService();
 		String userId = remoteAddr.getAddress().getHostName() + ":" + remoteAddr.getPort();
 
-		clientDetails = new ClientDetails(remoteAddr, clientEndpoint, new SessionDetails(userId, null));
+		clientDetails = new ClientDetails(remoteAddr, clientEndpoint, new SessionDetails(userId, null), null);
 
 		logger.info(String.format("New connection from : [Host=%s & Port=%d ]", clientDetails.getHostName(), clientDetails.getPort()));
 	}
@@ -205,8 +209,10 @@ public final class RequestProcessingManager
 								 * immutable. ClientDetails construction is only visible to this 
 								 * package for security reasons. 
 								 */
+								GeoLocation geoLocation = geolocationService.getGeoLocation(clientDetails.getIPAddress());
 								clientDetails = new ClientDetails(clientDetails.getRemoteAddress(), clientDetails.getClientEndpoint(),
-										new SessionDetails(loginResponse.getUserId(), loginResponse.getSessionId()));
+										new SessionDetails(loginResponse.getUserId(), loginResponse.getSessionId()),
+										Location.convert(geoLocation, false));
 
 								/**
 								 * Now that client is authenticated, create the MessageProcessingManager

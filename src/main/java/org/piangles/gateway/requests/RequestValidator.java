@@ -21,6 +21,7 @@ package org.piangles.gateway.requests;
 
 import javax.xml.bind.ValidationException;
 
+import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.dto.Request;
 
 /**

@@ -17,11 +17,24 @@
  
  
  
-package org.piangles.gateway.requests;
+package org.piangles.gateway.requests.processors;
 
-public enum ClientState
+import org.piangles.gateway.client.ClientDetails;
+import org.piangles.gateway.client.Location;
+import org.piangles.gateway.requests.Endpoints;
+import org.piangles.gateway.requests.dto.EmptyRequest;
+import org.piangles.gateway.requests.dto.Request;
+
+public class GetLocationRequestProcessor extends AbstractRequestProcessor<EmptyRequest, Location>
 {
-	PreAuthentication,
-	MidAuthentication,
-	PostAuthentication;
+	public GetLocationRequestProcessor()
+	{
+		super(Endpoints.GetLocation, EmptyRequest.class, Location.class);
+	}
+	
+	@Override
+	protected Location processRequest(ClientDetails clientDetails, Request request, EmptyRequest emptyRequest) throws Exception
+	{
+		return clientDetails.getLocation(); 
+	}
 }

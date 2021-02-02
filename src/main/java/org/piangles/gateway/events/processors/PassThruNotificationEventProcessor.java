@@ -24,8 +24,8 @@ import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.msg.Event;
 import org.piangles.gateway.Message;
 import org.piangles.gateway.MessageType;
+import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.events.EventProcessor;
-import org.piangles.gateway.requests.ClientDetails;
 
 public class PassThruNotificationEventProcessor implements EventProcessor
 {

@@ -36,7 +36,7 @@ import org.piangles.core.resources.KafkaMessagingSystem;
 import org.piangles.core.resources.ResourceException;
 import org.piangles.core.resources.ResourceManager;
 import org.piangles.gateway.Constants;
-import org.piangles.gateway.requests.ClientDetails;
+import org.piangles.gateway.client.ClientDetails;
 
 /**
  * 

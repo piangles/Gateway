@@ -28,7 +28,7 @@ import org.piangles.backbone.services.auth.FailureReason;
 import org.piangles.backbone.services.session.SessionDetails;
 import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.gateway.CommunicationPattern;
-import org.piangles.gateway.requests.ClientDetails;
+import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.LoginRequest;
 import org.piangles.gateway.requests.dto.LoginResponse;

@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 import org.piangles.core.util.reflect.TypeToken;
 import org.piangles.gateway.CommunicationPattern;
-import org.piangles.gateway.requests.ClientDetails;
+import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.RequestRouter;
 import org.piangles.gateway.requests.dto.EmptyRequest;

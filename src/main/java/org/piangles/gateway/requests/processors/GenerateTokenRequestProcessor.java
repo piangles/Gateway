@@ -22,7 +22,7 @@ package org.piangles.gateway.requests.processors;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.auth.AuthenticationService;
 import org.piangles.gateway.CommunicationPattern;
-import org.piangles.gateway.requests.ClientDetails;
+import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.GenerateTokenRequest;
 import org.piangles.gateway.requests.dto.Request;

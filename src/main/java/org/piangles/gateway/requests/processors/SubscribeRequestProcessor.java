@@ -28,7 +28,7 @@ import java.util.UUID;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.msg.MessagingService;
 import org.piangles.backbone.services.msg.Topic;
-import org.piangles.gateway.requests.ClientDetails;
+import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.SimpleResponse;

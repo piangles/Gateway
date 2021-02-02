@@ -32,7 +32,7 @@ import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.msg.Event;
 import org.piangles.backbone.services.msg.Topic;
 import org.piangles.core.util.coding.JSON;
-import org.piangles.gateway.requests.ClientDetails;
+import org.piangles.gateway.client.ClientDetails;
 
 public final class EventListener implements Runnable
 {

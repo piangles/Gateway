@@ -23,7 +23,7 @@ import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.suggest.AutoSuggestionService;
 import org.piangles.backbone.services.suggest.SuggestionRequest;
 import org.piangles.backbone.services.suggest.SuggestionResponse;
-import org.piangles.gateway.requests.ClientDetails;
+import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.Request;
 

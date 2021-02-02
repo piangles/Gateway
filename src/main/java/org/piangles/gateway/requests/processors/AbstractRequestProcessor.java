@@ -21,8 +21,8 @@ package org.piangles.gateway.requests.processors;
 
 import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.CommunicationPattern;
+import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.events.EventProcessingManager;
-import org.piangles.gateway.requests.ClientDetails;
 import org.piangles.gateway.requests.RequestProcessingThread;
 import org.piangles.gateway.requests.RequestProcessor;
 import org.piangles.gateway.requests.dto.EmptyRequest;

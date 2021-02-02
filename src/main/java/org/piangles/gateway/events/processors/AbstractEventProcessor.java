@@ -23,8 +23,8 @@ import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.msg.Event;
 import org.piangles.core.util.coding.JSON;
+import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.events.EventProcessor;
-import org.piangles.gateway.requests.ClientDetails;
 
 public abstract class AbstractEventProcessor<T> implements EventProcessor
 {

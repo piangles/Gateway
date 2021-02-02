@@ -17,25 +17,26 @@
  
  
  
-package org.piangles.gateway.requests;
+package org.piangles.gateway.client;
 
 import java.net.InetSocketAddress;
 
-import org.piangles.gateway.ClientEndpoint;
-
 import org.piangles.core.services.remoting.SessionDetails;
+import org.piangles.gateway.ClientEndpoint;
 
 public final class ClientDetails
 {
 	private InetSocketAddress remoteAddress;
 	private ClientEndpoint clientEndpoint = null;
 	private SessionDetails sessionDetails = null;
+	private Location location = null;
 	
-	ClientDetails(InetSocketAddress remoteAddress, ClientEndpoint clientEndpoint, SessionDetails sessionDetails)
+	public ClientDetails(InetSocketAddress remoteAddress, ClientEndpoint clientEndpoint, SessionDetails sessionDetails, Location location)
 	{
 		this.remoteAddress = remoteAddress;
 		this.clientEndpoint = clientEndpoint;
 		this.sessionDetails = sessionDetails;
+		this.location = location;
 	}
 
 	public ClientEndpoint getClientEndpoint()
@@ -48,7 +49,7 @@ public final class ClientDetails
 		return sessionDetails;
 	}
 	
-	InetSocketAddress getRemoteAddress()
+	public InetSocketAddress getRemoteAddress()
 	{
 		return remoteAddress;
 	}
@@ -67,7 +68,17 @@ public final class ClientDetails
 	{
 		return remoteAddress.getPort();
 	}
+	
+	public Location getLocation()
+	{
+		return location;
+	}
 
+	public void setLocation(Location location)
+	{
+		this.location = location;
+	}
+	
 	@Override
 	public String toString()
 	{

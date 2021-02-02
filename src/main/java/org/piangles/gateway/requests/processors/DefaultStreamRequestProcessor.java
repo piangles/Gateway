@@ -27,7 +27,7 @@ import org.piangles.core.stream.PassThruStreamProcessor;
 import org.piangles.core.stream.Stream;
 import org.piangles.core.stream.StreamProcessor;
 import org.piangles.core.util.coding.JSON;
-import org.piangles.gateway.requests.ClientDetails;
+import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.ResponseSender;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.Response;

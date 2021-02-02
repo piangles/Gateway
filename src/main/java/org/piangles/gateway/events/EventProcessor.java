@@ -20,7 +20,7 @@
 package org.piangles.gateway.events;
 
 import org.piangles.backbone.services.msg.Event;
-import org.piangles.gateway.requests.ClientDetails;
+import org.piangles.gateway.client.ClientDetails;
 
 public interface EventProcessor
 {

@@ -24,6 +24,7 @@ import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.session.SessionManagementException;
 import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.core.services.remoting.AbstractContextAwareThread;
+import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.events.EventProcessingManager;
 import org.piangles.gateway.events.KafkaConsumerManager;
 import org.piangles.gateway.requests.dto.Request;

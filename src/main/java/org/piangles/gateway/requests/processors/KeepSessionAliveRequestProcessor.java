@@ -19,7 +19,7 @@
  
 package org.piangles.gateway.requests.processors;
 
-import org.piangles.gateway.requests.ClientDetails;
+import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.EmptyRequest;
 import org.piangles.gateway.requests.dto.Request;

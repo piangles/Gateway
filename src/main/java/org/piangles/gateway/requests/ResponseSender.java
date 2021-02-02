@@ -23,6 +23,7 @@ import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.gateway.Message;
 import org.piangles.gateway.MessageType;
+import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.dto.Response;
 
 public final class ResponseSender
