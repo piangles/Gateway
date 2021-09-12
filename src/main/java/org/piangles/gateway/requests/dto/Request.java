@@ -19,12 +19,12 @@
  
 package org.piangles.gateway.requests.dto;
 
-import java.util.Date;
 import java.util.UUID;
 
 public final class Request
 {
-	private Date issuedTime = null;
+	private long issuedTime;
+	private long receiptTime;
 	private long transitTime;
 	private UUID traceId = null;
 
@@ -34,31 +34,39 @@ public final class Request
 	 * need a clientId.
 	 */
 	private String sessionId = null;
-	private SystemInfo systemInfo = null;
 	
 	private String endPoint = null;
-	private String appRequestAsString = null;
+	private String endpointRequest = null;
 	
-	public Request(String sessionId, SystemInfo systemInfo, String endPoint, String appRequestAsString)
+	private SystemInfo systemInfo = null;
+	
+	public Request(String sessionId, String endPoint, String endpointRequest, SystemInfo systemInfo)
 	{
-		this.issuedTime = new Date();
+		this.issuedTime = System.currentTimeMillis();
 		this.traceId = UUID.randomUUID();
 
 		this.sessionId = sessionId;
-		this.systemInfo = systemInfo;
 		
 		this.endPoint = endPoint;
-		this.appRequestAsString = appRequestAsString;
+		this.endpointRequest = endpointRequest;
+		
+		this.systemInfo = systemInfo;
 	}
 
-	public Date getIssuedTime()
+	public long getIssuedTime()
 	{
 		return issuedTime;
+	}
+	
+	public long getReceiptTime()
+	{
+		return receiptTime;
 	}
 
 	public void markTransitTime()
 	{
-		transitTime = System.currentTimeMillis() - issuedTime.getTime(); 
+		receiptTime = System.currentTimeMillis();
+		transitTime = receiptTime - issuedTime; 
 	}
 	
 	public long getTransitTime()
@@ -76,21 +84,21 @@ public final class Request
 		return sessionId;
 	}
 	
-	public SystemInfo getSystemInfo()
-	{
-		return systemInfo;
-	}
-	
 	public String getEndpoint()
 	{
 		return endPoint;
 	}
 	
-	public String getAppRequestAsString()
+	public String getEndpointRequest()
 	{
-		return appRequestAsString;
+		return endpointRequest;
 	}
 
+	public SystemInfo getSystemInfo()
+	{
+		return systemInfo;
+	}
+	
 	@Override
 	public String toString()
 	{

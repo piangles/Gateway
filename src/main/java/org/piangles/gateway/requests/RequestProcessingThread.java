@@ -29,6 +29,7 @@ import org.piangles.gateway.events.EventProcessingManager;
 import org.piangles.gateway.events.KafkaConsumerManager;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.Response;
+import org.piangles.gateway.requests.dto.StatusCode;
 
 public final class RequestProcessingThread extends AbstractContextAwareThread
 {
@@ -90,14 +91,14 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 				}
 				else
 				{
-					response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, "Invalid sessionId.");
+					response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), request.getTransitTime(), StatusCode.UnAuthenticated, "Invalid sessionId.");
 				}
 			}
 			catch (SessionManagementException e)
 			{
 				logger.error("Unable to validate Session because of : " + e.getMessage(), e);
 				validSession = false;
-				response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, "Unable to validate Session because of : " + e.getMessage());
+				response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), request.getTransitTime(), StatusCode.InternalError, "Unable to authenticate validate session.");
 			}
 		}
 		else if (clientDetails.getSessionDetails().getSessionId() != null)
@@ -117,12 +118,14 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 		catch(Exception e)
 		{
 			logger.warn("Exception while processing request because of : " + e.getMessage(), e);
-			response = new Response(getTraceId(), request.getEndpoint(), request.getTransitTime(), false, e.getMessage());
+			response = new Response(getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
+									request.getTransitTime(), StatusCode.InternalError, StatusCode.InternalError.getMessage());
 		}
 		catch(Throwable e)
 		{
 			logger.error("Unhandled Exception while processing request because of : " + e.getMessage(), e);
-			response = new Response(getTraceId(), request.getEndpoint(), request.getTransitTime(), false, e.getMessage());
+			response = new Response(getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
+					request.getTransitTime(), StatusCode.InternalError, StatusCode.InternalError.getMessage());
 		}
 		ResponseSender.sendResponse(clientDetails, response);
 	}

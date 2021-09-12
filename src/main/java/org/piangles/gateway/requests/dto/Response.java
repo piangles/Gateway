@@ -19,13 +19,13 @@
  
 package org.piangles.gateway.requests.dto;
 
-import java.util.Date;
 import java.util.UUID;
 
 public final class Response
 {
-	private Date issuedTime = null;
+	private long issuedTime;
 	private long requestTransitTime;
+	private long requestProcessingTime;
 	private UUID traceId = null;
 
 	/**
@@ -34,41 +34,61 @@ public final class Response
 	 * client to decode the appResponseAsString message to the client's
 	 * implementation of the class.
 	 */
-	private String endpoint;
+	private String endpoint = null;
+	
+	private StatusCode statusCode = null;
+
 	/**
 	 * requestSucessfull is a reflection of is the request was processed
 	 * successfully without any exception. Not if the actual service accepted
 	 * the request. Ex : LoginRequest even if failed authentication will still
 	 * return requestSuccessful = true.
 	 */
-	private boolean requestSuccessful;
+	private boolean requestSuccessful = false;
 
-	private int httpStatusCode; //TODO
-	private String errorMessage;
-	private String appResponseAsString = null;
+	private String errorMessage = null;
+	
+	private String endpointResponse = null;
 
-	public Response(UUID traceId, String endpoint, long requestTransitTime, boolean requestSuccessful, String payload)
+	public Response(StatusCode statusCode, String endpointResponse)
 	{
-		this.issuedTime = new Date();
+		this(null, null, 0, 0, statusCode, endpointResponse);
+	}
+	
+	public Response(UUID traceId, String endpoint, long requestReceiptTime, long requestTransitTime, StatusCode statusCode, String endpointResponse)
+	{
+		this.issuedTime = System.currentTimeMillis();
 		this.requestTransitTime = requestTransitTime;
+		this.requestProcessingTime = System.currentTimeMillis() - requestReceiptTime;
 		
 		this.traceId = traceId;
 		this.endpoint = endpoint;
 
-		this.requestSuccessful = requestSuccessful;
+		this.statusCode = statusCode;
+		this.requestSuccessful = (this.statusCode == StatusCode.Success)? true : false;
 		if (requestSuccessful)
 		{
-			this.appResponseAsString = payload; 
+			this.endpointResponse = endpointResponse; 
 		}
 		else
 		{
-			this.errorMessage = payload; 
+			this.errorMessage = endpointResponse; 
 		}
 	}
 	
-	public Date getIssuedTime()
+	public long getIssuedTime()
 	{
 		return issuedTime;
+	}
+
+	public long getRequestTransitTime()
+	{
+		return requestTransitTime;
+	}
+
+	public long getRequestProcessingTime()
+	{
+		return requestProcessingTime;
 	}
 	
 	public UUID getTraceId()
@@ -79,6 +99,11 @@ public final class Response
 	public String getEndpoint()
 	{
 		return endpoint;
+	}
+	
+	public StatusCode getStatusCode()
+	{
+		return statusCode;
 	}
 
 	public boolean isRequestSuccessful()
@@ -91,19 +116,15 @@ public final class Response
 		return errorMessage;
 	}
 
-	public String getAppResponseAsString()
+	public String getEndpointResponse()
 	{
-		return appResponseAsString;
-	}
-	
-	public long getRequestTransitTime()
-	{
-		return requestTransitTime;
+		return endpointResponse;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "Response [issuedTime=" + issuedTime + ", requestTransitTime=" + requestTransitTime + ", traceId=" + traceId + ", requestSuccessful=" + requestSuccessful + ", errorMessage=" + errorMessage + "]";
+		return "Response [issuedTime=" + issuedTime + ", requestTransitTime=" + requestTransitTime + ", requestProcessingTime=" + requestProcessingTime + ", traceId=" + traceId + ", endpoint="
+				+ endpoint + ", requestSuccessful=" + requestSuccessful + ", statusCode=" + statusCode + ", errorMessage=" + errorMessage + "]";
 	}
 }

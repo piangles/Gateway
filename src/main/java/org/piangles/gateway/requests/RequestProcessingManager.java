@@ -38,6 +38,7 @@ import org.piangles.gateway.requests.dto.LoginResponse;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.Response;
 import org.piangles.gateway.requests.dto.SimpleResponse;
+import org.piangles.gateway.requests.dto.StatusCode;
 
 /***
  * This is the entry point for any communication related with client. This Class
@@ -119,7 +120,7 @@ public final class RequestProcessingManager
 		catch (Exception e)
 		{
 			logger.warn("Message receieved from userId : " + clientDetails.getSessionDetails().getUserId() + " could not be decoded.", e);
-			response = new Response(null, null, 0, false, "Request could not be decoded because of : " + e.getMessage());
+			response = new Response(StatusCode.BadRequest, "Request could not be decoded because of : " + e.getMessage());
 		}
 
 		// Step 3 : Request was able to decoded and found a requestProcessor
@@ -131,7 +132,8 @@ public final class RequestProcessingManager
 		{
 			String errorMessage = "This endpoint " + request.getEndpoint() + " is not supported.";
 			logger.warn(errorMessage);
-			response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, errorMessage);
+			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
+									request.getTransitTime(), StatusCode.NotFound, errorMessage);
 		}
 
 		/**
@@ -150,21 +152,24 @@ public final class RequestProcessingManager
 		{
 			String errorMessage = "This endpoint " + request.getEndpoint() + " requires authentication.";
 			logger.warn(errorMessage);
-			response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, errorMessage);
+			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
+									request.getTransitTime(), StatusCode.UnAuthenticated, errorMessage);
 		}
 		else if (state == ClientState.MidAuthentication && !Endpoints.ChangePassword.name().equals(request.getEndpoint()))
 		{
 			// This is the part that makes sure we only accept ChangePassword
 			String errorMessage = "This endpoint " + request.getEndpoint() + " requires password to be updated.";
 			logger.warn(errorMessage);
-			response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, errorMessage);
+			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
+									request.getTransitTime(), StatusCode.BadRequest, errorMessage);
 		}
 		else if (!(state == ClientState.PreAuthentication && RequestRouter.getInstance().isPreAuthenticationEndpoint(request.getEndpoint()))
 				&& (clientDetails.getSessionDetails() != null && !StringUtils.equals(clientDetails.getSessionDetails().getSessionId(), request.getSessionId())))
 		{
 			String errorMessage = "SessionId between client and server does not match.";
 			logger.warn(errorMessage + " SessionIds ClientDetails["+clientDetails.getSessionDetails().getSessionId()+"] Request[" + request.getSessionId() + "]");
-			response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, errorMessage);
+			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), request.getTransitTime(), 
+									StatusCode.UnAuthenticated, errorMessage);
 		}
 
 		// Step 4 : Process the request only if the above conditions have not
@@ -191,7 +196,7 @@ public final class RequestProcessingManager
 					{
 						try
 						{
-							LoginResponse loginResponse = JSON.getDecoder().decode(response.getAppResponseAsString().getBytes(), LoginResponse.class);
+							LoginResponse loginResponse = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), LoginResponse.class);
 							if (loginResponse.isAuthenticated())
 							{
 								if (loginResponse.isAuthenticatedByToken())
@@ -230,7 +235,8 @@ public final class RequestProcessingManager
 						{
 							// Probability is zero
 							logger.error("InternalError-LoginResponse could not be decoded for client: " + clientDetails.getSessionDetails().getUserId(), e);
-							errResponse = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, "InternalError - LoginResponse could not be decoded.");
+							errResponse = new Response(request.getTraceId(), request.getEndpoint(),request.getReceiptTime(), 
+														request.getTransitTime(), StatusCode.InternalError, "InternalError - LoginResponse could not be decoded.");
 						}
 					}
 					
@@ -241,7 +247,7 @@ public final class RequestProcessingManager
 					{
 						try
 						{
-							SimpleResponse simpleResponse = JSON.getDecoder().decode(response.getAppResponseAsString().getBytes(), SimpleResponse.class);
+							SimpleResponse simpleResponse = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), SimpleResponse.class);
 							if (simpleResponse.isAppRequestSuccessful())
 							{
 								state = ClientState.PostAuthentication;
@@ -257,7 +263,8 @@ public final class RequestProcessingManager
 						{
 							// Probability is zero
 							logger.error("InternalError-LoginResponse could not be decoded for client: " + clientDetails.getSessionDetails().getUserId(), e);
-							response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, "InternalError - ChangePassword could not be decoded.");
+							response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(),
+													request.getTransitTime(), StatusCode.InternalError, "InternalError - ChangePassword could not be decoded.");
 						}
 					}
 					break;
@@ -273,7 +280,8 @@ public final class RequestProcessingManager
 			{
 				// Probability is low
 				logger.error("Error in RequestProcessingThread because of : " + e.getMessage(), e);
-				response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, "Could not process request because of : " + e.getMessage());
+				response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(),
+										request.getTransitTime(), StatusCode.InternalError, "Could not process request because of Internal Error.");
 			}
 		}
 		

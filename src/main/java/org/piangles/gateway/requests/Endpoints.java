@@ -66,6 +66,8 @@ public enum Endpoints
 	@Description(content="Given what user typed, this returns back auto/smart suggestions.")
 	AutoSuggest,
 	
+	@Description(content="")
 	GetLocation,
+	@Description(content="")
 	SetLocation
 }

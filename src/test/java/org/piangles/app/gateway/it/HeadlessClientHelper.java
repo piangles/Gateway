@@ -62,7 +62,7 @@ public class HeadlessClientHelper
 						switch (response.getEndpoint())
 						{
 						case "Login":
-							LoginResponse loginResponse = JSON.getDecoder().decode(response.getAppResponseAsString().getBytes(), LoginResponse.class);
+							LoginResponse loginResponse = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), LoginResponse.class);
 							sessionId = loginResponse.getSessionId();
 							if (sessionId != null)
 							{
@@ -71,7 +71,7 @@ public class HeadlessClientHelper
 							break;
 							
 						case "Logout":
-							System.out.println("Finished logging out = " + response.getAppResponseAsString());
+							System.out.println("Finished logging out = " + response.getEndpointResponse());
 							break;
 							
 						default:
@@ -117,14 +117,13 @@ public class HeadlessClientHelper
 	
 	protected final void createRequestAndSend(String endpoint, Object appRequest) throws Exception
 	{
-		SystemInfo systemInfo = new SystemInfo("HeadlessClient", "12345");
 		String appReqAsStr = null;
 		if (appRequest != null)
 		{
 			appReqAsStr = new String(JSON.getEncoder().encode(appRequest));
 		}
 		
-		Request request = new Request(sessionId, systemInfo.cloneAndCopy("threadId-123"), endpoint, appReqAsStr);
+		Request request = new Request(sessionId, endpoint, appReqAsStr, new SystemInfo("Win64", "Chrome", "92"));
 		System.out.println("For Endpoint : " + endpoint + "  the TRACE ID :" + request.getTraceId());
 		String requestAsStr = new String(JSON.getEncoder().encode(request));	
 		

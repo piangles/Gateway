@@ -25,48 +25,39 @@ public final class SystemInfo implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	
-	private String processName = null;
-	private String processId = null;
-	private String threadId = null; 
+	private String osName = null;
+	private String browserName = null;
+	private String browserVersion = null; 
 	
-	public SystemInfo(String processName, String processId)
+	public SystemInfo(String osName, String browserName, String browserVersion)
 	{
-		this.processName = processName;
-		this.processId = processId;
+		this.osName = osName;
+		this.browserName = browserName;
+		this.browserVersion = browserVersion;
 	}
 
-	public String getProcessName()
+	public String getOsName()
 	{
-		return processName;
+		return osName;
 	}
 
-	public String getProcessId()
+	public String getBrowserName()
 	{
-		return processId;
+		return browserName;
 	}
 
-	public String getThreadId()
+	public String getBrowserVersion()
 	{
-		return threadId;
-	}
-
-	/**
-	 * Taken from experience with Scala but limited only to one member.
-	 */
-	public SystemInfo cloneAndCopy(String threadId)
-	{
-		SystemInfo si = new SystemInfo(processName, processId);
-		si.threadId = threadId;
-		return si;
+		return browserVersion;
 	}
 
 	public String toString()
 	{
 		StringBuffer sb = new StringBuffer();
 		sb.append("[");
-		sb.append(processName).append(" ");
-		sb.append(processId).append(" ");
-		sb.append(threadId);
+		sb.append(osName).append(" ");
+		sb.append(browserName).append(" ");
+		sb.append(browserVersion);
 		sb.append("]");
 		return sb.toString();
 	}

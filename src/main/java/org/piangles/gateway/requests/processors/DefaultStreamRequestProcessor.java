@@ -32,6 +32,7 @@ import org.piangles.gateway.requests.ResponseSender;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.Response;
 import org.piangles.gateway.requests.dto.SimpleResponse;
+import org.piangles.gateway.requests.dto.StatusCode;
 
 public final class DefaultStreamRequestProcessor<AppReq, SI, SO> extends AbstractRequestProcessor<AppReq, SimpleResponse>
 {
@@ -71,7 +72,8 @@ public final class DefaultStreamRequestProcessor<AppReq, SI, SO> extends Abstrac
 					logger.info("Reached EndOfStream for Request : " + request.getTraceId().toString());
 				}
 				
-				Response response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), true, appResponseAsStr);
+				Response response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(),
+													request.getTransitTime(), StatusCode.Success, appResponseAsStr);
 				ResponseSender.sendResponse(clientDetails, response);
 			}
 			catch (Exception e)

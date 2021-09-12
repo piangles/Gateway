@@ -28,6 +28,7 @@ import org.piangles.gateway.requests.RequestProcessor;
 import org.piangles.gateway.requests.dto.EmptyRequest;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.Response;
+import org.piangles.gateway.requests.dto.StatusCode;
 
 /**
  * 
@@ -72,9 +73,9 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 	{
 		AppReq appRequest = null;
 		
-		if (!requestClass.equals(EmptyRequest.class) && request.getAppRequestAsString() != null)
+		if (!requestClass.equals(EmptyRequest.class) && request.getEndpointRequest() != null)
 		{
-			appRequest = JSON.getDecoder().decode(request.getAppRequestAsString().getBytes(), requestClass);
+			appRequest = JSON.getDecoder().decode(request.getEndpointRequest().getBytes(), requestClass);
 		}
 
 //		try
@@ -91,7 +92,8 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 		Response response = null;
 		if (!EmptyRequest.class.equals(requestClass) && appRequest == null)
 		{
-			response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), false, EMPTY_APP_REQUEST_ERR);
+			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
+									request.getTransitTime(), StatusCode.BadRequest, EMPTY_APP_REQUEST_ERR);
 		}
 		else
 		{
@@ -100,7 +102,8 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 			//appResponse cannot be null
 			String appResponseAsStr = new String(JSON.getEncoder().encode(appResponse));
 
-			response = new Response(request.getTraceId(), request.getEndpoint(), request.getTransitTime(), true, appResponseAsStr);
+			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(),
+									request.getTransitTime(), StatusCode.Success, appResponseAsStr);
 		}
 		
 		return response;
