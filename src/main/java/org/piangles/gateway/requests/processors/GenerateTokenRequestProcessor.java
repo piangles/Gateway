@@ -20,6 +20,7 @@
 package org.piangles.gateway.requests.processors;
 
 import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.auth.AuthenticationResponse;
 import org.piangles.backbone.services.auth.AuthenticationService;
 import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.client.ClientDetails;
@@ -43,7 +44,8 @@ public final class GenerateTokenRequestProcessor extends AbstractRequestProcesso
 		boolean result = true;
 		String message = "Please check your registered email for the token.";
 		
-		result = authService.generateResetToken(tokenRequest.getEmailId());
+		AuthenticationResponse response = authService.generateResetToken(tokenRequest.getEmailId());
+		result = response.isRequestSuccessful();
 		if (!result)
 		{
 			message = "Could not generate a reset token.";

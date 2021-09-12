@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.piangles.gateway</groupId>
@@ -6,10 +7,54 @@
 	<packaging>jar</packaging>
 	<version>0.1</version>
 
+	<name>PiAngles Gateway</name>
+	<description>
+	API gateway that is the single entry point for all clients. 
+	</description>
+	<url>https://www.piangles.org/</url>
+	<licenses>
+		<license>
+			<name>Apache License</name>
+			<url>https://raw.githubusercontent.com/piangles/Gateway/master/LICENSE</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>saradhivs</id>
+			<name>Saradhi Vemuri</name>
+			<email>saradhi.vemuri@piangles.org</email>
+			<organization>PiAngles</organization>
+			<organizationUrl>https://www.piangles.org/</organizationUrl>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>America/New_York</timezone>
+
+			<properties>
+				<picUrl>https://avatars.githubusercontent.com/saradhivs</picUrl>
+			</properties>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:https://github.com/piangles/Gateway.git</connection>
+		<developerConnection>scm:git:https://github.com/piangles/Gateway.git</developerConnection>
+		<url>https://github.com/piangles/Gateway</url>
+		<tag>HEAD</tag>
+	</scm>
+
+
 	<properties>
 		<org.springframework.build.aws-maven-version>5.0.0.RELEASE</org.springframework.build.aws-maven-version>
+		
 		<maven-compiler-plugin-version>3.3</maven-compiler-plugin-version>
 		<maven-dependency-plugin>2.10</maven-dependency-plugin>
+		
+		<nexus-staging-maven-plugin-version>1.6.7</nexus-staging-maven-plugin-version>
+		
 		<java-source-version>1.8</java-source-version>
 		<java-target-version>1.8</java-target-version>
 	</properties>
@@ -18,18 +63,18 @@
 		<dependency>
 			<groupId>org.piangles.backbone.services</groupId>
 			<artifactId>BackBoneServices</artifactId>
-			<version>0.1</version>
+			<version>0.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.piangles.backbone.services</groupId>
 			<artifactId>BackBoneServicesLocator</artifactId>
-			<version>0.1</version>
+			<version>0.7</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.piangles.core</groupId>
 			<artifactId>Core</artifactId>
-			<version>0.1</version>
+			<version>0.3</version>
 		</dependency>
 
 		<dependency>
@@ -108,22 +153,21 @@
 
 	<distributionManagement>
 		<snapshotRepository>
-			<id>piangle-s3-artifact-central</id>
-			<url>s3://piangle-s3-artifact/snapshot</url>
+			<id>ossrh</id>
+			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
 		<repository>
-			<id>piangle-s3-artifact-release</id>
-			<url>s3://piangle-s3-artifact/release</url>
+			<id>ossrh</id>
+			<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
-
 
 	<build>
 		<extensions>
 			<extension>
 				<groupId>org.springframework.build</groupId>
 				<artifactId>aws-maven</artifactId>
-				<version>5.0.0.RELEASE</version>
+				<version>${org.springframework.build.aws-maven-version}</version>
 			</extension>
 		</extensions>
 		<plugins>
@@ -136,7 +180,60 @@
 					<target>${java-target-version}</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<doclint>none</doclint>
+					<encoding>ISO-8859-1</encoding>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>${nexus-staging-maven-plugin-version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
 		</plugins>
-		<finalName>Gateway</finalName>
+
+		<finalName>Gateway-${version}</finalName>
 	</build>
 </project>
