@@ -70,7 +70,9 @@ public final class RequestProcessingManager
 		 * syntheticUserId. SessionId will also be null
 		 */
 		logger = Locator.getInstance().getLoggingService();
-		geolocationService = Locator.getInstance().getGeoLocationService();
+		
+		//TODO : Use the IP Address of the client and get the geolocation. 
+		//geolocationService = Locator.getInstance().getGeoLocationService();
 		String userId = remoteAddr.getAddress().getHostName() + ":" + remoteAddr.getPort();
 
 		clientDetails = new ClientDetails(remoteAddr, clientEndpoint, new SessionDetails(userId, null), null);
