@@ -47,29 +47,51 @@ public class RequestRouter
 {
 	private LoggingService logger = null;
 	private static RequestRouter self = null;
-	private Map<String, Endpoints> preAuthenticationEndpoints = null;
+	private Map<String, Enum<?>> preAuthenticationEndpoints = null;
 	private Map<String, RequestProcessor> endpointRequestProcessorMap;
 
 	private RequestRouter()
 	{
 		logger = Locator.getInstance().getLoggingService();
+		
+		preAuthenticationEndpoints = new HashMap<>();
+		endpointRequestProcessorMap = new HashMap<>();
+	}
 
+	public static RequestRouter getInstance()
+	{
+		if (self == null)
+		{
+			synchronized (RequestRouter.class)
+			{
+				if (self == null)
+				{
+					self = new RequestRouter();
+				}
+			}
+		}
+
+		return self;
+	}
+	
+	public void registerDefaultPreAuthenticationEndpoints()
+	{
 		/**
 		 * Register all preAuthenticationEndpoints
 		 */
-		preAuthenticationEndpoints = new HashMap<String, Endpoints>();
-		preAuthenticationEndpoints.put(Endpoints.ListEndpoints.name(), Endpoints.ListEndpoints);
-		preAuthenticationEndpoints.put(Endpoints.EndpointMetadata.name(), Endpoints.EndpointMetadata);
+		registerPreAuthenticationEndpoint(Endpoints.ListEndpoints.name(), Endpoints.ListEndpoints);
+		registerPreAuthenticationEndpoint(Endpoints.EndpointMetadata.name(), Endpoints.EndpointMetadata);
 		
-		preAuthenticationEndpoints.put(Endpoints.SignUp.name(), Endpoints.SignUp);
-		preAuthenticationEndpoints.put(Endpoints.Login.name(), Endpoints.Login);
-		preAuthenticationEndpoints.put(Endpoints.GenerateResetToken.name(), Endpoints.GenerateResetToken);
-
+		registerPreAuthenticationEndpoint(Endpoints.SignUp.name(), Endpoints.SignUp);
+		registerPreAuthenticationEndpoint(Endpoints.Login.name(), Endpoints.Login);
+		registerPreAuthenticationEndpoint(Endpoints.GenerateResetToken.name(), Endpoints.GenerateResetToken);
+	}
+	
+	public void registerDefaultRequestProcessors()
+	{
 		/**
 		 * Register all standard endpoints and request processors
 		 */
-		endpointRequestProcessorMap = new HashMap<String, RequestProcessor>();
-
 		registerRequestProcessor(createRequestProcessor(ListEndpointsRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(EndpointMetadataRequestProcessor.class));
 		
@@ -96,21 +118,10 @@ public class RequestRouter
 		registerRequestProcessor(createRequestProcessor(SubscribeRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(AutoSuggestRequestProcessor.class));
 	}
-
-	public static RequestRouter getInstance()
+	
+	public void registerPreAuthenticationEndpoint(String endpointName, Enum<?> endpoint)
 	{
-		if (self == null)
-		{
-			synchronized (RequestRouter.class)
-			{
-				if (self == null)
-				{
-					self = new RequestRouter();
-				}
-			}
-		}
-
-		return self;
+		preAuthenticationEndpoints.put(endpointName, endpoint);
 	}
 	
 	public boolean isPreAuthenticationEndpoint(String endpoint)
