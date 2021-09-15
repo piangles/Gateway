@@ -44,7 +44,7 @@ public class UpdateUserPreferencesRequestProcessor extends AbstractRequestProces
 	{
 		UserPreferences prefs = new UserPreferences(clientDetails.getSessionDetails().getUserId(), nvPair);
 		
-		upService.persistUserPreference(clientDetails.getSessionDetails().getUserId(), prefs);
+		upService.persistUserPreferences(clientDetails.getSessionDetails().getUserId(), prefs);
 		
 		return new SimpleResponse(true, "UserPreferences persisted successfully.");
 	}

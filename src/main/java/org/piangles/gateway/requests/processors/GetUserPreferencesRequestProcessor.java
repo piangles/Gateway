@@ -41,6 +41,6 @@ public class GetUserPreferencesRequestProcessor extends AbstractRequestProcessor
 	@Override
 	protected Map<String, Object> processRequest(ClientDetails clientDetails, Request request, EmptyRequest emptyRequest) throws Exception
 	{
-		return upService.retrieveUserPreference(clientDetails.getSessionDetails().getUserId()).getNVPair(); 
+		return upService.retrieveUserPreferences(clientDetails.getSessionDetails().getUserId()).getNVPair(); 
 	}
 }
