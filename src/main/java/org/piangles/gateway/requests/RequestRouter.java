@@ -31,14 +31,14 @@ import org.piangles.gateway.requests.processors.CreateUserProfileRequestProcesso
 import org.piangles.gateway.requests.processors.EndpointMetadataRequestProcessor;
 import org.piangles.gateway.requests.processors.GenerateTokenRequestProcessor;
 import org.piangles.gateway.requests.processors.GetConfigRequestProcessor;
-import org.piangles.gateway.requests.processors.GetUserPreferenceRequestProcessor;
+import org.piangles.gateway.requests.processors.GetUserPreferencesRequestProcessor;
 import org.piangles.gateway.requests.processors.GetUserProfileRequestProcessor;
 import org.piangles.gateway.requests.processors.KeepSessionAliveRequestProcessor;
 import org.piangles.gateway.requests.processors.ListEndpointsRequestProcessor;
 import org.piangles.gateway.requests.processors.LoginRequestProcessor;
 import org.piangles.gateway.requests.processors.LogoutRequestProcessor;
 import org.piangles.gateway.requests.processors.PingMessageProcessor;
-import org.piangles.gateway.requests.processors.UpdateUserPreferenceRequestProcessor;
+import org.piangles.gateway.requests.processors.UpdateUserPreferencesRequestProcessor;
 import org.piangles.gateway.requests.processors.SignUpRequestProcessor;
 import org.piangles.gateway.requests.processors.SubscribeRequestProcessor;
 import org.piangles.gateway.requests.processors.UpdateUserProfileRequestProcessor;
@@ -112,8 +112,8 @@ public class RequestRouter
 		
 		registerRequestProcessor(createRequestProcessor(GetConfigRequestProcessor.class));
 
-		registerRequestProcessor(createRequestProcessor(GetUserPreferenceRequestProcessor.class));
-		registerRequestProcessor(createRequestProcessor(UpdateUserPreferenceRequestProcessor.class));
+		registerRequestProcessor(createRequestProcessor(GetUserPreferencesRequestProcessor.class));
+		registerRequestProcessor(createRequestProcessor(UpdateUserPreferencesRequestProcessor.class));
 		
 		registerRequestProcessor(createRequestProcessor(SubscribeRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(AutoSuggestRequestProcessor.class));
