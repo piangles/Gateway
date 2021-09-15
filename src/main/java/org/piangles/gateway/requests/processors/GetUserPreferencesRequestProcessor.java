@@ -22,7 +22,7 @@ package org.piangles.gateway.requests.processors;
 import java.util.Map;
 
 import org.piangles.backbone.services.Locator;
-import org.piangles.backbone.services.prefs.UserPreferenceService;
+import org.piangles.backbone.services.prefs.UserPreferencesService;
 import org.piangles.core.util.reflect.TypeToken;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
@@ -31,7 +31,7 @@ import org.piangles.gateway.requests.dto.Request;
 
 public class GetUserPreferencesRequestProcessor extends AbstractRequestProcessor<EmptyRequest, Map<String,Object>>
 {
-	private UserPreferenceService upService = Locator.getInstance().getUserPreferenceService();
+	private UserPreferencesService upService = Locator.getInstance().getUserPreferencesService();
 	
 	public GetUserPreferencesRequestProcessor()
 	{

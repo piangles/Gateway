@@ -22,8 +22,8 @@ package org.piangles.gateway.requests.processors;
 import java.util.Map;
 
 import org.piangles.backbone.services.Locator;
-import org.piangles.backbone.services.prefs.UserPreference;
-import org.piangles.backbone.services.prefs.UserPreferenceService;
+import org.piangles.backbone.services.prefs.UserPreferences;
+import org.piangles.backbone.services.prefs.UserPreferencesService;
 import org.piangles.core.util.reflect.TypeToken;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
@@ -32,7 +32,7 @@ import org.piangles.gateway.requests.dto.SimpleResponse;
 
 public class UpdateUserPreferencesRequestProcessor extends AbstractRequestProcessor<Map<String, Object>, SimpleResponse>
 {
-	private UserPreferenceService upService = Locator.getInstance().getUserPreferenceService();
+	private UserPreferencesService upService = Locator.getInstance().getUserPreferencesService();
 	
 	public UpdateUserPreferencesRequestProcessor()
 	{
@@ -42,7 +42,7 @@ public class UpdateUserPreferencesRequestProcessor extends AbstractRequestProces
 	@Override
 	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, Map<String, Object> nvPair) throws Exception
 	{
-		UserPreference prefs = new UserPreference(clientDetails.getSessionDetails().getUserId(), nvPair);
+		UserPreferences prefs = new UserPreferences(clientDetails.getSessionDetails().getUserId(), nvPair);
 		
 		upService.persistUserPreference(clientDetails.getSessionDetails().getUserId(), prefs);
 		
