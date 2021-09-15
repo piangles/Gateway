@@ -148,13 +148,23 @@ public class RequestRouter
 	{
 		if (rp != null)
 		{
+			String registringOrOverriding = null; 
 			RequestProcessor existingRP = endpointRequestProcessorMap.get(rp.getEndpoint().name()); 
 			if (existingRP != null)
 			{
 				logger.warn("Request Router already has a registered endpoint : " + rp.getEndpoint() + " : " + existingRP.getClass().getCanonicalName());
-				logger.warn("Overriding " + rp.getEndpoint() + " with : " + rp.getClass().getCanonicalName());
+				registringOrOverriding = "Overriding"; 
 			}
+			else
+			{
+				registringOrOverriding = "Registering";
+			}
+			logger.info(registringOrOverriding + " " + rp.getEndpoint() + " with : " + rp.getClass().getCanonicalName());
 			endpointRequestProcessorMap.put(rp.getEndpoint().name(), rp);
+		}
+		else
+		{
+			logger.error("registerRequestProcessor: RequestProcessor is null.");
 		}
 	}
 	

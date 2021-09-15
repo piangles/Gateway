@@ -65,14 +65,14 @@ label {
 		console.log("Websocket : " + url)
 
 		class Request {
-			constructor(sessionId, endPoint, appRequestAsString) {
+			constructor(sessionId, endPoint, endpointRequest) {
 				this.createdTime = 'Oct 12, 2020 4:46:33 PM';//new Date(); Wed Dec 09 2020 07:45:47 GMT-0500 (Eastern Standard Time)
 				this.traceId = CreateUUID();
 	
 				this.sessionId = sessionId;
 				
 				this.endPoint = endPoint;
-				this.appRequestAsString = appRequestAsString;
+				this.endpointRequest = endpointRequest;
 			}
 		}	
 	
@@ -145,7 +145,7 @@ label {
 		   	{
 		    	requestStatus.value = "Request for endpoint : " + response.endpoint + " was successful.";
 		    	
-		    	appResponse = JSON.parse(response.appResponseAsString);
+		    	appResponse = JSON.parse(response.endpointResponse);
 		    	
 			    if (response.endpoint == "ListEndpoints")
 			   	{

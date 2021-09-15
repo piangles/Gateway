@@ -250,14 +250,14 @@ public final class RequestProcessingManager
 						try
 						{
 							SimpleResponse simpleResponse = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), SimpleResponse.class);
-							if (simpleResponse.isAppRequestSuccessful())
+							if (simpleResponse.isRequestSuccessful())
 							{
 								state = ClientState.PostAuthentication;
 							}
 							else
 							{
 								// Log and keep it as is.
-								logger.info("ChangePassword was not successful because of:" + simpleResponse.getAppResponseMessage());
+								logger.info("ChangePassword was not successful because of:" + simpleResponse.getMessage());
 							}
 							response = null;
 						}

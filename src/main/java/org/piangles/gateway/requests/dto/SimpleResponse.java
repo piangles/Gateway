@@ -23,33 +23,33 @@ public final class SimpleResponse
 {
 	private static final String SUCCESS_MESSAGE = "Request was successfully processed.";
 	private static final String FAILURE_MESSAGE = "Request failed to be processed.";
-	private boolean appRequestSuccessful;
-	private String appResponseMessage;
+	private boolean requestSuccessful;
+	private String message;
 	
-	public SimpleResponse(boolean appRequestSuccessful)
+	public SimpleResponse(boolean requestSuccessful)
 	{
-		this(appRequestSuccessful, appRequestSuccessful?SUCCESS_MESSAGE:FAILURE_MESSAGE);
+		this(requestSuccessful, requestSuccessful?SUCCESS_MESSAGE:FAILURE_MESSAGE);
 	}
 
-	public SimpleResponse(boolean appRequestSuccessful, String appResponeMessage)
+	public SimpleResponse(boolean requestSuccessful, String message)
 	{
-		this.appRequestSuccessful = appRequestSuccessful;
-		this.appResponseMessage = appResponeMessage;
+		this.requestSuccessful = requestSuccessful;
+		this.message = message;
 	}
 
-	public boolean isAppRequestSuccessful()
+	public boolean isRequestSuccessful()
 	{
-		return appRequestSuccessful;
+		return requestSuccessful;
 	}
 
-	public String getAppResponseMessage()
+	public String getMessage()
 	{
-		return appResponseMessage;
+		return message;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "SimpleResponse [appRequestSuccessful=" + appRequestSuccessful + ", appResponeMessage=" + appResponseMessage + "]";
+		return "SimpleResponse [requestSuccessful=" + requestSuccessful + ", message=" + message + "]";
 	}
 }
