@@ -21,7 +21,7 @@ package org.piangles.gateway.events.processors;
 
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
-import org.piangles.backbone.services.msg.ControlDetails;
+import org.piangles.backbone.services.msg.Control;
 import org.piangles.backbone.services.msg.Event;
 import org.piangles.gateway.Message;
 import org.piangles.gateway.MessageType;
@@ -35,7 +35,7 @@ public class PassThruControlEventProcessor implements EventProcessor
 	@Override
 	public String getType()
 	{
-		return ControlDetails.class.getCanonicalName();
+		return Control.class.getCanonicalName();
 	}
 
 	@Override
