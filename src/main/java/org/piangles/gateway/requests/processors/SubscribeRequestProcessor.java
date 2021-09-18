@@ -36,6 +36,8 @@ import org.piangles.gateway.requests.dto.SubscribeRequest;
 
 public class SubscribeRequestProcessor extends AbstractRequestProcessor<SubscribeRequest, SimpleResponse>
 {
+	private static final String USER_ID = "UserId";
+	
 	private MessagingService msgService = null;
 
 	public SubscribeRequestProcessor()
@@ -53,7 +55,7 @@ public class SubscribeRequestProcessor extends AbstractRequestProcessor<Subscrib
 
 		if (subscribeRequest.isUserTopics())
 		{
-			topics = msgService.getTopicsForUser(clientDetails.getSessionDetails().getUserId());
+			topics = msgService.getTopicsFor(USER_ID, clientDetails.getSessionDetails().getUserId());
 			if (topics == null)
 			{
 				result = false;
