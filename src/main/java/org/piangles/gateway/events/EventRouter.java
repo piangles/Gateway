@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
-import org.piangles.backbone.services.msg.ControlDetails;
+import org.piangles.backbone.services.msg.Control;
 import org.piangles.backbone.services.msg.Event;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.events.processors.PassThruControlEventProcessor;
@@ -72,7 +72,7 @@ public class EventRouter
 		String processorId = null;
 		if (EVENT_TYPE_CONTROL.equals(event.getEventType()))
 		{
-			ControlDetails controlDetails = JSON.getDecoder().decode(((String)event.getPayload()).getBytes(), ControlDetails.class);
+			Control controlDetails = JSON.getDecoder().decode(((String)event.getPayload()).getBytes(), Control.class);
 			processorId = createControlEventProcessorId(controlDetails.getType());
 		}
 		else
@@ -172,6 +172,6 @@ public class EventRouter
 	
 	private String createControlEventProcessorId(String controlPayloadType)
 	{
-		return ControlDetails.class.getCanonicalName() + ":" + controlPayloadType;
+		return Control.class.getCanonicalName() + ":" + controlPayloadType;
 	}
 }
