@@ -131,7 +131,7 @@ public class EventProcessingManager implements EventDispatcher
 			// create ConsumerProperties from list of Topics
 			ConsumerProperties consumerProps = new ConsumerProperties(clientDetails.getSessionDetails().getUserId());
 			List<ConsumerProperties.Topic> modifiedTopics = topicTraceIdMap.keySet().stream().map(topic -> {
-				return consumerProps.new Topic(topic.getTopicName(), topic.getPartition(), topic.isCompacted());
+				return consumerProps.new Topic(topic.getTopicName(), topic.getPartition(), topic.shouldReadEarliest());
 			}).collect(Collectors.toList());
 			
 			consumerProps.setTopics(modifiedTopics);
