@@ -40,7 +40,7 @@ import org.piangles.gateway.requests.processors.LogoutRequestProcessor;
 import org.piangles.gateway.requests.processors.PingMessageProcessor;
 import org.piangles.gateway.requests.processors.UpdateUserPreferencesRequestProcessor;
 import org.piangles.gateway.requests.processors.SignUpRequestProcessor;
-import org.piangles.gateway.requests.processors.SubscribeRequestProcessor;
+import org.piangles.gateway.requests.processors.SubscriptionRequestProcessor;
 import org.piangles.gateway.requests.processors.UpdateUserProfileRequestProcessor;
 
 public class RequestRouter
@@ -115,7 +115,7 @@ public class RequestRouter
 		registerRequestProcessor(createRequestProcessor(GetUserPreferencesRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(UpdateUserPreferencesRequestProcessor.class));
 		
-		registerRequestProcessor(createRequestProcessor(SubscribeRequestProcessor.class));
+		registerRequestProcessor(createRequestProcessor(SubscriptionRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(AutoSuggestRequestProcessor.class));
 	}
 	

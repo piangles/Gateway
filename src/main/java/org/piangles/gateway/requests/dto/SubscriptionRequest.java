@@ -19,42 +19,29 @@
  
 package org.piangles.gateway.requests.dto;
 
-import java.util.List;
-
-public class SubscribeRequest
+public final class SubscriptionRequest
 {
-	private boolean userTopics = false;
-	private String topic;//TODO Will need to change to Topic. Currently will work only for Default partition.
-	private List<String> aliases;
+	private String topicAlias;
+	private String id;
 
-	public SubscribeRequest()
+	public SubscriptionRequest(String topicAlias)
 	{
-		//This will create topics for UserId
-		this.userTopics = true;
-	}
-	
-	public SubscribeRequest(String topic)
-	{
-		this.topic = topic;
-	}
-	
-	public SubscribeRequest(List<String> aliases)
-	{
-		this.aliases = aliases;
+		this(topicAlias, null);
 	}
 
-	public boolean isUserTopics()
+	public SubscriptionRequest(String topicAlias, String id)
 	{
-		return userTopics;
-	}
-	
-	public String getTopic()
-	{
-		return topic;
+		this.topicAlias = topicAlias;
+		this.id = id;
 	}
 
-	public List<String> getAliases()
+	public String getTopicAlias()
 	{
-		return aliases;
+		return topicAlias;
+	}
+	
+	public String getId()
+	{
+		return id;
 	}
 }
