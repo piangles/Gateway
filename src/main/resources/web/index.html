@@ -66,7 +66,7 @@ label {
 
 		class Request {
 			constructor(sessionId, endPoint, endpointRequest) {
-				this.createdTime = 'Oct 12, 2020 4:46:33 PM';//new Date(); Wed Dec 09 2020 07:45:47 GMT-0500 (Eastern Standard Time)
+				this.issuedTime = '1632095127978';
 				this.traceId = CreateUUID();
 	
 				this.sessionId = sessionId;
@@ -75,7 +75,14 @@ label {
 				this.endpointRequest = endpointRequest;
 			}
 		}	
-	
+
+		class Message {
+			constructor(messageType, payload) {
+				this.messageType = messageType;
+				this.payload = payload;
+			}
+		}
+
 		function onLoad() {
 			endpointList = document.getElementById("endpointList");
 			requestStatus = document.getElementById("requestStatus");
@@ -101,23 +108,23 @@ label {
 			});
 		}
 
-		function sendRequest(endpoint, appRequest) {
-			let
-			request = new Request(SESSION_ID, endpoint, appRequest);
-			console.log("Sending Request : " + JSON.stringify(request));
-
-			ws.send(JSON.stringify(request));
+		function sendMessage(endpoint, endpointRequest) {
+			let request = new Request(SESSION_ID, endpoint, endpointRequest);
+			let message = new Message('Request', JSON.stringify(request));
+			
+			console.log("Sending Message-Request : " + JSON.stringify(message));
+			ws.send(JSON.stringify(message));
 		}
 
 		function getEndpointMetadata(){
 			console.log("Sending request for Metadata for: " + endpointList.value);
 			
-			sendRequest("EndpointMetadata", endpointList.value);
+			sendMessage("EndpointMetadata", endpointList.value);
 		}
 		
 		this.ws.onopen = (e) => {
 			if (e.target.readyState !== WebSocket.OPEN) return;
-			sendRequest("ListEndpoints", "{}");
+			sendMessage("ListEndpoints", "{}");
 		}
 		
 		this.ws.onclose = (e) => {

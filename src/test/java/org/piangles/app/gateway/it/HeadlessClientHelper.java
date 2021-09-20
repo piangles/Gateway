@@ -28,7 +28,7 @@ import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.Response;
 import org.piangles.gateway.requests.dto.SystemInfo;
 
-public class HeadlessClientHelper
+public class HeadlessClientHelper //Rename
 {
 	// open websocket
 	protected WebsocketClientEndpoint clientEndpoint;

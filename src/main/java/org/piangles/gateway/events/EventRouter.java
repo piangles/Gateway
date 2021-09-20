@@ -28,7 +28,7 @@ import org.piangles.backbone.services.msg.Control;
 import org.piangles.backbone.services.msg.Event;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.events.processors.PassThruControlEventProcessor;
-import org.piangles.gateway.events.processors.PassThruNotificationEventProcessor;
+import org.piangles.gateway.events.processors.PassThruApplicationEventsProcessor;
 
 public class EventRouter
 {
@@ -126,7 +126,7 @@ public class EventRouter
 		else
 		{
 			processorId = payloadType;
-			ep = new PassThruNotificationEventProcessor(payloadType);
+			ep = new PassThruApplicationEventsProcessor(payloadType);
 		}
 		register(processorId, ep);
 	}
@@ -161,12 +161,19 @@ public class EventRouter
 	{
 		automaticPassThru = true;
 		passThruControlProcessor = new PassThruControlEventProcessor();
-		passThruNotificationProcessor = new PassThruNotificationEventProcessor("AutoPassThru");
+		passThruNotificationProcessor = new PassThruApplicationEventsProcessor("AutoPassThru");
 	}
 	
 	public boolean isAutomaticPassThru()
 	{
-		logger.info("AutomaticPassThru enabled:  PassThru EventProcessor will be used when processorId is not found.");
+		if (automaticPassThru)
+		{
+			logger.info("AutomaticPassThru is Enabled:  PassThruEventProcessor will be used when event processor is not found.");
+		}
+		else
+		{
+			logger.info("AutomaticPassThru is Disabled. Error will be thrown, when event processor is not found.");
+		}
 		return automaticPassThru;
 	}
 	

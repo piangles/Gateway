@@ -27,12 +27,12 @@ import org.piangles.gateway.MessageType;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.events.EventProcessor;
 
-public class PassThruNotificationEventProcessor implements EventProcessor
+public class PassThruApplicationEventsProcessor implements EventProcessor
 {
 	private LoggingService logger = Locator.getInstance().getLoggingService();
 	private String type = null;
 
-	public PassThruNotificationEventProcessor(String type)
+	public PassThruApplicationEventsProcessor(String type)
 	{
 		this.type = type;
 	}

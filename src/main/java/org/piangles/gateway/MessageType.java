@@ -21,6 +21,7 @@ package org.piangles.gateway;
 
 public enum MessageType
 {
+	Request,
 	Response,
 	Event
 }

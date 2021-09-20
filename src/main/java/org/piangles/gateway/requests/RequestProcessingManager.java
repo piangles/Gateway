@@ -30,6 +30,7 @@ import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.ClientEndpoint;
 import org.piangles.gateway.CommunicationPattern;
+import org.piangles.gateway.Message;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.client.ClientState;
 import org.piangles.gateway.client.Location;
@@ -101,8 +102,9 @@ public final class RequestProcessingManager
 	/**
 	 * @param message
 	 */
-	public void onMessage(String message)
+	public void onMessage(String messageAsString)
 	{
+		Message message = null;
 		Request request = null;
 		Response response = null;
 
@@ -114,7 +116,8 @@ public final class RequestProcessingManager
 		RequestProcessor requestProcessor = null;
 		try
 		{
-			request = JSON.getDecoder().decode(message.getBytes(), Request.class);
+			message = JSON.getDecoder().decode(messageAsString.getBytes(), Message.class);
+			request = JSON.getDecoder().decode(message.getPayload().getBytes(), Request.class);
 			request.markTransitTime();
 			endpoint = request.getEndpoint();
 			requestProcessor = RequestRouter.getInstance().getRequestProcessor(endpoint);
