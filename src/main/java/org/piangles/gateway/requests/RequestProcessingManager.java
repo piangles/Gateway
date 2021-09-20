@@ -23,8 +23,6 @@ import java.net.InetSocketAddress;
 
 import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
-import org.piangles.backbone.services.geo.GeoLocation;
-import org.piangles.backbone.services.geo.GeoLocationService;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
@@ -33,7 +31,6 @@ import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.Message;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.client.ClientState;
-import org.piangles.gateway.client.Location;
 import org.piangles.gateway.events.EventProcessingManager;
 import org.piangles.gateway.requests.dto.LoginResponse;
 import org.piangles.gateway.requests.dto.Request;
@@ -57,7 +54,7 @@ import org.piangles.gateway.requests.dto.StatusCode;
 public final class RequestProcessingManager
 {
 	private LoggingService logger = null;
-	private GeoLocationService geolocationService = null;
+	//private GeoLocationService geolocationService = null;
 
 	private ClientState state = ClientState.PreAuthentication;
 	private ClientDetails clientDetails = null;
@@ -219,10 +216,11 @@ public final class RequestProcessingManager
 								 * immutable. ClientDetails construction is only visible to this 
 								 * package for security reasons. 
 								 */
-								GeoLocation geoLocation = geolocationService.getGeoLocation(clientDetails.getIPAddress());
+								//GeoLocation geoLocation = geolocationService.getGeoLocation(clientDetails.getIPAddress());
 								clientDetails = new ClientDetails(clientDetails.getRemoteAddress(), clientDetails.getClientEndpoint(),
 										new SessionDetails(loginResponse.getUserId(), loginResponse.getSessionId()),
-										Location.convert(geoLocation, false));
+										null);
+								//		Location.convert(geoLocation, false));
 
 								/**
 								 * Now that client is authenticated, create the MessageProcessingManager
