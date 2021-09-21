@@ -19,9 +19,14 @@
  
 package org.piangles.gateway.requests.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public final class SubscriptionRequest
 {
+	@JsonProperty(required = true)
 	private String topicAlias;
+	
+	@JsonProperty(required = true)
 	private String id;
 
 	public SubscriptionRequest(String topicAlias)

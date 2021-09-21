@@ -19,8 +19,11 @@
  
 package org.piangles.gateway.requests.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class GenerateTokenRequest
 {
+	@JsonProperty(required = true)
 	private String emailId;
 
 	public GenerateTokenRequest(String emailId)

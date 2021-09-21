@@ -19,17 +19,24 @@
  
 package org.piangles.gateway.requests.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Pong
 {
+	@JsonProperty(required = true)
 	private long sequenceNo;
-	private long pingTimeStamp;
-	private long receivedTimeStamp;
 	
-	public Pong(long sequenceNo, long pingTimeStamp)
+	@JsonProperty(required = true)
+	private long pingTimestamp;
+	
+	@JsonProperty(required = true)
+	private long receivedTimestamp;
+	
+	public Pong(long sequenceNo, long pingTimestamp)
 	{
 		this.sequenceNo = sequenceNo;
-		this.pingTimeStamp = pingTimeStamp;
-		this.receivedTimeStamp = System.currentTimeMillis();
+		this.pingTimestamp = pingTimestamp;
+		this.receivedTimestamp = System.currentTimeMillis();
 	}
 
 	public long getSequenceNo()
@@ -37,13 +44,13 @@ public class Pong
 		return sequenceNo;
 	}
 
-	public long getPingTimeStamp()
+	public long getPingTimestamp()
 	{
-		return pingTimeStamp;
+		return pingTimestamp;
 	}
 
-	public long getReceivedTimeStamp()
+	public long getReceivedTimestamp()
 	{
-		return receivedTimeStamp;
+		return receivedTimestamp;
 	}
 }

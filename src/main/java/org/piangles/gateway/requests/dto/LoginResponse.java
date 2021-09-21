@@ -19,16 +19,31 @@
  
 package org.piangles.gateway.requests.dto;
 
+import org.piangles.backbone.services.auth.FailureReason;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public final class LoginResponse
 {
+	@JsonProperty(required = true)
 	private boolean authenticated = false;
-	private boolean authenticatedByToken = false; 
+	
+	@JsonProperty(required = false)
+	private boolean authenticatedByToken = false;
+	
+	@JsonProperty(required = true)
 	private String userId;
+	
+	@JsonProperty(required = true)
 	private String sessionId;
+	
+	@JsonProperty(required = true)
 	private int noOfAttemptsRemaining = 0;
-	private String failureReason = null;
+	
+	@JsonProperty(required = false)
+	private FailureReason failureReason = null;
 
-	public LoginResponse(int noOfAttemptsRemaining, String failureReason)
+	public LoginResponse(int noOfAttemptsRemaining, FailureReason failureReason)
 	{
 		this.noOfAttemptsRemaining = noOfAttemptsRemaining;
 		this.failureReason = failureReason;
@@ -67,7 +82,7 @@ public final class LoginResponse
 		return noOfAttemptsRemaining;
 	}
 
-	public String getFailureReason()
+	public FailureReason getFailureReason()
 	{
 		return failureReason;
 	}

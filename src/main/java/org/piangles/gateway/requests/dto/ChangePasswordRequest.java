@@ -19,9 +19,14 @@
  
 package org.piangles.gateway.requests.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ChangePasswordRequest
 {
+	@JsonProperty(required = true)
 	private String oldPassword = null;
+	
+	@JsonProperty(required = true)
 	private String newPassword = null;
 	
 	public ChangePasswordRequest(String newPassword)

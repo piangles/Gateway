@@ -19,11 +19,17 @@
  
 package org.piangles.gateway.requests.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public final class SimpleResponse
 {
 	private static final String SUCCESS_MESSAGE = "Request was successfully processed.";
 	private static final String FAILURE_MESSAGE = "Request failed to be processed.";
+	
+	@JsonProperty(required = true)
 	private boolean requestSuccessful;
+	
+	@JsonProperty(required = true)
 	private String message;
 	
 	public SimpleResponse(boolean requestSuccessful)

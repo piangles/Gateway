@@ -83,7 +83,7 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 			}
 			else
 			{
-				loginResponse = new LoginResponse(authResponse.getNoOfAttemptsRemaining(), authResponse.getFailureReason().name());
+				loginResponse = new LoginResponse(authResponse.getNoOfAttemptsRemaining(), authResponse.getFailureReason());
 			}
 		}
 		else //Authenticate using login and sessionId
@@ -95,7 +95,7 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 			}
 			else
 			{
-				loginResponse = new LoginResponse(0, FailureReason.InvalidSession.name());
+				loginResponse = new LoginResponse(0, FailureReason.InvalidSession);
 			}
 		}
 

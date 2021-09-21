@@ -19,12 +19,23 @@
  
 package org.piangles.gateway.requests.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class SignUpRequest
 {
+	@JsonProperty(required = true)
 	private String firstName = null;
+	
+	@JsonProperty(required = true)
 	private String lastName = null;
+	
+	@JsonProperty(required = true)
 	private String emailId = null;
+	
+	@JsonProperty(required = false)
 	private String phoneNo = null;
+	
+	@JsonProperty(required = true)
 	private String password = null;
 	
 	public SignUpRequest(String firstName, String lastName, String emailId, String phoneNo, String password)

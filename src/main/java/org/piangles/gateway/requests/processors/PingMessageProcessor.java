@@ -35,7 +35,7 @@ public final class PingMessageProcessor extends AbstractRequestProcessor<Ping, P
 	@Override
 	protected Pong processRequest(ClientDetails clientDetails, Request request, Ping ping) throws Exception
 	{
-		return new Pong(ping.getSequenceNo(), ping.getTimeStamp());
+		return new Pong(ping.getSequenceNo(), ping.getTimestamp());
 	}
 	
 	@Override

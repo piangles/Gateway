@@ -19,11 +19,20 @@
  
 package org.piangles.gateway.requests.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public final class LoginRequest
 {
+	@JsonProperty(required = true, defaultValue="Default")
 	private String authenticationType; //Could be one of [Default,TokenBased,Google]
+	
+	@JsonProperty(required = true)
 	private String id; //Could be one of [emailId or phoneNumber, tokenId(Proprietary or from SSO Providers), userId]
+	
+	@JsonProperty(required = true)
 	private String password; 
+	
+	@JsonProperty(required = false)
 	private String sessionId; //When client app reconnects on disconnect this can be used in combo with userId
 	
 	public LoginRequest(String authenticationType, String id, String password, String sessionId)
