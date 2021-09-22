@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.msg.MessagingService;
 import org.piangles.backbone.services.msg.Topic;
@@ -32,8 +33,6 @@ import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.SimpleResponse;
 import org.piangles.gateway.requests.dto.SubscriptionRequest;
-
-import com.mysql.jdbc.StringUtils;
 
 public class SubscriptionRequestProcessor extends AbstractRequestProcessor<SubscriptionRequest, SimpleResponse>
 {
@@ -54,7 +53,7 @@ public class SubscriptionRequestProcessor extends AbstractRequestProcessor<Subsc
 		String message = "Subscription was successful.";
 		List<Topic> topics = null;
 
-		if (StringUtils.isEmptyOrWhitespaceOnly(subscribeRequest.getTopicAlias()))
+		if (StringUtils.isBlank(subscribeRequest.getTopicAlias()))
 		{
 			result = false;
 			message = "None of the mandatory fields are specified.";
