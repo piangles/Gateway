@@ -22,6 +22,9 @@ package org.piangles.gateway.requests.processors;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.auth.AuthenticationResponse;
 import org.piangles.backbone.services.auth.AuthenticationService;
+import org.piangles.core.expt.NotFoundException;
+import org.piangles.core.expt.ServiceRuntimeException;
+import org.piangles.core.expt.ValidationException;
 import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
@@ -41,17 +44,30 @@ public final class GenerateTokenRequestProcessor extends AbstractRequestProcesso
 	@Override
 	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, GenerateTokenRequest tokenRequest) throws Exception
 	{
+		SimpleResponse simpleResponse = null;
 		boolean result = true;
-		String message = "Please check your registered email for the token.";
 		
-		AuthenticationResponse response = authService.generateResetToken(tokenRequest.getEmailId());
-		result = response.isRequestSuccessful();
-		if (!result)
+		AuthenticationResponse authResponse = authService.generateResetToken(tokenRequest.getEmailId());
+		
+		if (authResponse.isRequestSuccessful())
 		{
-			message = "Could not generate a reset token.";
+			simpleResponse = new SimpleResponse("Please check your registered email for the token.");
+		}
+		else
+		{
+			StringBuffer sb = new StringBuffer();
+			authResponse.getFailureMessages().stream().map(msg -> sb.append(msg).append("\n"));
+		
+			switch(authResponse.getFailureReason())
+			{
+			case AccountDoesNotExist:
+				throw new NotFoundException(sb.toString());
+			default:
+				throw new ServiceRuntimeException("Unhandled FailureReason : " + authResponse.getFailureReason() + "\n" + sb.toString());
+			}
 		}
 		
-		return new SimpleResponse(result, message);
+		return simpleResponse;
 	}
 	
 	@Override

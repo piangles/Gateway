@@ -40,6 +40,6 @@ public class UpdateUserProfileRequestProcessor extends AbstractRequestProcessor<
 	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, BasicUserProfile userProfile) throws Exception
 	{
 		profileService.updateProfile(clientDetails.getSessionDetails().getUserId(), userProfile);
-		return new SimpleResponse(true);
+		return new SimpleResponse("UserProfile was updated successfully.");
 	}
 }

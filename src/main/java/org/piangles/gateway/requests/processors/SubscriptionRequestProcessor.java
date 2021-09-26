@@ -50,7 +50,6 @@ public class SubscriptionRequestProcessor extends AbstractRequestProcessor<Subsc
 	public final SimpleResponse processRequest(ClientDetails clientDetails, Request request, SubscriptionRequest subscribeRequest) throws Exception
 	{
 		boolean result = true;
-		String message = "Subscription was successful.";
 		List<Topic> topics = null;
 
 		String alias = subscribeRequest.getTopicAlias();
@@ -75,6 +74,7 @@ public class SubscriptionRequestProcessor extends AbstractRequestProcessor<Subsc
 		 */
 		if (topics == null)
 		{
+			String message = null;
 			if (entityRelated)
 			{
 				message = "Entity " + alias + " does not have any associated topics.";
@@ -94,6 +94,6 @@ public class SubscriptionRequestProcessor extends AbstractRequestProcessor<Subsc
 			getEventProcessingManager().restart();
 		}
 
-		return new SimpleResponse(result, message);
+		return new SimpleResponse("Subscription was successful.");
 	}
 }

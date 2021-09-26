@@ -35,6 +35,6 @@ public final class KeepSessionAliveRequestProcessor extends AbstractRequestProce
 	@Override
 	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, EmptyRequest emptyRequest) throws Exception
 	{
-		return new SimpleResponse(true);
+		return new SimpleResponse("Renewed Session successfully.");
 	}
 }

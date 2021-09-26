@@ -22,6 +22,8 @@ package org.piangles.gateway.requests.processors;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.geo.GeoLocation;
 import org.piangles.backbone.services.geo.GeoLocationService;
+import org.piangles.core.expt.NotFoundException;
+import org.piangles.core.expt.ValidationException;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.client.Location;
 import org.piangles.gateway.requests.Endpoints;
@@ -31,7 +33,6 @@ import org.piangles.gateway.requests.dto.SimpleResponse;
 
 public class SetLocationRequestProcessor extends AbstractRequestProcessor<LocationRequest, SimpleResponse>
 {
-	private static final SimpleResponse INVALID_REQUEST = new SimpleResponse(false, "LocationRequest received is not a valid or does not have valid values.");
 	private GeoLocationService geolocationService = Locator.getInstance().getGeoLocationService();
 	
 	public SetLocationRequestProcessor()
@@ -51,7 +52,7 @@ public class SetLocationRequestProcessor extends AbstractRequestProcessor<Locati
 				(locationRequest.getZipCode() == null || !locationRequest.getZipCode().isValid())
 			)
 		{
-			simpleResponse = INVALID_REQUEST;
+			throw new ValidationException("LocationRequest received is not a valid or does not have valid values.");
 		}
 		else
 		{
@@ -76,11 +77,11 @@ public class SetLocationRequestProcessor extends AbstractRequestProcessor<Locati
 			if (geoLocation != null)
 			{
 				clientDetails.setLocation(Location.convert(geoLocation, precise));
-				simpleResponse = new SimpleResponse(true);
+				simpleResponse = new SimpleResponse("GeoLocation was determined successfully.");
 			}
 			else
 			{
-				simpleResponse = new SimpleResponse(false, String.format("Unable to determine GeoLocation from %s .", fromName)); 
+				throw new NotFoundException(String.format("Unable to determine GeoLocation from %s .", fromName));
 			}
 		}
 		

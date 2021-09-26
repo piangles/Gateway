@@ -83,6 +83,6 @@ public final class DefaultStreamRequestProcessor<AppReq, SI, SO> extends Abstrac
 			return null;
 		});
 		
-		return new SimpleResponse(true);
+		return new SimpleResponse("Accquired Stream successfully.");
 	}
 }

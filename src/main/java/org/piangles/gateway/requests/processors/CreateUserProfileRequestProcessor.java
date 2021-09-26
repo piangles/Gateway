@@ -40,6 +40,6 @@ public class CreateUserProfileRequestProcessor extends AbstractRequestProcessor<
 	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, BasicUserProfile userProfile) throws Exception
 	{
 		String userId = profileService.createProfile(userProfile);
-		return new SimpleResponse(true, userId);
+		return new SimpleResponse("Created UserProfile for : " + userId + " successfully.");
 	}
 }

@@ -42,6 +42,6 @@ public final class LogoutRequestProcessor extends AbstractRequestProcessor<Empty
 	{
 		sessionMgmtService.unregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
 
-		return new SimpleResponse(true, "Logged out successfully.");
+		return new SimpleResponse("Logged out successfully.");
 	}
 }

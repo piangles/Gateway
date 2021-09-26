@@ -24,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public final class SimpleResponse
 {
 	private static final String SUCCESS_MESSAGE = "Request was successfully processed.";
-	private static final String FAILURE_MESSAGE = "Request failed to be processed.";
 	
 	@JsonProperty(required = true)
 	private boolean requestSuccessful;
@@ -32,14 +31,13 @@ public final class SimpleResponse
 	@JsonProperty(required = true)
 	private String message;
 	
-	public SimpleResponse(boolean requestSuccessful)
+	public SimpleResponse()
 	{
-		this(requestSuccessful, requestSuccessful?SUCCESS_MESSAGE:FAILURE_MESSAGE);
+		this(SUCCESS_MESSAGE);
 	}
 
-	public SimpleResponse(boolean requestSuccessful, String message)
+	public SimpleResponse(String message)
 	{
-		this.requestSuccessful = requestSuccessful;
 		this.message = message;
 	}
 
