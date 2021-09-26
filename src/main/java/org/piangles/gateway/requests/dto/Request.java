@@ -21,11 +21,20 @@ package org.piangles.gateway.requests.dto;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public final class Request
 {
+	@JsonProperty(required = true)
 	private long issuedTime;
+	
+	@JsonIgnore
 	private long receiptTime;
+	@JsonIgnore
 	private long transitTime;
+	
+	@JsonProperty(required = true)
 	private UUID traceId = null;
 
 	/**
@@ -33,11 +42,16 @@ public final class Request
 	 * and needs to reconnect with a different server. Possibly we could also
 	 * need a clientId.
 	 */
+	@JsonProperty(required = true)
 	private String sessionId = null;
 	
+	@JsonProperty(required = true)
 	private String endPoint = null;
+	
+	@JsonProperty(required = true)
 	private String endpointRequest = null;
 	
+	@JsonProperty(required = false)
 	private SystemInfo systemInfo = null;
 	
 	public Request(String sessionId, String endPoint, String endpointRequest, SystemInfo systemInfo)

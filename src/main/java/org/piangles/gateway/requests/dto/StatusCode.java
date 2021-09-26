@@ -21,10 +21,17 @@ package org.piangles.gateway.requests.dto;
 public enum StatusCode
 {
 	Success(200, "OK"),
+	
 	BadRequest(400, "Bad Request"),
-	UnAuthenticated(401, "Not Authenticated"),
-	UnAuthorized(403, "Not Authorized" ),
+	Unauthenticated(401, "Not Authenticated"),
+	Unauthorized(403, "Not Authorized" ),
 	NotFound(404, "Not Found"),
+	RequestedFormatNotSupported(406, "Not Acceptable"),
+	VersionMismatch(409, "Version Mismatch"),
+	PayloadTooLarge(413, "Payload Too Large"),
+	UnsupportedMedia(415, "Unsupported Media"),
+	ValidationFailure(422, "Unprocessable Entity"),
+	
 	InternalError(500, "Internal Server Error");
 	
 	 //Map this to HTTP Status Codes

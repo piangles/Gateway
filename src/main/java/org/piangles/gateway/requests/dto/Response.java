@@ -21,11 +21,20 @@ package org.piangles.gateway.requests.dto;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public final class Response
 {
+	@JsonProperty(required = true)
 	private long issuedTime;
+	
+	@JsonProperty(required = true)
 	private long requestTransitTime;
+	
+	@JsonProperty(required = true)
 	private long requestProcessingTime;
+	
+	@JsonProperty(required = true)
 	private UUID traceId = null;
 
 	/**
@@ -34,8 +43,10 @@ public final class Response
 	 * client to decode the appResponseAsString message to the client's
 	 * implementation of the class.
 	 */
+	@JsonProperty(required = true)
 	private String endpoint = null;
 	
+	@JsonProperty(required = true)
 	private StatusCode statusCode = null;
 
 	/**
@@ -44,10 +55,13 @@ public final class Response
 	 * the request. Ex : LoginRequest even if failed authentication will still
 	 * return requestSuccessful = true.
 	 */
+	@JsonProperty(required = true)
 	private boolean requestSuccessful = false;
 
+	@JsonProperty(required = false)
 	private String errorMessage = null;
 	
+	@JsonProperty(required = true)
 	private String endpointResponse = null;
 
 	public Response(StatusCode statusCode, String endpointResponse)

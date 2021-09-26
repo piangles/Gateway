@@ -66,10 +66,6 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 	protected LoginResponse processRequest(ClientDetails clientDetails, Request request, LoginRequest loginRequest) throws Exception
 	{
 		LoginResponse loginResponse = null;
-		if (loginRequest.getId() == null || (loginRequest.getPassword() == null && loginRequest.getSessionId() == null))
-		{
-			throw new Exception("Invalid LoginRequest request, mandatory fields are absent.");
-		}
 
 		if (loginRequest.getPassword() != null) //Authenticate using login and password
 		{
