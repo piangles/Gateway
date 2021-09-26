@@ -152,6 +152,10 @@ public final class RequestProcessingManager
 		Response response = null;
 		if (state == ClientState.PreAuthentication && !RequestRouter.getInstance().isPreAuthenticationEndpoint(request.getEndpoint()))
 		{
+			/**
+			 * The Client is in PreAuthentication State, so only endpoints supported are that are registered in
+			 * PreAuthenticationEndpoint Map in RequestRouter.
+			 */
 			String errorMessage = "This endpoint " + request.getEndpoint() + " requires authentication.";
 			logger.warn(errorMessage);
 			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
@@ -159,7 +163,10 @@ public final class RequestProcessingManager
 		}
 		else if (state == ClientState.MidAuthentication && !Endpoints.ChangePassword.name().equals(request.getEndpoint()))
 		{
-			// This is the part that makes sure we only accept ChangePassword
+			/**
+			 * MidAuthenticatin State is when we have sent a GeneratedToken, the only endpoint allowed is 
+			 * for user to change ChangePassword.
+			 */
 			String errorMessage = "This endpoint " + request.getEndpoint() + " requires password to be updated.";
 			logger.warn(errorMessage);
 			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
@@ -174,8 +181,10 @@ public final class RequestProcessingManager
 									StatusCode.Unauthenticated, errorMessage);
 		}
 
-		// Step 4 : Process the request only if the above conditions have not
-		// passed
+		/**
+		 * Step 4 : Process the request only if the above conditions 
+		 * have not passed.
+		 */
 		if (response == null && isAsyncProcessor(requestProcessor))
 		{
 			processRequestASynchronously(request);

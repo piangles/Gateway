@@ -136,7 +136,7 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 		try
 		{
 			/**
-			 * Finally if the Session isValid make the call to the
+			 * FINALLY if the Session isValid make the call to the
 			 * actual call to the RequestProcessor.
 			 */
 			if (validSession)

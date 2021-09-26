@@ -27,6 +27,7 @@ import java.util.UUID;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.msg.MessagingService;
 import org.piangles.backbone.services.msg.Topic;
+import org.piangles.core.expt.NotFoundException;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.Request;
@@ -59,32 +60,32 @@ public class SubscriptionRequestProcessor extends AbstractRequestProcessor<Subsc
 		if (subscribeRequest.getTopicAlias().startsWith(ENTITY_ALIAS))
 		{
 			entityRelated = true;
-			alias = subscribeRequest.getTopicAlias().substring(ENTITY_ALIAS.length()); 
-		}
-		
-		if (entityRelated)
-		{
+			//From the aliasName get the entityType
+			alias = subscribeRequest.getTopicAlias().substring(ENTITY_ALIAS.length());
+			
 			topics = msgService.getTopicsFor(alias, subscribeRequest.getId());
-			if (topics == null)
-			{
-				result = false;
-				message = "Entity " + alias + " does not have any associated topics.";
-			}
 		}
 		else
 		{
 			topics = msgService.getTopicsForAlias(alias);
-			if (topics == null)
-			{
-				result = false;
-				message = "Alias does not have any associated topics.";
-			}
 		}
 		/**
 		 * Restart the notification processing manager to stop any previous
 		 * event listeners and start a new one.
 		 */
-		if (topics != null)
+		if (topics == null)
+		{
+			if (entityRelated)
+			{
+				message = "Entity " + alias + " does not have any associated topics.";
+			}
+			else
+			{
+				message = "Alias does not have any associated topics.";
+			}
+			throw new NotFoundException(message);
+		}
+		else
 		{
 			Map<Topic, UUID> topicTraceIdMap = new HashMap<>();
 			
