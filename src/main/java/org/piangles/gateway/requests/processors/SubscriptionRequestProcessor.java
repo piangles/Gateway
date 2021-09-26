@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.msg.MessagingService;
 import org.piangles.backbone.services.msg.Topic;
@@ -53,53 +52,45 @@ public class SubscriptionRequestProcessor extends AbstractRequestProcessor<Subsc
 		String message = "Subscription was successful.";
 		List<Topic> topics = null;
 
-		if (StringUtils.isBlank(subscribeRequest.getTopicAlias()))
+		String alias = subscribeRequest.getTopicAlias();
+		boolean entityRelated = false;
+		
+		
+		if (subscribeRequest.getTopicAlias().startsWith(ENTITY_ALIAS))
 		{
-			result = false;
-			message = "None of the mandatory fields are specified.";
+			entityRelated = true;
+			alias = subscribeRequest.getTopicAlias().substring(ENTITY_ALIAS.length()); 
+		}
+		
+		if (entityRelated)
+		{
+			topics = msgService.getTopicsFor(alias, subscribeRequest.getId());
+			if (topics == null)
+			{
+				result = false;
+				message = "Entity " + alias + " does not have any associated topics.";
+			}
 		}
 		else
 		{
-			String alias = subscribeRequest.getTopicAlias();
-			boolean entityRelated = false;
+			topics = msgService.getTopicsForAlias(alias);
+			if (topics == null)
+			{
+				result = false;
+				message = "Alias does not have any associated topics.";
+			}
+		}
+		/**
+		 * Restart the notification processing manager to stop any previous
+		 * event listeners and start a new one.
+		 */
+		if (topics != null)
+		{
+			Map<Topic, UUID> topicTraceIdMap = new HashMap<>();
 			
-			
-			if (subscribeRequest.getTopicAlias().startsWith(ENTITY_ALIAS))
-			{
-				entityRelated = true;
-				alias = subscribeRequest.getTopicAlias().substring(ENTITY_ALIAS.length()); 
-			}
-			
-			if (entityRelated)
-			{
-				topics = msgService.getTopicsFor(alias, subscribeRequest.getId());
-				if (topics == null)
-				{
-					result = false;
-					message = "User does not have any associated topics.";
-				}
-			}
-			else
-			{
-				topics = msgService.getTopicsForAlias(alias);
-				if (topics == null)
-				{
-					result = false;
-					message = "Alias does not have any associated topics.";
-				}
-			}
-			/**
-			 * Restart the notification processing manager to stop any previous
-			 * event listeners and start a new one.
-			 */
-			if (topics != null)
-			{
-				Map<Topic, UUID> topicTraceIdMap = new HashMap<>();
-				
-				topics.stream().forEach(topic -> topicTraceIdMap.put(topic, request.getTraceId()));
-				getEventProcessingManager().subscribeToTopics(topicTraceIdMap);
-				getEventProcessingManager().restart();
-			}
+			topics.stream().forEach(topic -> topicTraceIdMap.put(topic, request.getTraceId()));
+			getEventProcessingManager().subscribeToTopics(topicTraceIdMap);
+			getEventProcessingManager().restart();
 		}
 
 		return new SimpleResponse(result, message);

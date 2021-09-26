@@ -46,6 +46,8 @@ import org.piangles.gateway.requests.processors.UpdateUserPreferencesRequestProc
 import org.piangles.gateway.requests.processors.UpdateUserProfileRequestProcessor;
 import org.piangles.gateway.requests.validators.ChangePasswordRequestValidator;
 import org.piangles.gateway.requests.validators.LoginRequestValidator;
+import org.piangles.gateway.requests.validators.SignUpRequestValidator;
+import org.piangles.gateway.requests.validators.SubscriptionRequestValidator;
 
 public class RequestRouter
 {
@@ -125,8 +127,10 @@ public class RequestRouter
 	
 	public void registerDefaultRequestValidators()
 	{
+		RequestRouter.getInstance().registerRequestValidator(new SignUpRequestValidator());
 		RequestRouter.getInstance().registerRequestValidator(new LoginRequestValidator());
 		RequestRouter.getInstance().registerRequestValidator(new ChangePasswordRequestValidator());
+		RequestRouter.getInstance().registerRequestValidator(new SubscriptionRequestValidator());
 	}
 	
 	public void registerPreAuthenticationEndpoint(String endpointName, Enum<?> endpoint)

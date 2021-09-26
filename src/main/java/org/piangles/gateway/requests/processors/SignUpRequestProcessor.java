@@ -14,14 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
- 
- 
+
 package org.piangles.gateway.requests.processors;
 
 import java.util.ArrayList;
 
-import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.auth.AuthenticationResponse;
 import org.piangles.backbone.services.auth.AuthenticationService;
@@ -53,17 +50,12 @@ public final class SignUpRequestProcessor extends AbstractRequestProcessor<SignU
 		SimpleResponse response = null;
 		AuthenticationResponse authResponse = null;
 
-		if (StringUtils.isBlank(signupRequest.getEmailId()) || StringUtils.isBlank(signupRequest.getPassword()))
+		if (signupRequest.getEmailId().equals(signupRequest.getPassword()))
 		{
-			throw new Exception("Invalid SignUp request, mandatory fields are absent.");
+			authResponse = new AuthenticationResponse(FailureReason.PasswordDoesNotMeetStrength, new ArrayList<String>());
+			authResponse.getFailureMessages().add("LoginId and Password cannot be the same.");
 		}
-
-		 if (signupRequest.getEmailId().equals(signupRequest.getPassword()))
-		 {
-			 authResponse = new AuthenticationResponse(FailureReason.PasswordDoesNotMeetStrength, new ArrayList<String>());
-			 authResponse.getFailureMessages().add("LoginId and Password cannot be the same.");
-		 }
-		 else
+		else
 		{
 			authResponse = authService.validatePasswordStrength(signupRequest.getPassword());
 			if (authResponse.isRequestSuccessful())
