@@ -53,5 +53,5 @@ public abstract class AbstractRequestValidator<EndpointReq> implements Validator
 	{
 		validate((ClientDetails)objects[0], (Request)objects[1], (EndpointReq)objects[2]);
 	}
-	public abstract void validate(ClientDetails clientDetails, Request request, EndpointReq epRequest);
+	public abstract void validate(ClientDetails clientDetails, Request request, EndpointReq epRequest) throws ValidationException;
 }

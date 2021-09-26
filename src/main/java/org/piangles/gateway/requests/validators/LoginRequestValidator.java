@@ -33,7 +33,7 @@ public class LoginRequestValidator extends AbstractRequestValidator<LoginRequest
 	}
 	
 	@Override
-	public void validate(ClientDetails clientDetails, Request request, LoginRequest loginRequest)
+	public void validate(ClientDetails clientDetails, Request request, LoginRequest loginRequest) throws ValidationException
 	{
 		if (StringUtils.isBlank(loginRequest.getId()) || StringUtils.isAllBlank(loginRequest.getPassword(), loginRequest.getSessionId()))
 		{
