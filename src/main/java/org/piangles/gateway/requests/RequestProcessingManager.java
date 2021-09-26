@@ -24,6 +24,7 @@ import java.net.InetSocketAddress;
 import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
+import org.piangles.core.resources.ResourceException;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.ClientEndpoint;
@@ -105,37 +106,65 @@ public final class RequestProcessingManager
 		Request request = null;
 		Response response = null;
 
-		// Step 1 : Log the receipt of the Raw Message, not the message itself.
+		//Step 1 : Log the receipt of the Raw Message, not the message itself.
 		logger.info("Message receieved from userId : " + clientDetails.getSessionDetails().getUserId());
 
-		// Step 2 : Decode the raw message to Request.
 		String endpoint = null;
 		RequestProcessor requestProcessor = null;
 		try
 		{
+			//Step 2 : Decode the raw message to Request.
 			message = JSON.getDecoder().decode(messageAsString.getBytes(), Message.class);
+			
+			//Step 3 : Decode the Gateway Request from the Message.
 			request = JSON.getDecoder().decode(message.getPayload().getBytes(), Request.class);
+			
+			//Step 4: Gateway Request was decoded successfully, mark TransitTime 
 			request.markTransitTime();
+			
+			//Step 5: Do Endpoint validation
 			endpoint = request.getEndpoint();
 			requestProcessor = RequestRouter.getInstance().getRequestProcessor(endpoint);
+			
+			if (requestProcessor == null)//Step 5.1 : Endpoint not found.
+			{
+				String errorMessage = "This endpoint " + request.getEndpoint() + " is not supported.";
+				logger.warn(errorMessage);
+				response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
+										request.getTransitTime(), StatusCode.NotFound, errorMessage);
+			}
+			else //Step 5.2 Endpoint found.
+			{
+				//Step 6 : Validate Request Against the Current State
+				response = validateRequestAgainstState(request, requestProcessor);
+				
+				if (response == null) //Request is Valid for the current State
+				{
+					/**
+					 * Step 5 : Process the request and send response Directly 
+					 */
+					processRequestAndSendResponse(request, requestProcessor);
+				}
+			}
+		}
+		catch (InterruptedException e)//Thrown if Request is Synchronous and Join fails on Thread. 
+		{
+			// Probability is low
+			logger.error("Error in RequestProcessingThread because of : " + e.getMessage(), e);
+			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(),
+									request.getTransitTime(), StatusCode.InternalError, "Could not process request because of Internal Error.");
+		}
+		catch (ResourceException e)//On successful Login, EventProcessingManager could not be created
+		{
+			logger.error("EventProcessingManager Creation Failed: " + clientDetails.getSessionDetails().getUserId(), e);
+			response = new Response(request.getTraceId(), request.getEndpoint(),request.getReceiptTime(), 
+										request.getTransitTime(), StatusCode.InternalError, e.getMessage());
+			
 		}
 		catch (Exception e)
 		{
 			logger.warn("Message receieved from userId : " + clientDetails.getSessionDetails().getUserId() + " could not be decoded.", e);
 			response = new Response(StatusCode.BadRequest, "Request could not be decoded because of : " + e.getMessage());
-		}
-
-		// Step 3 : Request was able to decoded and found a requestProcessor
-		if (request != null && requestProcessor != null)
-		{
-			response = processRequest(request, requestProcessor);
-		}
-		else if (request != null)
-		{
-			String errorMessage = "This endpoint " + request.getEndpoint() + " is not supported.";
-			logger.warn(errorMessage);
-			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
-									request.getTransitTime(), StatusCode.NotFound, errorMessage);
 		}
 
 		/**
@@ -147,7 +176,7 @@ public final class RequestProcessingManager
 		}
 	}
 
-	private Response processRequest(Request request, RequestProcessor requestProcessor)
+	private Response validateRequestAgainstState(Request request, RequestProcessor requestProcessor)
 	{
 		Response response = null;
 		if (state == ClientState.PreAuthentication && !RequestRouter.getInstance().isPreAuthenticationEndpoint(request.getEndpoint()))
@@ -170,7 +199,7 @@ public final class RequestProcessingManager
 			String errorMessage = "This endpoint " + request.getEndpoint() + " requires password to be updated.";
 			logger.warn(errorMessage);
 			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
-									request.getTransitTime(), StatusCode.BadRequest, errorMessage);
+									request.getTransitTime(), StatusCode.ValidationFailure, errorMessage);
 		}
 		else if (!(state == ClientState.PreAuthentication && RequestRouter.getInstance().isPreAuthenticationEndpoint(request.getEndpoint()))
 				&& (clientDetails.getSessionDetails() != null && !StringUtils.equals(clientDetails.getSessionDetails().getSessionId(), request.getSessionId())))
@@ -180,132 +209,31 @@ public final class RequestProcessingManager
 			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), request.getTransitTime(), 
 									StatusCode.Unauthenticated, errorMessage);
 		}
-
-		/**
-		 * Step 4 : Process the request only if the above conditions 
-		 * have not passed.
-		 */
-		if (response == null && isAsyncProcessor(requestProcessor))
-		{
-			processRequestASynchronously(request);
-		}
-		else if (response == null && !isAsyncProcessor(requestProcessor))
-		{
-			//Request will be processed synchronously
-			try
-			{
-				response = processRequestSynchronously(request);
-
-				/**
-				 * Post the Request being processed Synchronously
-				 */
-				switch (state)
-				{
-				case PreAuthentication:
-					Response errResponse = null;
-					if (Endpoints.Login.name().equals(request.getEndpoint()) && response.isRequestSuccessful())
-					{
-						try
-						{
-							LoginResponse loginResponse = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), LoginResponse.class);
-							if (loginResponse.isAuthenticated())
-							{
-								if (loginResponse.isAuthenticatedByToken())
-								{
-									state = ClientState.MidAuthentication;
-								}
-								else
-								{
-									state = ClientState.PostAuthentication;
-								}
-
-								/**
-								 * Now create a new client details from the original one but 
-								 * with new SessionDetails. ClientDetails and SessionDetails are
-								 * immutable. ClientDetails construction is only visible to this 
-								 * package for security reasons. 
-								 */
-								//GeoLocation geoLocation = geolocationService.getGeoLocation(clientDetails.getIPAddress());
-								clientDetails = new ClientDetails(clientDetails.getRemoteAddress(), clientDetails.getClientEndpoint(),
-										new SessionDetails(loginResponse.getUserId(), loginResponse.getSessionId()),
-										null);
-								//		Location.convert(geoLocation, false));
-
-								/**
-								 * Now that client is authenticated, create the MessageProcessingManager
-								 */
-								logger.info("Creating EventProcessingManager for: " + clientDetails);
-								epm = new EventProcessingManager(clientDetails);
-							}
-							
-							/**
-							 * Responses for Synchronous Requests already goes through RequestProcessingThread
-							 */
-							response = null;
-						}
-						catch (Exception e)
-						{
-							// Probability is zero
-							logger.error("InternalError-LoginResponse could not be decoded for client: " + clientDetails.getSessionDetails().getUserId(), e);
-							errResponse = new Response(request.getTraceId(), request.getEndpoint(),request.getReceiptTime(), 
-														request.getTransitTime(), StatusCode.InternalError, "InternalError - LoginResponse could not be decoded.");
-						}
-					}
-					
-					response = errResponse;
-					break;
-				case MidAuthentication:
-					if (Endpoints.ChangePassword.name().equals(request.getEndpoint()) && response.isRequestSuccessful())
-					{
-						try
-						{
-							SimpleResponse simpleResponse = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), SimpleResponse.class);
-							if (simpleResponse.isRequestSuccessful())
-							{
-								state = ClientState.PostAuthentication;
-							}
-							else
-							{
-								// Log and keep it as is.
-								logger.info("ChangePassword was not successful because of:" + simpleResponse.getMessage());
-							}
-							response = null;
-						}
-						catch (Exception e)
-						{
-							// Probability is zero
-							logger.error("InternalError-LoginResponse could not be decoded for client: " + clientDetails.getSessionDetails().getUserId(), e);
-							response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(),
-													request.getTransitTime(), StatusCode.InternalError, "InternalError - ChangePassword could not be decoded.");
-						}
-					}
-					break;
-				case PostAuthentication:
-					if (request.getEndpoint().equals("Logout"))
-					{
-						state = ClientState.PreAuthentication;
-					}
-					break;
-				}
-			}
-			catch (Exception e)
-			{
-				// Probability is low
-				logger.error("Error in RequestProcessingThread because of : " + e.getMessage(), e);
-				response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(),
-										request.getTransitTime(), StatusCode.InternalError, "Could not process request because of Internal Error.");
-			}
-		}
 		
 		return response;
 	}
-	
-	private boolean isAsyncProcessor(RequestProcessor requestProcessor)
+
+	private void processRequestAndSendResponse(Request request, RequestProcessor requestProcessor) throws Exception
 	{
-		return !CommunicationPattern.RequestResponse.equals(requestProcessor.getCommunicationPattern());
+		/**
+		 * Since we have several communication patters, anything other than RequestResponse
+		 * is Asynchronously processed.
+		 */
+		boolean asyncProcessor = !CommunicationPattern.RequestResponse.equals(requestProcessor.getCommunicationPattern());
+		
+		if (asyncProcessor)
+		{
+			processRequestASynchronously(request);
+		}
+		else
+		{
+			Response response = processRequestSynchronously(request);
+			
+			performPostSynchronousRequestProcessingActions(request, response);
+		}
 	}
 
-	private Response processRequestSynchronously(Request request) throws Exception
+	private Response processRequestSynchronously(Request request) throws InterruptedException
 	{
 		RequestProcessingThread reqProcThread = processRequestASynchronously(request);
 		reqProcThread.join();
@@ -319,5 +247,68 @@ public final class RequestProcessingManager
 		reqProcThread.start();
 
 		return reqProcThread;
+	}
+	
+	private void performPostSynchronousRequestProcessingActions(Request request, Response response) throws ResourceException, Exception
+	{
+		switch (state)
+		{
+		case PreAuthentication:
+			if (Endpoints.Login.name().equals(request.getEndpoint()) && response.isRequestSuccessful())
+			{
+				LoginResponse loginResponse = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), LoginResponse.class);
+				if (loginResponse.isAuthenticated())
+				{
+					if (loginResponse.isAuthenticatedByToken())
+					{
+						state = ClientState.MidAuthentication;
+					}
+					else
+					{
+						state = ClientState.PostAuthentication;
+					}
+
+					/**
+					 * Now create a new client details from the original one but 
+					 * with new SessionDetails. ClientDetails and SessionDetails are
+					 * immutable. ClientDetails construction is only visible to this 
+					 * package for security reasons. 
+					 */
+					//GeoLocation geoLocation = geolocationService.getGeoLocation(clientDetails.getIPAddress());
+					clientDetails = new ClientDetails(clientDetails.getRemoteAddress(), clientDetails.getClientEndpoint(),
+							new SessionDetails(loginResponse.getUserId(), loginResponse.getSessionId()),
+							null);
+					//		Location.convert(geoLocation, false));
+
+					/**
+					 * Now that client is authenticated, create the MessageProcessingManager
+					 */
+					logger.info("Creating EventProcessingManager for: " + clientDetails);
+					epm = new EventProcessingManager(clientDetails);
+				}
+			}
+			break;
+		case MidAuthentication:
+			if (Endpoints.ChangePassword.name().equals(request.getEndpoint()) && response.isRequestSuccessful())
+			{
+				SimpleResponse simpleResponse = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), SimpleResponse.class);
+				if (simpleResponse.isRequestSuccessful())
+				{
+					state = ClientState.PostAuthentication;
+				}
+				else
+				{
+					// Log and keep it as is.
+					logger.info("ChangePassword was not successful because of:" + simpleResponse.getMessage());
+				}
+			}
+			break;
+		case PostAuthentication:
+			if (request.getEndpoint().equals("Logout"))
+			{
+				state = ClientState.PreAuthentication;
+			}
+			break;
+		}
 	}
 }
