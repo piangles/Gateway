@@ -24,7 +24,6 @@ import org.piangles.backbone.services.auth.AuthenticationResponse;
 import org.piangles.backbone.services.auth.AuthenticationService;
 import org.piangles.core.expt.NotFoundException;
 import org.piangles.core.expt.ServiceRuntimeException;
-import org.piangles.core.expt.ValidationException;
 import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
@@ -45,7 +44,6 @@ public final class GenerateTokenRequestProcessor extends AbstractRequestProcesso
 	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, GenerateTokenRequest tokenRequest) throws Exception
 	{
 		SimpleResponse simpleResponse = null;
-		boolean result = true;
 		
 		AuthenticationResponse authResponse = authService.generateResetToken(tokenRequest.getEmailId());
 		
