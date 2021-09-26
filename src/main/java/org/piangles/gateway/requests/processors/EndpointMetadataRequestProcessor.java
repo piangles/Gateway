@@ -60,8 +60,8 @@ public final class EndpointMetadataRequestProcessor extends AbstractRequestProce
 					description,
 					rp.getCommunicationPattern().name() + " : " + rp.getCommunicationPattern().description(),
 					rp.shouldValidateSession(),
-					getSchema(rp.getRequestClass()), 
-					getSchema(rp.getResponseClass())); 
+					getSchema(rp.getEndpointRequestClass()), 
+					getSchema(rp.getEndpointResponseClass())); 
 		}
 		else
 		{

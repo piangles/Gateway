@@ -29,7 +29,7 @@ public interface RequestProcessor
 	public Enum<?> getEndpoint();
 	public CommunicationPattern getCommunicationPattern(); 
 	public boolean shouldValidateSession();
-	public Class<?> getRequestClass();
-	public Class<?> getResponseClass();
+	public Class<?> getEndpointRequestClass();
+	public Class<?> getEndpointResponseClass();
 	public Response processRequest(ClientDetails clientDetails, Request request) throws Exception;
 }

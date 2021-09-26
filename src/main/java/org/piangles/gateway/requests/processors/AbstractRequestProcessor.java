@@ -54,8 +54,8 @@ public abstract class AbstractRequestProcessor<EndpointReq,EndpointResp> impleme
 	 */
 	private Enum<?> endpoint;
 	private CommunicationPattern communicationPattern;
-	private Class<EndpointReq> requestClass = null;
-	private Class<EndpointResp> responseClass = null;
+	private Class<EndpointReq> endpointRequestClass = null;
+	private Class<EndpointResp> endpointResponseClass = null;
 	private DefaultGatewayRequestValidator<EndpointReq> gatewayRequestValidator = null;
 
 	public AbstractRequestProcessor(Enum<?> endpoint, Class<EndpointReq> requestClass, Class<EndpointResp> responseClass)
@@ -63,13 +63,13 @@ public abstract class AbstractRequestProcessor<EndpointReq,EndpointResp> impleme
 		this(endpoint, CommunicationPattern.RequestAsynchronousResponse, requestClass, responseClass);
 	}
 
-	public AbstractRequestProcessor(Enum<?> endpoint, CommunicationPattern communicationPattern, Class<EndpointReq> requestClass, Class<EndpointResp> responseClass)
+	public AbstractRequestProcessor(Enum<?> endpoint, CommunicationPattern communicationPattern, Class<EndpointReq> endpointRequestClass, Class<EndpointResp> endpointResponseClass)
 	{
 		this.endpoint = endpoint;
 		this.communicationPattern = communicationPattern;
-		this.requestClass = requestClass;
-		this.responseClass = responseClass;
-		this.gatewayRequestValidator = new DefaultGatewayRequestValidator<EndpointReq>(requestClass);
+		this.endpointRequestClass = endpointRequestClass;
+		this.endpointResponseClass = endpointResponseClass;
+		this.gatewayRequestValidator = new DefaultGatewayRequestValidator<EndpointReq>(endpointRequestClass);
 	}
 	
 	@Override
@@ -78,9 +78,9 @@ public abstract class AbstractRequestProcessor<EndpointReq,EndpointResp> impleme
 		Response response = null;
 		EndpointReq epRequest = null;
 		
-		if (!EmptyRequest.class.equals(requestClass) && request.getEndpointRequest() != null)
+		if (!EmptyRequest.class.equals(endpointRequestClass) && request.getEndpointRequest() != null)
 		{
-			epRequest = JSON.getDecoder().decode(request.getEndpointRequest().getBytes(), requestClass);
+			epRequest = JSON.getDecoder().decode(request.getEndpointRequest().getBytes(), endpointRequestClass);
 		}
 
 		/**
@@ -116,15 +116,15 @@ public abstract class AbstractRequestProcessor<EndpointReq,EndpointResp> impleme
 	}
 	
 	@Override
-	public final Class<?> getRequestClass()
+	public final Class<?> getEndpointRequestClass()
 	{
-		return requestClass;
+		return endpointRequestClass;
 	}
 
 	@Override
-	public final Class<?> getResponseClass()
+	public final Class<?> getEndpointResponseClass()
 	{
-		return responseClass;
+		return endpointResponseClass;
 	}
 
 	@Override
