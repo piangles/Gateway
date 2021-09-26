@@ -20,6 +20,8 @@
 package org.piangles.gateway.requests.processors;
 
 import org.piangles.core.util.coding.JSON;
+import org.piangles.core.util.validate.ValidationManager;
+import org.piangles.core.util.validate.Validator;
 import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.events.EventProcessingManager;
@@ -29,6 +31,7 @@ import org.piangles.gateway.requests.dto.EmptyRequest;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.Response;
 import org.piangles.gateway.requests.dto.StatusCode;
+import org.piangles.gateway.requests.validators.DefaultGatewayRequestValidator;
 
 /**
  * 
@@ -43,68 +46,65 @@ import org.piangles.gateway.requests.dto.StatusCode;
  * the ClientDetails.
  * 
  */
-public abstract class AbstractRequestProcessor<AppReq,AppResp> implements RequestProcessor  
+public abstract class AbstractRequestProcessor<EndpointReq,EndpointResp> implements RequestProcessor  
 {
-	private static final String EMPTY_APP_REQUEST_ERR = "App Request cannot be null for this endpoint.";
 	/**
 	 * There should not be any instance specific variables
 	 * there will only one instance of the derived class per server
 	 */
 	private Enum<?> endpoint;
 	private CommunicationPattern communicationPattern;
-	private Class<AppReq> requestClass = null;
-	private Class<AppResp> responseClass = null;
-	
-	public AbstractRequestProcessor(Enum<?> endpoint, Class<AppReq> requestClass, Class<AppResp> responseClass)
+	private Class<EndpointReq> requestClass = null;
+	private Class<EndpointResp> responseClass = null;
+	private DefaultGatewayRequestValidator<EndpointReq> gatewayRequestValidator = null;
+
+	public AbstractRequestProcessor(Enum<?> endpoint, Class<EndpointReq> requestClass, Class<EndpointResp> responseClass)
 	{
 		this(endpoint, CommunicationPattern.RequestAsynchronousResponse, requestClass, responseClass);
 	}
 
-	public AbstractRequestProcessor(Enum<?> endpoint, CommunicationPattern communicationPattern, Class<AppReq> requestClass, Class<AppResp> responseClass)
+	public AbstractRequestProcessor(Enum<?> endpoint, CommunicationPattern communicationPattern, Class<EndpointReq> requestClass, Class<EndpointResp> responseClass)
 	{
 		this.endpoint = endpoint;
 		this.communicationPattern = communicationPattern;
 		this.requestClass = requestClass;
 		this.responseClass = responseClass;
+		this.gatewayRequestValidator = new DefaultGatewayRequestValidator<EndpointReq>(requestClass);
 	}
 	
 	@Override
 	public final Response processRequest(ClientDetails clientDetails, Request request) throws Exception
 	{
-		AppReq appRequest = null;
-		
-		if (!requestClass.equals(EmptyRequest.class) && request.getEndpointRequest() != null)
-		{
-			appRequest = JSON.getDecoder().decode(request.getEndpointRequest().getBytes(), requestClass);
-		}
-
-//		try
-//		{
-//			//TODO Validate the Request 
-//			RequestValidator.validate(clientDetails, request);
-//		}
-//		catch (ValidationException e)
-//		{
-//			logger.warn("Message receieved from userId : " + clientDetails.getSessionDetails().getUserId() + " is not valid.", e);
-//			response = new Response(request.getTraceId(), request.getEndpoint(), false, "Request failed validation because of : " + e.getMessage());
-//		}
-
 		Response response = null;
-		if (!EmptyRequest.class.equals(requestClass) && appRequest == null)
+		EndpointReq epRequest = null;
+		
+		if (!EmptyRequest.class.equals(requestClass) && request.getEndpointRequest() != null)
 		{
-			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
-									request.getTransitTime(), StatusCode.BadRequest, EMPTY_APP_REQUEST_ERR);
+			epRequest = JSON.getDecoder().decode(request.getEndpointRequest().getBytes(), requestClass);
 		}
-		else
+
+		/**
+		 * Validate the GatewayRequest
+		 */
+		gatewayRequestValidator.validate(clientDetails, request, epRequest);
+		
+		/**
+		 * Validate the Endpoint Request
+		 */
+		Validator validator = ValidationManager.getInstance().getValidator(request.getEndpoint());
+		if (validator != null) //Validate the EndpointRequest itself
 		{
-			AppResp appResponse = processRequest(clientDetails, request, appRequest);
-
-			//appResponse cannot be null
-			String appResponseAsStr = new String(JSON.getEncoder().encode(appResponse));
-
-			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(),
-									request.getTransitTime(), StatusCode.Success, appResponseAsStr);
+			validator.validate(clientDetails, request, epRequest);
 		}
+		
+		//Finally process the Request
+		EndpointResp epResponse = processRequest(clientDetails, request, epRequest);
+
+		//appResponse cannot be null
+		String epResponseAsStr = new String(JSON.getEncoder().encode(epResponse));
+
+		response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(),
+								request.getTransitTime(), StatusCode.Success, epResponseAsStr);
 		
 		return response;
 	}
@@ -150,5 +150,5 @@ public abstract class AbstractRequestProcessor<AppReq,AppResp> implements Reques
 		return npm;
 	}
 	
-	protected abstract AppResp processRequest(ClientDetails clientDetails, Request request, AppReq appRequest) throws Exception;
+	protected abstract EndpointResp processRequest(ClientDetails clientDetails, Request request, EndpointReq endpointRequest) throws Exception;
 }
