@@ -62,7 +62,5 @@ public final class DefaultGatewayRequestValidator<EndpointReq> implements Valida
 		{
 			throw new ValidationException("EndpointRequest cannot be empty(null/blanks) for this endpoint.");
 		}
-		
-		validate(clientDetails, request, epRequest);
 	}
 }
