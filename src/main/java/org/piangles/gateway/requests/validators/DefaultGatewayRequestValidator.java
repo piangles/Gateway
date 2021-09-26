@@ -21,24 +21,18 @@ package org.piangles.gateway.requests.validators;
 import org.piangles.core.expt.ValidationException;
 import org.piangles.core.util.validate.Validator;
 import org.piangles.gateway.client.ClientDetails;
+import org.piangles.gateway.requests.dto.EmptyRequest;
 import org.piangles.gateway.requests.dto.Request;
 
-/**
- * One of the checks here should be SessionId the client sends
- * should be the same as the one assigned by the server.
- * This may seems double check at this point because we are already
- * checking in Service call in org.piangles.core.services.remoting.rabbit.RequestProcessingThread
- * In reality, Services are very important to be avaiable and validation can prevent
- * any calls to Service the better.
- * 
- */
-public abstract class AbstractRequestValidator<EndpointReq> implements Validator
+public final class DefaultGatewayRequestValidator<EndpointReq> implements Validator
 {
 	private String name = null;
+	private Class<EndpointReq> requestClass = null;
 	
-	public AbstractRequestValidator(Enum<?> name)
+	public DefaultGatewayRequestValidator(Class<EndpointReq> requestClass)
 	{
-		this.name = name.name();
+		this.name = "GatewayRequest";
+		this.requestClass = requestClass;
 	}
 	
 	@Override
@@ -49,14 +43,26 @@ public abstract class AbstractRequestValidator<EndpointReq> implements Validator
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public final void validate(Object ... objects) throws ValidationException
+	public void validate(Object ... objects) throws ValidationException
 	{
 		ClientDetails clientDetails = (ClientDetails)objects[0]; 
 		Request request = (Request)objects[1];
 		EndpointReq epRequest = (EndpointReq)objects[2];
 		
+		/**
+		 * One of the checks here should be SessionId the client sends
+		 * should be the same as the one assigned by the server.
+		 * This may seems double check at this point because we are already
+		 * checking in Service call in org.piangles.core.services.remoting.rabbit.RequestProcessingThread
+		 * In reality, Services are very important to be avaiable and validation can prevent
+		 * any calls to Service the better.
+		 * 
+		 */
+		if (!EmptyRequest.class.equals(requestClass) && epRequest == null)
+		{
+			throw new ValidationException("EndpointRequest cannot be empty(null/blanks) for this endpoint.");
+		}
+		
 		validate(clientDetails, request, epRequest);
 	}
-	
-	public abstract void validate(ClientDetails clientDetails, Request request, EndpointReq epRequest) throws ValidationException;
 }

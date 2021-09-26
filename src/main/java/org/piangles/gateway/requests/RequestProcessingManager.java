@@ -155,7 +155,7 @@ public final class RequestProcessingManager
 			String errorMessage = "This endpoint " + request.getEndpoint() + " requires authentication.";
 			logger.warn(errorMessage);
 			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
-									request.getTransitTime(), StatusCode.UnAuthenticated, errorMessage);
+									request.getTransitTime(), StatusCode.Unauthenticated, errorMessage);
 		}
 		else if (state == ClientState.MidAuthentication && !Endpoints.ChangePassword.name().equals(request.getEndpoint()))
 		{
@@ -171,7 +171,7 @@ public final class RequestProcessingManager
 			String errorMessage = "SessionId between client and server does not match.";
 			logger.warn(errorMessage + " SessionIds ClientDetails["+clientDetails.getSessionDetails().getSessionId()+"] Request[" + request.getSessionId() + "]");
 			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), request.getTransitTime(), 
-									StatusCode.UnAuthenticated, errorMessage);
+									StatusCode.Unauthenticated, errorMessage);
 		}
 
 		// Step 4 : Process the request only if the above conditions have not

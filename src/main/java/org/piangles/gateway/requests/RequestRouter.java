@@ -25,6 +25,8 @@ import java.util.Set;
 
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
+import org.piangles.core.util.validate.ValidationManager;
+import org.piangles.core.util.validate.Validator;
 import org.piangles.gateway.requests.processors.AutoSuggestRequestProcessor;
 import org.piangles.gateway.requests.processors.ChangePasswordRequestProcessor;
 import org.piangles.gateway.requests.processors.CreateUserProfileRequestProcessor;
@@ -38,10 +40,12 @@ import org.piangles.gateway.requests.processors.ListEndpointsRequestProcessor;
 import org.piangles.gateway.requests.processors.LoginRequestProcessor;
 import org.piangles.gateway.requests.processors.LogoutRequestProcessor;
 import org.piangles.gateway.requests.processors.PingMessageProcessor;
-import org.piangles.gateway.requests.processors.UpdateUserPreferencesRequestProcessor;
 import org.piangles.gateway.requests.processors.SignUpRequestProcessor;
 import org.piangles.gateway.requests.processors.SubscriptionRequestProcessor;
+import org.piangles.gateway.requests.processors.UpdateUserPreferencesRequestProcessor;
 import org.piangles.gateway.requests.processors.UpdateUserProfileRequestProcessor;
+import org.piangles.gateway.requests.validators.ChangePasswordRequestValidator;
+import org.piangles.gateway.requests.validators.LoginRequestValidator;
 
 public class RequestRouter
 {
@@ -119,31 +123,17 @@ public class RequestRouter
 		registerRequestProcessor(createRequestProcessor(AutoSuggestRequestProcessor.class));
 	}
 	
+	public void registerDefaultRequestValidators()
+	{
+		RequestRouter.getInstance().registerRequestValidator(new LoginRequestValidator());
+		RequestRouter.getInstance().registerRequestValidator(new ChangePasswordRequestValidator());
+	}
+	
 	public void registerPreAuthenticationEndpoint(String endpointName, Enum<?> endpoint)
 	{
 		preAuthenticationEndpoints.put(endpointName, endpoint);
 	}
 	
-	public boolean isPreAuthenticationEndpoint(String endpoint)
-	{
-		return preAuthenticationEndpoints.containsKey(endpoint);
-	}
-	
-	public Set<String> getRegisteredEndpoints()
-	{
-		return endpointRequestProcessorMap.keySet();
-	}
-
-	public RequestProcessor getRequestProcessor(String endpoint)
-	{
-		return endpointRequestProcessorMap.get(endpoint);
-	}
-	
-	public void clear()
-	{
-		endpointRequestProcessorMap.clear();
-	}
-
 	public void registerRequestProcessor(RequestProcessor rp)
 	{
 		if (rp != null)
@@ -167,7 +157,51 @@ public class RequestRouter
 			logger.error("registerRequestProcessor: RequestProcessor is null.");
 		}
 	}
+
+	public void registerRequestValidator(Validator validator)
+	{
+		String registringOrOverriding = null; 
+		String endpoint = validator.getName();
+		Validator existingValidator = ValidationManager.getInstance().getValidator(endpoint); 
+		if (existingValidator != null)
+		{
+			logger.warn("Validator already exists for : " + endpoint + " : " + existingValidator.getClass().getCanonicalName());
+			registringOrOverriding = "Overriding"; 
+		}
+		else
+		{
+			registringOrOverriding = "Registering";
+		}
+		logger.info(registringOrOverriding + " " + endpoint + " Validator with : " + validator.getClass().getCanonicalName());
+		ValidationManager.getInstance().addValidator(validator);
+	}
 	
+	public boolean isPreAuthenticationEndpoint(String endpoint)
+	{
+		return preAuthenticationEndpoints.containsKey(endpoint);
+	}
+	
+	public Set<String> getRegisteredEndpoints()
+	{
+		return endpointRequestProcessorMap.keySet();
+	}
+
+	public RequestProcessor getRequestProcessor(String endpoint)
+	{
+		return endpointRequestProcessorMap.get(endpoint);
+	}
+	
+	
+	public void clearRequestProcessors()
+	{
+		endpointRequestProcessorMap.clear();
+	}
+
+	public void clearRequestValidators()
+	{
+		ValidationManager.getInstance().clear();
+	}
+
 	private RequestProcessor createRequestProcessor(Class<?> rpClass)
 	{
 		RequestProcessor rp = null;

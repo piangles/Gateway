@@ -22,22 +22,22 @@ import org.apache.commons.lang3.StringUtils;
 import org.piangles.core.expt.ValidationException;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
-import org.piangles.gateway.requests.dto.LoginRequest;
+import org.piangles.gateway.requests.dto.ChangePasswordRequest;
 import org.piangles.gateway.requests.dto.Request;
 
-public class LoginRequestValidator extends AbstractRequestValidator<LoginRequest>
+public class ChangePasswordRequestValidator extends AbstractRequestValidator<ChangePasswordRequest>
 {
-	public LoginRequestValidator()
+	public ChangePasswordRequestValidator()
 	{
-		super(Endpoints.Login);
+		super(Endpoints.ChangePassword);
 	}
 	
 	@Override
-	public void validate(ClientDetails clientDetails, Request request, LoginRequest loginRequest) throws ValidationException
+	public void validate(ClientDetails clientDetails, Request request, ChangePasswordRequest cpRequest) throws ValidationException
 	{
-		if (StringUtils.isBlank(loginRequest.getId()) || StringUtils.isAllBlank(loginRequest.getPassword(), loginRequest.getSessionId()))
+		if (StringUtils.isAnyBlank(cpRequest.getOldPassword(), cpRequest.getNewPassword()))
 		{
-			throw new ValidationException("Invalid LoginRequest, mandatory fields (id and [password or sessionId]) are missing.");
+			throw new ValidationException("Invalid ChangePasswordRequest, mandatory fields [oldPassword and/or newPassword]) are missing.");
 		}
 	}
 }
