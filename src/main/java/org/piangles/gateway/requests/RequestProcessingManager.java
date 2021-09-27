@@ -33,7 +33,7 @@ import org.piangles.gateway.Message;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.client.ClientState;
 import org.piangles.gateway.events.EventProcessingManager;
-import org.piangles.gateway.requests.dto.LoginResponse;
+import org.piangles.gateway.requests.dto.AuthenticationDetails;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.Response;
 import org.piangles.gateway.requests.dto.SimpleResponse;
@@ -254,12 +254,12 @@ public final class RequestProcessingManager
 		switch (state)
 		{
 		case PreAuthentication:
-			if (Endpoints.Login.name().equals(request.getEndpoint()) && response.isRequestSuccessful())
+			if (RequestRouter.getInstance().isAuthenticationEndpoint(request.getEndpoint()) && response.isRequestSuccessful())
 			{
-				LoginResponse loginResponse = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), LoginResponse.class);
-				if (loginResponse.isAuthenticated())
+				AuthenticationDetails authDetails = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), AuthenticationDetails.class);
+				if (authDetails.isAuthenticated())
 				{
-					if (loginResponse.isAuthenticatedByToken())
+					if (authDetails.isAuthenticatedByToken())
 					{
 						state = ClientState.MidAuthentication;
 					}
@@ -276,7 +276,7 @@ public final class RequestProcessingManager
 					 */
 					//GeoLocation geoLocation = geolocationService.getGeoLocation(clientDetails.getIPAddress());
 					clientDetails = new ClientDetails(clientDetails.getRemoteAddress(), clientDetails.getClientEndpoint(),
-							new SessionDetails(loginResponse.getUserId(), loginResponse.getSessionId()),
+							new SessionDetails(authDetails.getUserId(), authDetails.getSessionId()),
 							null);
 					//		Location.convert(geoLocation, false));
 

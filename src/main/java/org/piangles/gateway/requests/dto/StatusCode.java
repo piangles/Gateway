@@ -20,6 +20,7 @@ package org.piangles.gateway.requests.dto;
 
 public enum StatusCode
 {
+	 //Number are corresponding to HTTP Status Codes
 	Success(200, "OK"),
 	
 	BadRequest(400, "Bad Request"),
@@ -34,7 +35,6 @@ public enum StatusCode
 	
 	InternalError(500, "Internal Server Error");
 	
-	 //Map this to HTTP Status Codes
 	private final int code;
 	private final String message;
 	

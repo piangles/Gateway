@@ -54,6 +54,7 @@ public class RequestRouter
 	private LoggingService logger = null;
 	private static RequestRouter self = null;
 	private Map<String, Enum<?>> preAuthenticationEndpoints = null;
+	private Map<String, Enum<?>> authenticationEndpoints = null;
 	private Map<String, RequestProcessor> endpointRequestProcessorMap;
 
 	private RequestRouter()
@@ -61,6 +62,7 @@ public class RequestRouter
 		logger = Locator.getInstance().getLoggingService();
 		
 		preAuthenticationEndpoints = new HashMap<>();
+		authenticationEndpoints = new HashMap<>();
 		endpointRequestProcessorMap = new HashMap<>();
 	}
 
@@ -91,6 +93,15 @@ public class RequestRouter
 		registerPreAuthenticationEndpoint(Endpoints.SignUp.name(), Endpoints.SignUp);
 		registerPreAuthenticationEndpoint(Endpoints.Login.name(), Endpoints.Login);
 		registerPreAuthenticationEndpoint(Endpoints.GenerateResetToken.name(), Endpoints.GenerateResetToken);
+	}
+	
+	public void registerDefaultAuthenticationEndpoints()
+	{
+		/**
+		 * Register all authenticationEndpoints
+		 */
+		registerAuthenticationEndpoint(Endpoints.SignUp.name(), Endpoints.SignUp);
+		registerAuthenticationEndpoint(Endpoints.Login.name(), Endpoints.Login);
 	}
 	
 	public void registerDefaultRequestProcessors()
@@ -137,7 +148,12 @@ public class RequestRouter
 	{
 		preAuthenticationEndpoints.put(endpointName, endpoint);
 	}
-	
+
+	public void registerAuthenticationEndpoint(String endpointName, Enum<?> endpoint)
+	{
+		authenticationEndpoints.put(endpointName, endpoint);
+	}
+
 	public void registerRequestProcessor(RequestProcessor rp)
 	{
 		if (rp != null)
@@ -184,7 +200,12 @@ public class RequestRouter
 	{
 		return preAuthenticationEndpoints.containsKey(endpoint);
 	}
-	
+
+	public boolean isAuthenticationEndpoint(String endpoint)
+	{
+		return authenticationEndpoints.containsKey(endpoint);
+	}
+
 	public Set<String> getRegisteredEndpoints()
 	{
 		return endpointRequestProcessorMap.keySet();

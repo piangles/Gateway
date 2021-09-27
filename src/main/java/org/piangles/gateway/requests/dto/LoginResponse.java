@@ -23,20 +23,8 @@ import org.piangles.backbone.services.auth.FailureReason;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public final class LoginResponse
+public final class LoginResponse extends AuthenticationDetails
 {
-	@JsonProperty(required = true)
-	private boolean authenticated = false;
-	
-	@JsonProperty(required = false)
-	private boolean authenticatedByToken = false;
-	
-	@JsonProperty(required = true)
-	private String userId;
-	
-	@JsonProperty(required = true)
-	private String sessionId;
-	
 	@JsonProperty(required = true)
 	private int noOfAttemptsRemaining = 0;
 	
@@ -51,30 +39,7 @@ public final class LoginResponse
 	
 	public LoginResponse(String userId, String sessionId, boolean authenticatedByToken)
 	{
-		this.authenticated = true;
-		this.userId = userId;
-		this.sessionId = sessionId;
-		this.authenticatedByToken = authenticatedByToken;
-	}
-
-	public boolean isAuthenticated()
-	{
-		return authenticated;
-	}
-
-	public String getUserId()
-	{
-		return userId;
-	}
-
-	public String getSessionId()
-	{
-		return sessionId;
-	}
-	
-	public boolean isAuthenticatedByToken()
-	{
-		return authenticatedByToken;
+		super(true, authenticatedByToken, userId, sessionId);
 	}
 
 	public int getNoOfAttemptsRemaining()
@@ -90,7 +55,7 @@ public final class LoginResponse
 	@Override
 	public String toString()
 	{
-		return "LoginResponse [authenticated=" + authenticated + ", authenticatedByToken=" + authenticatedByToken + ", userId=" + userId + ", sessionId=" + sessionId + ", noOfAttemptsRemaining="
+		return "LoginResponse [authenticated=" + isAuthenticated() + ", authenticatedByToken=" + isAuthenticatedByToken() + ", userId=" + getUserId() + ", sessionId=" + getSessionId() + ", noOfAttemptsRemaining="
 				+ noOfAttemptsRemaining + ", failureReason=" + failureReason + "]";
 	}
 }

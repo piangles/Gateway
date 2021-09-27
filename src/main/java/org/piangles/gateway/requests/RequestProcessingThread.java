@@ -152,13 +152,13 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 		{
 			logger.warn("Exception while processing request because of : " + e.getMessage(), e);
 			response = new Response(getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
-									request.getTransitTime(), StatusCode.InternalError, StatusCode.InternalError.getMessage());
+									request.getTransitTime(), StatusCode.InternalError, e.getMessage());
 		}
-		catch(Throwable e)
+		catch(Throwable e) //The Top Level in Exception hierarchy. Next level has Error and Exception and we are covered. 
 		{
 			logger.error("Unhandled Exception while processing request because of : " + e.getMessage(), e);
 			response = new Response(getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
-					request.getTransitTime(), StatusCode.InternalError, StatusCode.InternalError.getMessage());
+					request.getTransitTime(), StatusCode.InternalError, e.getMessage());
 		}
 		ResponseSender.sendResponse(clientDetails, response);
 	}
