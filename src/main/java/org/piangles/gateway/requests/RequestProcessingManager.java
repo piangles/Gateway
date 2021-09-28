@@ -24,6 +24,8 @@ import java.net.InetSocketAddress;
 import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
+import org.piangles.backbone.services.session.SessionManagementException;
+import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.core.resources.ResourceException;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
@@ -55,6 +57,7 @@ import org.piangles.gateway.requests.dto.StatusCode;
 public final class RequestProcessingManager
 {
 	private LoggingService logger = null;
+	private SessionManagementService sessionService = null;  
 	//private GeoLocationService geolocationService = null;
 
 	private ClientState state = ClientState.PreAuthentication;
@@ -63,13 +66,14 @@ public final class RequestProcessingManager
 
 	public RequestProcessingManager(InetSocketAddress remoteAddr, ClientEndpoint clientEndpoint)
 	{
+		logger = Locator.getInstance().getLoggingService();
+		sessionService = Locator.getInstance().getSessionManagementService();
+
 		/*
 		 * UserId initially is the combination of the address and the port. But
 		 * will change later through the transformation of loginId to
 		 * syntheticUserId. SessionId will also be null
 		 */
-		logger = Locator.getInstance().getLoggingService();
-		
 		//TODO : Use the IP Address of the client and get the geolocation. 
 		//geolocationService = Locator.getInstance().getGeoLocationService();
 		String userId = remoteAddr.getAddress().getHostName() + ":" + remoteAddr.getPort();
@@ -82,6 +86,14 @@ public final class RequestProcessingManager
 	public void onClose(int statusCode, String reason)
 	{
 		logger.info(String.format("Close received for UserId=%s with StatusCode=%d and Reason=%s", clientDetails.getSessionDetails().getUserId(), statusCode, reason));
+		try
+		{
+			sessionService.markForUnregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+		}
+		catch (SessionManagementException e)
+		{
+			logger.error("Unable to markForUnregister Session for UserId:" + clientDetails.getSessionDetails().getUserId(), e);
+		}
 		if (epm != null)
 		{
 			epm.stop();
@@ -91,6 +103,14 @@ public final class RequestProcessingManager
 	public void onError(Throwable t)
 	{
 		logger.error(String.format("Error received for UserId=%s with Message=%s", clientDetails.getSessionDetails().getUserId(), t.getMessage()), t);
+		try
+		{
+			sessionService.markForUnregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+		}
+		catch (SessionManagementException e)
+		{
+			logger.error("Unable to markForUnregister Session for UserId:" + clientDetails.getSessionDetails().getUserId(), e);
+		}
 		if (epm != null)
 		{
 			epm.stop();

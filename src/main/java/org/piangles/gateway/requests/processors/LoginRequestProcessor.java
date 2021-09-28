@@ -87,6 +87,7 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 			boolean isSessionValid = sessionMgmtService.isValid(loginRequest.getId(), loginRequest.getSessionId());
 			if (isSessionValid)
 			{
+				sessionMgmtService.makeLastAccessedCurrent(loginRequest.getId(), loginRequest.getSessionId());
 				loginResponse = new LoginResponse(loginRequest.getId(), loginRequest.getSessionId(), false); 
 			}
 			else
