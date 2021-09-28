@@ -37,6 +37,7 @@ import org.piangles.core.expt.UnsupportedMediaException;
 import org.piangles.core.expt.ValidationException;
 import org.piangles.core.expt.VersionMismatchException;
 import org.piangles.core.services.remoting.AbstractContextAwareThread;
+import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.events.EventProcessingManager;
 import org.piangles.gateway.events.KafkaConsumerManager;
@@ -171,6 +172,15 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 	public EventProcessingManager getMessageProcessingManager()
 	{
 		return mpm;
+	}
+	
+	/**
+	 * TODO : Remove this Hack, this was introduced because of
+	 * SignUpRequestProcessor needing to setSessionDetails in Zuro.
+	 */
+	public void setSessionDetails(SessionDetails sessionDetails)
+	{
+		super.init(sessionDetails, getTraceId());
 	}
 	
 	private Response processServiceRuntimeException(ServiceRuntimeException sre)
