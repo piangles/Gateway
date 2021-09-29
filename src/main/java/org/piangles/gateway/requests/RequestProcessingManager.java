@@ -38,7 +38,6 @@ import org.piangles.gateway.events.EventProcessingManager;
 import org.piangles.gateway.requests.dto.AuthenticationDetails;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.Response;
-import org.piangles.gateway.requests.dto.SimpleResponse;
 import org.piangles.gateway.requests.dto.StatusCode;
 
 /***
@@ -311,16 +310,8 @@ public final class RequestProcessingManager
 		case MidAuthentication:
 			if (Endpoints.ChangePassword.name().equals(request.getEndpoint()) && response.isRequestSuccessful())
 			{
-				SimpleResponse simpleResponse = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), SimpleResponse.class);
-				if (simpleResponse.isRequestSuccessful())
-				{
-					state = ClientState.PostAuthentication;
-				}
-				else
-				{
-					// Log and keep it as is.
-					logger.info("ChangePassword was not successful because of:" + simpleResponse.getMessage());
-				}
+				logger.info("ChangePassword was successful moving to PostAuthentication state for: " + clientDetails);
+				state = ClientState.PostAuthentication;
 			}
 			break;
 		case PostAuthentication:

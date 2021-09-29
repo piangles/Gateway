@@ -49,7 +49,6 @@ public class SubscriptionRequestProcessor extends AbstractRequestProcessor<Subsc
 	@Override
 	public final SimpleResponse processRequest(ClientDetails clientDetails, Request request, SubscriptionRequest subscribeRequest) throws Exception
 	{
-		boolean result = true;
 		List<Topic> topics = null;
 
 		String alias = subscribeRequest.getTopicAlias();

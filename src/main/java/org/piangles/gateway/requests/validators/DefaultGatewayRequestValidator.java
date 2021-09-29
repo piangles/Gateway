@@ -41,7 +41,7 @@ public final class DefaultGatewayRequestValidator<EndpointReq> implements Valida
 		return name;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "unused"})
 	@Override
 	public void validate(Object ... objects) throws ValidationException
 	{

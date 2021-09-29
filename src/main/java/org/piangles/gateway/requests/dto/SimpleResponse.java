@@ -21,6 +21,9 @@ package org.piangles.gateway.requests.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Only used for for Successful Responses.  
+ */
 public final class SimpleResponse
 {
 	private static final String SUCCESS_MESSAGE = "Request was successfully processed.";
@@ -38,6 +41,7 @@ public final class SimpleResponse
 
 	public SimpleResponse(String message)
 	{
+		this.requestSuccessful = true;
 		this.message = message;
 	}
 

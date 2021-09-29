@@ -57,6 +57,7 @@ public abstract class AbstractEventProcessor<T> implements EventProcessor
 
 	public abstract void processPayload(ClientDetails clientDetails, T payload) throws Exception;
 	
+	@SuppressWarnings("unchecked")
 	private T convertPayload(Event event) throws Exception
 	{
 		Class<?> payloadClass = Class.forName(event.getPayloadType());
