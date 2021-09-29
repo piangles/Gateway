@@ -19,6 +19,7 @@
  
 package org.piangles.gateway.requests.processors;
 
+import org.piangles.core.expt.BadRequestException;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.core.util.validate.ValidationManager;
 import org.piangles.core.util.validate.Validator;
@@ -80,7 +81,14 @@ public abstract class AbstractRequestProcessor<EndpointReq,EndpointResp> impleme
 		
 		if (!EmptyRequest.class.equals(endpointRequestClass) && request.getEndpointRequest() != null)
 		{
-			epRequest = JSON.getDecoder().decode(request.getEndpointRequest().getBytes(), endpointRequestClass);
+			try
+			{
+				epRequest = JSON.getDecoder().decode(request.getEndpointRequest().getBytes(), endpointRequestClass);
+			}
+			catch (Exception e)
+			{
+				throw new BadRequestException("EndpointRequest could not be decoded because of : " + e.getMessage());
+			}
 		}
 
 		/**

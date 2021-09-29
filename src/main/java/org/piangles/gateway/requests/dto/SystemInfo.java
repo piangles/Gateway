@@ -28,8 +28,17 @@ public final class SystemInfo implements Serializable
 	private String osName = null;
 	private String browserName = null;
 	private String browserVersion = null; 
+	private int screenWidthInPixels;
+	private int screenHeightInPixels;
 	
 	public SystemInfo(String osName, String browserName, String browserVersion)
+	{
+		this.osName = osName;
+		this.browserName = browserName;
+		this.browserVersion = browserVersion;
+	}
+
+	public SystemInfo(String osName, String browserName, String browserVersion, int screenWidthInPixels, int screenHeightInPixels)
 	{
 		this.osName = osName;
 		this.browserName = browserName;
@@ -50,15 +59,21 @@ public final class SystemInfo implements Serializable
 	{
 		return browserVersion;
 	}
+	
+	public int getScreenWidthInPixels()
+	{
+		return screenWidthInPixels;
+	}
 
+	public int getScreenHeightInPixels()
+	{
+		return screenHeightInPixels;
+	}
+
+	@Override
 	public String toString()
 	{
-		StringBuffer sb = new StringBuffer();
-		sb.append("[");
-		sb.append(osName).append(" ");
-		sb.append(browserName).append(" ");
-		sb.append(browserVersion);
-		sb.append("]");
-		return sb.toString();
+		return "SystemInfo [osName=" + osName + ", browserName=" + browserName + ", browserVersion=" + browserVersion + ", screenWidthInPixels=" + screenWidthInPixels + ", screenHeightInPixels="
+				+ screenHeightInPixels + "]";
 	}
 }
