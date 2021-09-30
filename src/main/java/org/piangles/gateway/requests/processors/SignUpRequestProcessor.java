@@ -17,8 +17,6 @@
 
 package org.piangles.gateway.requests.processors;
 
-import java.util.ArrayList;
-
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.auth.AuthenticationResponse;
 import org.piangles.backbone.services.auth.AuthenticationService;
@@ -61,8 +59,8 @@ public final class SignUpRequestProcessor extends AbstractRequestProcessor<SignU
 		 */
 		if (signupRequest.getEmailId().equals(signupRequest.getPassword()))
 		{
-			authResponse = new AuthenticationResponse(FailureReason.PasswordDoesNotMeetStrength, new ArrayList<String>());
-			authResponse.getFailureMessages().add("LoginId and Password cannot be the same.");
+			authResponse = new AuthenticationResponse(FailureReason.PasswordDoesNotMeetStrength, 0);
+			authResponse.addFailureMessage("LoginId and Password cannot be the same.");
 		}
 		else
 		{
