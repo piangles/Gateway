@@ -20,6 +20,9 @@
 package org.piangles.gateway.client;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.gateway.ClientEndpoint;
@@ -29,14 +32,22 @@ public final class ClientDetails
 	private InetSocketAddress remoteAddress;
 	private ClientEndpoint clientEndpoint = null;
 	private SessionDetails sessionDetails = null;
+	private long inactivityExpiryTimeInSeconds = 0L;
+	private AtomicLong lastAccessed = null;
 	private Location location = null;
+	private Map<String, Object> applicationDataMap;
 	
-	public ClientDetails(InetSocketAddress remoteAddress, ClientEndpoint clientEndpoint, SessionDetails sessionDetails, Location location)
+	public ClientDetails(InetSocketAddress remoteAddress, ClientEndpoint clientEndpoint, SessionDetails sessionDetails, long inactivityExpiryTimeInSeconds, Location location)
 	{
 		this.remoteAddress = remoteAddress;
 		this.clientEndpoint = clientEndpoint;
 		this.sessionDetails = sessionDetails;
+		this.inactivityExpiryTimeInSeconds = inactivityExpiryTimeInSeconds;
+		this.lastAccessed = new AtomicLong(); 
+		
 		this.location = location;
+		
+		this.applicationDataMap = new HashMap<>();
 	}
 
 	public ClientEndpoint getClientEndpoint()
@@ -47,6 +58,11 @@ public final class ClientDetails
 	public SessionDetails getSessionDetails()
 	{
 		return sessionDetails;
+	}
+	
+	public long getInactivityExpiryTimeInSeconds()
+	{
+		return inactivityExpiryTimeInSeconds;
 	}
 	
 	public InetSocketAddress getRemoteAddress()
@@ -74,10 +90,26 @@ public final class ClientDetails
 		return location;
 	}
 
-	public void setLocation(Location location)
+	public Object getApplicationData(String name)
 	{
-		this.location = location;
+		return applicationDataMap.get(name);
 	}
+
+	public void putApplicationData(String name, Object value)
+	{
+		applicationDataMap.put(name, value);
+	}
+
+	public void markLastAccessed()
+	{
+		lastAccessed.set(System.currentTimeMillis());
+	}
+	
+	public boolean hasSessionExpired()
+	{
+		return ((System.currentTimeMillis() - lastAccessed.get()) >= (inactivityExpiryTimeInSeconds*1000));
+	}
+	
 	
 	@Override
 	public String toString()

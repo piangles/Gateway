@@ -31,17 +31,17 @@ public final class LoginResponse extends AuthenticationDetails
 	@JsonProperty(required = false)
 	private FailureReason failureReason = null;
 
+	public LoginResponse(boolean authenticatedByToken, String userId, String sessionId, long inactivityExpiryTimeInSeconds)
+	{
+		super(true, authenticatedByToken, userId, sessionId, inactivityExpiryTimeInSeconds);
+	}
+
 	public LoginResponse(int noOfAttemptsRemaining, FailureReason failureReason)
 	{
 		this.noOfAttemptsRemaining = noOfAttemptsRemaining;
 		this.failureReason = failureReason;
 	}
 	
-	public LoginResponse(String userId, String sessionId, boolean authenticatedByToken)
-	{
-		super(true, authenticatedByToken, userId, sessionId);
-	}
-
 	public int getNoOfAttemptsRemaining()
 	{
 		return noOfAttemptsRemaining;

@@ -36,6 +36,8 @@ import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.client.ClientState;
 import org.piangles.gateway.events.EventProcessingManager;
 import org.piangles.gateway.requests.dto.AuthenticationDetails;
+import org.piangles.gateway.requests.dto.Ping;
+import org.piangles.gateway.requests.dto.Pong;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.Response;
 import org.piangles.gateway.requests.dto.StatusCode;
@@ -77,7 +79,7 @@ public final class RequestProcessingManager
 		//geolocationService = Locator.getInstance().getGeoLocationService();
 		String userId = remoteAddr.getAddress().getHostName() + ":" + remoteAddr.getPort();
 
-		clientDetails = new ClientDetails(remoteAddr, clientEndpoint, new SessionDetails(userId, null), null);
+		clientDetails = new ClientDetails(remoteAddr, clientEndpoint, new SessionDetails(userId, null), 0L, null);
 
 		logger.info(String.format("New connection from : [Host=%s & Port=%d ]", clientDetails.getHostName(), clientDetails.getPort()));
 	}
@@ -141,28 +143,44 @@ public final class RequestProcessingManager
 			//Step 4: Gateway Request was decoded successfully, mark TransitTime 
 			request.markTransitTime();
 			
-			//Step 5: Do Endpoint validation
+			//Step 5.1: Do Endpoint validation
 			endpoint = request.getEndpoint();
 			requestProcessor = RequestRouter.getInstance().getRequestProcessor(endpoint);
 			
-			if (requestProcessor == null)//Step 5.1 : Endpoint not found.
+			if (requestProcessor == null)//Step 5.2 : Endpoint not found.
 			{
 				String errorMessage = "This endpoint " + request.getEndpoint() + " is not supported.";
 				logger.warn(errorMessage);
 				response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
 										request.getTransitTime(), StatusCode.NotFound, errorMessage);
 			}
-			else //Step 5.2 Endpoint found.
+			else //Step 5.3 Endpoint found. 
 			{
-				//Step 6 : Validate Request Against the Current State
+				//Step 6.1 : Validate Request Against the Current State
 				response = validateRequestAgainstState(request, requestProcessor);
 				
 				if (response == null) //Request is Valid for the current State
 				{
-					/**
-					 * Step 5 : Process the request and send response Directly 
-					 */
-					processRequestAndSendResponse(request, requestProcessor);
+					if (Endpoints.Ping.name().equals(endpoint))//Step 6.2 Process Ping and send response
+					{
+						if (clientDetails.hasSessionExpired())
+						{
+							clientDetails.getClientEndpoint().close();
+						}
+						else
+						{
+							Ping ping = JSON.getDecoder().decode(request.getEndpointRequest().getBytes(), Ping.class);
+							Pong pong = new Pong(ping.getSequenceNo(), ping.getTimestamp());
+							String epResponseAsStr = new String(JSON.getEncoder().encode(pong));
+
+							response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(),
+													request.getTransitTime(), StatusCode.Success, epResponseAsStr);
+						}
+					}
+					else//Step 6.3 Process regular request
+					{
+						processRequestAndSendResponse(request, requestProcessor);
+					}
 				}
 			}
 		}
@@ -187,7 +205,7 @@ public final class RequestProcessingManager
 		}
 
 		/**
-		 * This is the Exception Response
+		 * This is the Pong (Ping Response) or an Exception Response
 		 */
 		if (response != null)
 		{
@@ -296,8 +314,8 @@ public final class RequestProcessingManager
 					//GeoLocation geoLocation = geolocationService.getGeoLocation(clientDetails.getIPAddress());
 					clientDetails = new ClientDetails(clientDetails.getRemoteAddress(), clientDetails.getClientEndpoint(),
 							new SessionDetails(authDetails.getUserId(), authDetails.getSessionId()),
-							null);
-					//		Location.convert(geoLocation, false));
+							authDetails.getInactivityExpiryTimeInSeconds(), null);
+					//Location.convert(geoLocation, false));
 
 					/**
 					 * Now that client is authenticated, create the MessageProcessingManager
@@ -318,6 +336,7 @@ public final class RequestProcessingManager
 			if (request.getEndpoint().equals("Logout"))
 			{
 				state = ClientState.PreAuthentication;
+				clientDetails.getClientEndpoint().close();
 			}
 			break;
 		}

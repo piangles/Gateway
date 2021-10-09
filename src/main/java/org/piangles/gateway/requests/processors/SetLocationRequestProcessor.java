@@ -25,7 +25,6 @@ import org.piangles.backbone.services.geo.GeoLocationService;
 import org.piangles.core.expt.NotFoundException;
 import org.piangles.core.expt.ValidationException;
 import org.piangles.gateway.client.ClientDetails;
-import org.piangles.gateway.client.Location;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.LocationRequest;
 import org.piangles.gateway.requests.dto.Request;
@@ -76,7 +75,7 @@ public class SetLocationRequestProcessor extends AbstractRequestProcessor<Locati
 			
 			if (geoLocation != null)
 			{
-				clientDetails.setLocation(Location.convert(geoLocation, precise));
+				//TODO clientDetails.setLocation(Location.convert(geoLocation, precise));
 				simpleResponse = new SimpleResponse("GeoLocation was determined successfully.");
 			}
 			else

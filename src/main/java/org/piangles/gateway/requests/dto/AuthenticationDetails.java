@@ -34,18 +34,22 @@ public class AuthenticationDetails
 	@JsonProperty(required = true)
 	private String sessionId;
 	
+	@JsonProperty(required = true)
+	private long inactivityExpiryTimeInSeconds = 0L;
+	
 	public AuthenticationDetails()
 	{
 		
 	}
 
-	public AuthenticationDetails(boolean authenticated, boolean authenticatedByToken, String userId, String sessionId)
+	public AuthenticationDetails(boolean authenticated, boolean authenticatedByToken, String userId, String sessionId, long inactivityExpiryTimeInSeconds)
 	{
 		super();
 		this.authenticated = authenticated;
 		this.authenticatedByToken = authenticatedByToken;
 		this.userId = userId;
 		this.sessionId = sessionId;
+		this.inactivityExpiryTimeInSeconds = inactivityExpiryTimeInSeconds;
 	}
 
 	public final boolean isAuthenticated()
@@ -66,5 +70,10 @@ public class AuthenticationDetails
 	public final String getSessionId()
 	{
 		return sessionId;
+	}
+	
+	public long getInactivityExpiryTimeInSeconds()
+	{
+		return inactivityExpiryTimeInSeconds;
 	}
 }

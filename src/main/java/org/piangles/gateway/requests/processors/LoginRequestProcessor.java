@@ -75,20 +75,21 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 			if (authResponse.isAuthenticated())
 			{
 				SessionDetails sessionDetails = sessionMgmtService.register(authResponse.getUserId());
-				loginResponse = new LoginResponse(authResponse.getUserId(), sessionDetails.getSessionId(), authResponse.IsValidatedByToken());
+				loginResponse = new LoginResponse(authResponse.IsValidatedByToken(), authResponse.getUserId(), 
+													sessionDetails.getSessionId(), clientDetails.getInactivityExpiryTimeInSeconds());
 			}
 			else
 			{
 				loginResponse = new LoginResponse(authResponse.getNoOfAttemptsRemaining(), authResponse.getFailureReason());
 			}
 		}
-		else //Authenticate using login and sessionId
+		else //Authenticate using userId and sessionId
 		{
 			boolean isSessionValid = sessionMgmtService.isValid(loginRequest.getId(), loginRequest.getSessionId());
 			if (isSessionValid)
 			{
 				sessionMgmtService.makeLastAccessedCurrent(loginRequest.getId(), loginRequest.getSessionId());
-				loginResponse = new LoginResponse(loginRequest.getId(), loginRequest.getSessionId(), false); 
+				loginResponse = new LoginResponse(true, loginRequest.getId(), loginRequest.getSessionId(), clientDetails.getInactivityExpiryTimeInSeconds()); 
 			}
 			else
 			{

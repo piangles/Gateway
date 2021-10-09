@@ -39,7 +39,6 @@ import org.piangles.gateway.requests.processors.KeepSessionAliveRequestProcessor
 import org.piangles.gateway.requests.processors.ListEndpointsRequestProcessor;
 import org.piangles.gateway.requests.processors.LoginRequestProcessor;
 import org.piangles.gateway.requests.processors.LogoutRequestProcessor;
-import org.piangles.gateway.requests.processors.PingMessageProcessor;
 import org.piangles.gateway.requests.processors.SignUpRequestProcessor;
 import org.piangles.gateway.requests.processors.SubscriptionRequestProcessor;
 import org.piangles.gateway.requests.processors.UpdateUserPreferencesRequestProcessor;
@@ -119,7 +118,6 @@ public class RequestRouter
 		registerRequestProcessor(createRequestProcessor(ChangePasswordRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(LogoutRequestProcessor.class));
 		
-		registerRequestProcessor(createRequestProcessor(PingMessageProcessor.class));
 		registerRequestProcessor(createRequestProcessor(KeepSessionAliveRequestProcessor.class));
 
 		registerRequestProcessor(createRequestProcessor(CreateUserProfileRequestProcessor.class));
