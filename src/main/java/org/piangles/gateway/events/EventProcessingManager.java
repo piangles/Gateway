@@ -128,8 +128,14 @@ public class EventProcessingManager implements EventDispatcher
 
 		if (topicTraceIdMap.size() != 0)
 		{
-			// create ConsumerProperties from list of Topics
+			/**
+			 * ConsumerProperties uses the userId as consumerGroupId, the Kafka servers uses the
+			 * consumergroupId to maintain offset of the Consumer. This is how Kafka figures out
+			 * how many messages a consumer has consumed from a Topic and when the consumer connects
+			 * next time it uses this to start from the correct offset.
+			 */
 			ConsumerProperties consumerProps = new ConsumerProperties(clientDetails.getSessionDetails().getUserId());
+			// create ConsumerProperties from list of Topics
 			List<ConsumerProperties.Topic> modifiedTopics = topicTraceIdMap.keySet().stream().map(topic -> {
 				return consumerProps.new Topic(topic.getTopicName(), topic.getPartition(), topic.shouldReadEarliest());
 			}).collect(Collectors.toList());
