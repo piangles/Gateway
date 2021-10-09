@@ -36,13 +36,17 @@ public class AuthenticationDetails
 	
 	@JsonProperty(required = true)
 	private long inactivityExpiryTimeInSeconds = 0L;
-	
+
+	@JsonProperty(required = true)
+	private long lastLoggedInTimestamp = 0L;
+
 	public AuthenticationDetails()
 	{
 		
 	}
 
-	public AuthenticationDetails(boolean authenticated, boolean authenticatedByToken, String userId, String sessionId, long inactivityExpiryTimeInSeconds)
+	public AuthenticationDetails(boolean authenticated, boolean authenticatedByToken, String userId, String sessionId, 
+									long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp)
 	{
 		super();
 		this.authenticated = authenticated;
@@ -50,6 +54,7 @@ public class AuthenticationDetails
 		this.userId = userId;
 		this.sessionId = sessionId;
 		this.inactivityExpiryTimeInSeconds = inactivityExpiryTimeInSeconds;
+		this.lastLoggedInTimestamp = lastLoggedInTimestamp;
 	}
 
 	public final boolean isAuthenticated()
@@ -75,5 +80,10 @@ public class AuthenticationDetails
 	public long getInactivityExpiryTimeInSeconds()
 	{
 		return inactivityExpiryTimeInSeconds;
+	}
+	
+	public long getLastLoggedInTimestamp()
+	{
+		return lastLoggedInTimestamp;
 	}
 }

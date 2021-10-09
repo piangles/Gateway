@@ -31,22 +31,26 @@ public final class ClientDetails
 {
 	private InetSocketAddress remoteAddress;
 	private ClientEndpoint clientEndpoint = null;
+	
 	private SessionDetails sessionDetails = null;
 	private long inactivityExpiryTimeInSeconds = 0L;
+	private long lastLoggedInTimestamp = 0L;
+	
 	private AtomicLong lastAccessed = null;
 	private Location location = null;
 	private Map<String, Object> applicationDataMap;
 	
-	public ClientDetails(InetSocketAddress remoteAddress, ClientEndpoint clientEndpoint, SessionDetails sessionDetails, long inactivityExpiryTimeInSeconds, Location location)
+	public ClientDetails(InetSocketAddress remoteAddress, ClientEndpoint clientEndpoint, SessionDetails sessionDetails, long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp, Location location)
 	{
 		this.remoteAddress = remoteAddress;
 		this.clientEndpoint = clientEndpoint;
+
 		this.sessionDetails = sessionDetails;
 		this.inactivityExpiryTimeInSeconds = inactivityExpiryTimeInSeconds;
+		this.lastLoggedInTimestamp = lastLoggedInTimestamp;
+		
 		this.lastAccessed = new AtomicLong(); 
-		
 		this.location = location;
-		
 		this.applicationDataMap = new HashMap<>();
 	}
 
@@ -64,7 +68,12 @@ public final class ClientDetails
 	{
 		return inactivityExpiryTimeInSeconds;
 	}
-	
+
+	public long getLastLoggedInTimestamp()
+	{
+		return lastLoggedInTimestamp;
+	}
+
 	public InetSocketAddress getRemoteAddress()
 	{
 		return remoteAddress;

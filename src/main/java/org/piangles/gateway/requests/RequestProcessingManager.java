@@ -79,7 +79,7 @@ public final class RequestProcessingManager
 		//geolocationService = Locator.getInstance().getGeoLocationService();
 		String userId = remoteAddr.getAddress().getHostName() + ":" + remoteAddr.getPort();
 
-		clientDetails = new ClientDetails(remoteAddr, clientEndpoint, new SessionDetails(userId, null), 0L, null);
+		clientDetails = new ClientDetails(remoteAddr, clientEndpoint, new SessionDetails(userId, null), 0L, 0L, null);
 
 		logger.info(String.format("New connection from : [Host=%s & Port=%d ]", clientDetails.getHostName(), clientDetails.getPort()));
 	}
@@ -314,7 +314,7 @@ public final class RequestProcessingManager
 					//GeoLocation geoLocation = geolocationService.getGeoLocation(clientDetails.getIPAddress());
 					clientDetails = new ClientDetails(clientDetails.getRemoteAddress(), clientDetails.getClientEndpoint(),
 							new SessionDetails(authDetails.getUserId(), authDetails.getSessionId()),
-							authDetails.getInactivityExpiryTimeInSeconds(), null);
+							authDetails.getInactivityExpiryTimeInSeconds(), authDetails.getLastLoggedInTimestamp(), null);
 					//Location.convert(geoLocation, false));
 
 					/**

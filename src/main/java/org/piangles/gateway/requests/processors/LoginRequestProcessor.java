@@ -76,7 +76,8 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 			{
 				SessionDetails sessionDetails = sessionMgmtService.register(authResponse.getUserId());
 				loginResponse = new LoginResponse(authResponse.IsValidatedByToken(), authResponse.getUserId(), 
-													sessionDetails.getSessionId(), clientDetails.getInactivityExpiryTimeInSeconds());
+													sessionDetails.getSessionId(), 
+													clientDetails.getInactivityExpiryTimeInSeconds(), authResponse.getLastLoggedInTimestamp());
 			}
 			else
 			{
@@ -89,7 +90,8 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 			if (isSessionValid)
 			{
 				sessionMgmtService.makeLastAccessedCurrent(loginRequest.getId(), loginRequest.getSessionId());
-				loginResponse = new LoginResponse(true, loginRequest.getId(), loginRequest.getSessionId(), clientDetails.getInactivityExpiryTimeInSeconds()); 
+				loginResponse = new LoginResponse(true, loginRequest.getId(), loginRequest.getSessionId(), 
+													clientDetails.getInactivityExpiryTimeInSeconds(), clientDetails.getLastLoggedInTimestamp()); 
 			}
 			else
 			{
