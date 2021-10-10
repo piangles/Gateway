@@ -19,6 +19,8 @@
  
 package org.piangles.gateway.requests.processors;
 
+import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.core.expt.BadRequestException;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.core.util.validate.ValidationManager;
@@ -49,6 +51,7 @@ import org.piangles.gateway.requests.validators.DefaultGatewayRequestValidator;
  */
 public abstract class AbstractRequestProcessor<EndpointReq,EndpointResp> implements RequestProcessor  
 {
+	private LoggingService logger = Locator.getInstance().getLoggingService();
 	/**
 	 * There should not be any instance specific variables
 	 * there will only one instance of the derived class per server
@@ -87,7 +90,9 @@ public abstract class AbstractRequestProcessor<EndpointReq,EndpointResp> impleme
 			}
 			catch (Exception e)
 			{
-				throw new BadRequestException("EndpointRequest could not be decoded because of : " + e.getMessage());
+				String message = "EndpointRequest for: " + request.getEndpoint() + " could not be decoded."; 
+				logger.error(message + " Reason: " + e.getMessage(), e);
+				throw new BadRequestException(message);
 			}
 		}
 
@@ -105,7 +110,10 @@ public abstract class AbstractRequestProcessor<EndpointReq,EndpointResp> impleme
 			validator.validate(clientDetails, request, epRequest);
 		}
 		
-		//Finally process the Request
+		/**
+		 * Finally process the Request
+		 * ---------------------------
+		 */
 		EndpointResp epResponse = processRequest(clientDetails, request, epRequest);
 
 		//appResponse cannot be null

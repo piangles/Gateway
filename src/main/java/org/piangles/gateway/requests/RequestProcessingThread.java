@@ -22,6 +22,7 @@ package org.piangles.gateway.requests;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.session.SessionManagementException;
@@ -47,6 +48,8 @@ import org.piangles.gateway.requests.dto.StatusCode;
 
 public final class RequestProcessingThread extends AbstractContextAwareThread
 {
+	private static final String INTERNAL_ERR_MESSAGE = "Oh no! Something went wrong on our end. TraceId: %s";
+	
 	private ClientDetails clientDetails = null;
 	private Request request = null;
 	private Response response = null;
@@ -125,7 +128,7 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 			{
 				logger.error("Unable to validate Session because of : " + e.getMessage(), e);
 				validSession = false;
-				response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), request.getTransitTime(), StatusCode.InternalError, "Unable to authenticate validate session.");
+				response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), request.getTransitTime(), StatusCode.InternalError, internalErrorMessage());
 			}
 		}
 		else if (clientDetails.getSessionDetails().getSessionId() != null)
@@ -151,15 +154,15 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 		}
 		catch(Exception e)
 		{
-			logger.warn("Exception while processing request because of : " + e.getMessage(), e);
+			logger.warn("Exception while processing request because of : " + extractThrowableMessage(e), e);
 			response = new Response(getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
-									request.getTransitTime(), StatusCode.InternalError, e.getMessage());
+									request.getTransitTime(), StatusCode.InternalError, internalErrorMessage());
 		}
 		catch(Throwable e) //The Top Level in Exception hierarchy. Next level has Error and Exception and we are covered. 
 		{
-			logger.error("Unhandled Exception while processing request because of : " + e.getMessage(), e);
+			logger.error("Unhandled Exception while processing request because of : " + extractThrowableMessage(e), e);
 			response = new Response(getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
-					request.getTransitTime(), StatusCode.InternalError, e.getMessage());
+					request.getTransitTime(), StatusCode.InternalError, internalErrorMessage());
 		}
 		ResponseSender.sendResponse(clientDetails, response);
 	}
@@ -188,16 +191,40 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 		Response response = null;
 		StatusCode statusCode = sreStatusCodeMap.get(sre.getClass().getSimpleName());
 
+		String errorMessage = null;
 		if (statusCode == null)
 		{
-			logger.error("Unable to find ServiceRuntimeException class " + sre.getClass().getSimpleName() + " in sreStatusCodeMap, Defaulting to:" + StatusCode.InternalError);
+			logger.warn("Unable to find StatusCode for ServiceRuntimeException class " + sre.getClass().getSimpleName() + " in sreStatusCodeMap, Defaulting to:" + StatusCode.InternalError);
+			logger.error(sre.getClass().getSimpleName() + " while processing request because of : " + sre.getMessage(), sre);
+			
 			statusCode = StatusCode.InternalError;
+			errorMessage = internalErrorMessage();
+		}
+		else
+		{
+			logger.warn(sre.getClass().getSimpleName() + " while processing request because of : " + sre.getMessage(), sre);
+			errorMessage = sre.getMessage();
 		}
 		
-		logger.warn(sre.getClass().getSimpleName() + " while processing request because of : " + sre.getMessage(), sre);
 		response = new Response(getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
-				request.getTransitTime(), statusCode, sre.getMessage());
+				request.getTransitTime(), statusCode, errorMessage);
 		
 		return response;
+	}
+	
+	private String internalErrorMessage()
+	{
+		return String.format(INTERNAL_ERR_MESSAGE, getTraceId().toString());
+	}
+	
+	private String extractThrowableMessage(Throwable e)
+	{
+		String exptMessage = e.getMessage();
+		if (StringUtils.isBlank(exptMessage))
+		{
+			exptMessage = e.getClass().getCanonicalName();
+		}
+		
+		return exptMessage;
 	}
 }
