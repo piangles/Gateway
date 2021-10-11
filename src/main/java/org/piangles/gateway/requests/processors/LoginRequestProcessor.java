@@ -77,7 +77,7 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 				SessionDetails sessionDetails = sessionMgmtService.register(authResponse.getUserId());
 				loginResponse = new LoginResponse(authResponse.IsValidatedByToken(), authResponse.getUserId(), 
 													sessionDetails.getSessionId(), 
-													clientDetails.getInactivityExpiryTimeInSeconds(), authResponse.getLastLoggedInTimestamp());
+													sessionDetails.getInactivityExpiryTimeInSeconds(), authResponse.getLastLoggedInTimestamp());
 			}
 			else
 			{
