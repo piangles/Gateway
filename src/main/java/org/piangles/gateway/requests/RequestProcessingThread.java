@@ -118,6 +118,7 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 				if (validSession)
 				{
 					sessionMgmtService.makeLastAccessedCurrent(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+					clientDetails.markLastAccessed();
 				}
 				else
 				{

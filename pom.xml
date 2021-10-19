@@ -5,7 +5,7 @@
 	<groupId>org.piangles.gateway</groupId>
 	<artifactId>Gateway</artifactId>
 	<packaging>jar</packaging>
-	<version>3.5</version>
+	<version>3.7</version>
 
 	<name>PiAngles Gateway</name>
 	<description>

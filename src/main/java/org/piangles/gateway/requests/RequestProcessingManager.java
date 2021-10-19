@@ -147,14 +147,14 @@ public final class RequestProcessingManager
 			endpoint = request.getEndpoint();
 			requestProcessor = RequestRouter.getInstance().getRequestProcessor(endpoint);
 			
-			if (requestProcessor == null)//Step 5.2 : Endpoint not found.
+			if (requestProcessor == null && !Endpoints.Ping.name().equals(endpoint))//Step 5.2 : Endpoint not found.
 			{
 				String errorMessage = "This endpoint " + request.getEndpoint() + " is not supported.";
 				logger.warn(errorMessage);
 				response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
 										request.getTransitTime(), StatusCode.NotFound, errorMessage);
 			}
-			else //Step 5.3 Endpoint found. 
+			else //Step 5.3 Endpoint found or it is Ping
 			{
 				//Step 6.1 : Validate Request Against the Current State
 				response = validateRequestAgainstState(request, requestProcessor);
@@ -315,6 +315,7 @@ public final class RequestProcessingManager
 					clientDetails = new ClientDetails(clientDetails.getRemoteAddress(), clientDetails.getClientEndpoint(),
 							new SessionDetails(authDetails.getUserId(), authDetails.getSessionId()),
 							authDetails.getInactivityExpiryTimeInSeconds(), authDetails.getLastLoggedInTimestamp(), null);
+					clientDetails.markLastAccessed();
 					//Location.convert(geoLocation, false));
 
 					/**
