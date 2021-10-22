@@ -165,6 +165,7 @@ public final class RequestProcessingManager
 					{
 						if (clientDetails.hasSessionExpired())
 						{
+							logger.info("Ping Received from User: " + clientDetails.getSessionDetails().getUserId() + " but session has expired. Closing connection.");
 							clientDetails.getClientEndpoint().close();
 						}
 						else

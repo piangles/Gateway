@@ -90,8 +90,8 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 			if (isSessionValid)
 			{
 				sessionMgmtService.makeLastAccessedCurrent(loginRequest.getId(), loginRequest.getSessionId());
-				loginResponse = new LoginResponse(true, loginRequest.getId(), loginRequest.getSessionId(), 
-													clientDetails.getInactivityExpiryTimeInSeconds(), clientDetails.getLastLoggedInTimestamp()); 
+				loginResponse = new LoginResponse(false, loginRequest.getId(), loginRequest.getSessionId(), 
+													900, 0); //TODO THIS HAS TO BE FIXED 
 			}
 			else
 			{
