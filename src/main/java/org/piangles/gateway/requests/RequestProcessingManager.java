@@ -26,6 +26,7 @@ import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.session.SessionManagementException;
 import org.piangles.backbone.services.session.SessionManagementService;
+import org.piangles.core.expt.BadRequestException;
 import org.piangles.core.resources.ResourceException;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
@@ -134,10 +135,20 @@ public final class RequestProcessingManager
 		RequestProcessor requestProcessor = null;
 		try
 		{
+			logger.info("Message receieved from userId : " + clientDetails.getSessionDetails().getUserId());
+			
 			//Step 2 : Decode the raw message to Request.
+			if (StringUtils.isBlank(messageAsString))
+			{
+				throw new BadRequestException("GatewayMessage cannot be empty.");
+			}
 			message = JSON.getDecoder().decode(messageAsString.getBytes(), Message.class);
 			
 			//Step 3 : Decode the Gateway Request from the Message.
+			if (StringUtils.isBlank(message.getPayload()))
+			{
+				throw new BadRequestException("GatewayMessage Payload cannot be empty.");
+			}
 			request = JSON.getDecoder().decode(message.getPayload().getBytes(), Request.class);
 			
 			//Step 4: Gateway Request was decoded successfully, mark TransitTime 
@@ -294,6 +305,9 @@ public final class RequestProcessingManager
 		case PreAuthentication:
 			if (RequestRouter.getInstance().isAuthenticationEndpoint(request.getEndpoint()) && response.isRequestSuccessful())
 			{
+				/**
+				 * TODO Max Sessions allowed need to handle gracefully.
+				 */
 				AuthenticationDetails authDetails = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), AuthenticationDetails.class);
 				if (authDetails.isAuthenticated())
 				{

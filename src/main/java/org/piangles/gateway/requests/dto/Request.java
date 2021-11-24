@@ -46,7 +46,7 @@ public final class Request
 	private String sessionId = null;
 	
 	@JsonProperty(required = true)
-	private String endPoint = null;
+	private String endpoint = null;
 	
 	@JsonProperty(required = true)
 	private String endpointRequest = null;
@@ -54,14 +54,14 @@ public final class Request
 	@JsonProperty(required = false)
 	private SystemInfo systemInfo = null;
 	
-	public Request(String sessionId, String endPoint, String endpointRequest, SystemInfo systemInfo)
+	public Request(String sessionId, String endpoint, String endpointRequest, SystemInfo systemInfo)
 	{
 		this.issuedTime = System.currentTimeMillis();
 		this.traceId = UUID.randomUUID();
 
 		this.sessionId = sessionId;
 		
-		this.endPoint = endPoint;
+		this.endpoint = endpoint;
 		this.endpointRequest = endpointRequest;
 		
 		this.systemInfo = systemInfo;
@@ -100,7 +100,7 @@ public final class Request
 	
 	public String getEndpoint()
 	{
-		return endPoint;
+		return endpoint;
 	}
 	
 	public String getEndpointRequest()
@@ -116,6 +116,6 @@ public final class Request
 	@Override
 	public String toString()
 	{
-		return "Request [issuedTime=" + issuedTime + ", traceId=" + traceId + ", sessionId=" + sessionId + ", systemInfo=" + systemInfo + ", endPoint=" + endPoint + "]";
+		return "Request [issuedTime=" + issuedTime + ", traceId=" + traceId + ", sessionId=" + sessionId + ", systemInfo=" + systemInfo + ", endpoint=" + endpoint + "]";
 	}
 }
