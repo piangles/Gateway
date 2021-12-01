@@ -51,10 +51,7 @@ public final class Request
 	@JsonProperty(required = true)
 	private String endpointRequest = null;
 	
-	@JsonProperty(required = false)
-	private SystemInfo systemInfo = null;
-	
-	public Request(String sessionId, String endpoint, String endpointRequest, SystemInfo systemInfo)
+	public Request(String sessionId, String endpoint, String endpointRequest)
 	{
 		this.issuedTime = System.currentTimeMillis();
 		this.traceId = UUID.randomUUID();
@@ -63,8 +60,6 @@ public final class Request
 		
 		this.endpoint = endpoint;
 		this.endpointRequest = endpointRequest;
-		
-		this.systemInfo = systemInfo;
 	}
 
 	public long getIssuedTime()
@@ -108,14 +103,9 @@ public final class Request
 		return endpointRequest;
 	}
 
-	public SystemInfo getSystemInfo()
-	{
-		return systemInfo;
-	}
-	
 	@Override
 	public String toString()
 	{
-		return "Request [issuedTime=" + issuedTime + ", traceId=" + traceId + ", sessionId=" + sessionId + ", systemInfo=" + systemInfo + ", endpoint=" + endpoint + "]";
+		return "Request [issuedTime=" + issuedTime + ", traceId=" + traceId + ", sessionId=" + sessionId + ", endpoint=" + endpoint + "]";
 	}
 }

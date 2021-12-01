@@ -35,12 +35,16 @@ public final class LoginRequest
 	@JsonProperty(required = false)
 	private String sessionId; //When client app reconnects on disconnect this can be used in combo with userId
 	
-	public LoginRequest(String authenticationType, String id, String password, String sessionId)
+	@JsonProperty(required = false)
+	private SystemInfo systemInfo = null;
+	
+	public LoginRequest(String authenticationType, String id, String password, String sessionId, SystemInfo systemInfo)
 	{
 		this.authenticationType = authenticationType;
 		this.id = id;
 		this.password = password;
 		this.sessionId = sessionId;
+		this.systemInfo = systemInfo;
 	}
 
 	public String getAuthenticationType()
@@ -62,10 +66,15 @@ public final class LoginRequest
 	{
 		return sessionId;
 	}
+	
+	public SystemInfo getSystemInfo()
+	{
+		return systemInfo;
+	}
 
 	@Override
 	public String toString()
 	{
-		return "LoginRequest [authenticationType=" + authenticationType + ", id=" + id + ", sessionId=" + sessionId + "]";
+		return "LoginRequest [authenticationType=" + authenticationType + ", id=" + id + ", sessionId=" + sessionId + ", systemInfo=" + systemInfo +  "]";
 	}
 }
