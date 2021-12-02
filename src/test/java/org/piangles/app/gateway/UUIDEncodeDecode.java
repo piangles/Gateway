@@ -30,7 +30,7 @@ public class UUIDEncodeDecode
 	{
 		try
 		{
-			Request req = new Request(UUID.randomUUID().toString(), null, "Dummy", null);
+			Request req = new Request(UUID.randomUUID().toString(), null, "Dummy");
 			System.out.println("Trace Id : " + req.getTraceId());
 			String traceId = req.getTraceId().toString();
 			String reqAsString = new String(JSON.getEncoder().encode(req));

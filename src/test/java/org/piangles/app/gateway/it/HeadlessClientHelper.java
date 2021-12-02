@@ -93,14 +93,14 @@ public class HeadlessClientHelper //Rename
 	
 	protected final void login() throws Exception
 	{
-		LoginRequest loginRequest = new LoginRequest("Default", "testuser@testmail.com", "password", null);
+		LoginRequest loginRequest = new LoginRequest("Default", "testuser@testmail.com", "password", null, new SystemInfo("Win64", "Chrome", "92"));
 
 		createRequestAndSend("Login", loginRequest);
 	}
 
 	protected final void loginWithSession() throws Exception
 	{
-		LoginRequest loginRequest = new LoginRequest("Default", "testuser@testmail.com", null, sessionId);
+		LoginRequest loginRequest = new LoginRequest("Default", "testuser@testmail.com", null, sessionId, new SystemInfo("Win64", "Chrome", "92"));
 
 		createRequestAndSend("Login", loginRequest);
 	}
@@ -123,7 +123,7 @@ public class HeadlessClientHelper //Rename
 			appReqAsStr = new String(JSON.getEncoder().encode(appRequest));
 		}
 		
-		Request request = new Request(sessionId, endpoint, appReqAsStr, new SystemInfo("Win64", "Chrome", "92"));
+		Request request = new Request(sessionId, endpoint, appReqAsStr);
 		System.out.println("For Endpoint : " + endpoint + "  the TRACE ID :" + request.getTraceId());
 		String requestAsStr = new String(JSON.getEncoder().encode(request));	
 		

@@ -47,9 +47,9 @@ public class HeadlessClientFail
 			});
 			
 			String sessionId = UUID.randomUUID().toString();
-			LoginRequest loginRequest = new LoginRequest("Default", "saradhivs", "password", null);
+			LoginRequest loginRequest = new LoginRequest("Default", "saradhivs", "password", null, new SystemInfo("Win64", "Chrome", "92"));
 			String loginReqAsStr = new String(JSON.getEncoder().encode(loginRequest));
-			Request request = new Request(sessionId, "Dummy", loginReqAsStr, new SystemInfo("Win64", "Chrome", "92"));
+			Request request = new Request(sessionId, "Dummy", loginReqAsStr);
 			
 			System.out.println(new String(JSON.getEncoder().encode(request)));
 			
