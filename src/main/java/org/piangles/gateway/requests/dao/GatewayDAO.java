@@ -17,21 +17,12 @@
  
  
  
-package org.piangles.gateway.requests;
+package org.piangles.gateway.requests.dao;
 
-import org.piangles.gateway.CommunicationPattern;
-import org.piangles.gateway.client.ClientDetails;
-import org.piangles.gateway.requests.dao.GatewayDAO;
-import org.piangles.gateway.requests.dto.Request;
-import org.piangles.gateway.requests.dto.Response;
+import org.piangles.core.dao.DAOException;
+import org.piangles.gateway.requests.UserDeviceInfo;
 
-public interface RequestProcessor
+public interface GatewayDAO
 {
-	public Enum<?> getEndpoint();
-	public CommunicationPattern getCommunicationPattern(); 
-	public boolean shouldValidateSession();
-	public Class<?> getEndpointRequestClass();
-	public Class<?> getEndpointResponseClass();
-	public void setGatewayDAO(GatewayDAO gatewayDAO);
-	public Response processRequest(ClientDetails clientDetails, Request request) throws Exception;
+	public void insertUserDeviceInfo(UserDeviceInfo userDeviceInfo) throws DAOException;
 }

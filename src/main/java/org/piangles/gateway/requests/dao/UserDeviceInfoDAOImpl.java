@@ -17,21 +17,28 @@
  
  
  
-package org.piangles.gateway.requests;
+package org.piangles.gateway.requests.dao;
 
-import org.piangles.gateway.CommunicationPattern;
-import org.piangles.gateway.client.ClientDetails;
-import org.piangles.gateway.requests.dao.GatewayDAO;
-import org.piangles.gateway.requests.dto.Request;
-import org.piangles.gateway.requests.dto.Response;
+import org.piangles.core.dao.DAOException;
+import org.piangles.core.dao.nosql.AbstractDAO;
+import org.piangles.core.resources.MongoDataStore;
+import org.piangles.gateway.requests.UserDeviceInfo;
 
-public interface RequestProcessor
+public class UserDeviceInfoDAOImpl extends AbstractDAO<UserDeviceInfo>
 {
-	public Enum<?> getEndpoint();
-	public CommunicationPattern getCommunicationPattern(); 
-	public boolean shouldValidateSession();
-	public Class<?> getEndpointRequestClass();
-	public Class<?> getEndpointResponseClass();
-	public void setGatewayDAO(GatewayDAO gatewayDAO);
-	public Response processRequest(ClientDetails clientDetails, Request request) throws Exception;
+	public UserDeviceInfoDAOImpl(MongoDataStore mongoDataStore) throws Exception
+	{
+		super.init(mongoDataStore);
+	}
+	
+	public void insertUserDeviceInfo(UserDeviceInfo userDeviceInfo) throws DAOException
+	{
+		super.create(userDeviceInfo);
+	}
+
+	@Override
+	protected Class<UserDeviceInfo> getTClass()
+	{
+		return UserDeviceInfo.class;
+	}
 }

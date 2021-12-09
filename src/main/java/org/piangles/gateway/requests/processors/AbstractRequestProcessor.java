@@ -30,6 +30,7 @@ import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.events.EventProcessingManager;
 import org.piangles.gateway.requests.RequestProcessingThread;
 import org.piangles.gateway.requests.RequestProcessor;
+import org.piangles.gateway.requests.dao.GatewayDAO;
 import org.piangles.gateway.requests.dto.EmptyRequest;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.Response;
@@ -60,6 +61,7 @@ public abstract class AbstractRequestProcessor<EndpointReq,EndpointResp> impleme
 	private CommunicationPattern communicationPattern;
 	private Class<EndpointReq> endpointRequestClass = null;
 	private Class<EndpointResp> endpointResponseClass = null;
+	private GatewayDAO gatewayDAO = null;
 	private DefaultGatewayRequestValidator<EndpointReq> gatewayRequestValidator = null;
 
 	public AbstractRequestProcessor(Enum<?> endpoint, Class<EndpointReq> requestClass, Class<EndpointResp> responseClass)
@@ -153,6 +155,17 @@ public abstract class AbstractRequestProcessor<EndpointReq,EndpointResp> impleme
 	public boolean shouldValidateSession()
 	{
 		return true;
+	}
+	
+	@Override
+	public final void setGatewayDAO(GatewayDAO gatewayDAO)
+	{
+		this.gatewayDAO = gatewayDAO;
+	}
+	
+	protected final GatewayDAO getGatewayDAO()
+	{
+		return gatewayDAO;
 	}
 	
 	protected final EventProcessingManager getEventProcessingManager()

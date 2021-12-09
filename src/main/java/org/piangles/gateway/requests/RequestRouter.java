@@ -27,6 +27,8 @@ import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.core.util.validate.ValidationManager;
 import org.piangles.core.util.validate.Validator;
+import org.piangles.gateway.requests.dao.GatewayDAO;
+import org.piangles.gateway.requests.dao.GatewayDAOImpl;
 import org.piangles.gateway.requests.processors.AutoSuggestRequestProcessor;
 import org.piangles.gateway.requests.processors.ChangePasswordRequestProcessor;
 import org.piangles.gateway.requests.processors.CreateUserProfileRequestProcessor;
@@ -50,8 +52,11 @@ import org.piangles.gateway.requests.validators.SubscriptionRequestValidator;
 
 public class RequestRouter
 {
-	private LoggingService logger = null;
 	private static RequestRouter self = null;
+
+	private LoggingService logger = null;
+
+	private GatewayDAO gatewayDAO = null;
 	private Map<String, Enum<?>> preAuthenticationEndpoints = null;
 	private Map<String, Enum<?>> authenticationEndpoints = null;
 	private Map<String, RequestProcessor> endpointRequestProcessorMap;
@@ -60,6 +65,16 @@ public class RequestRouter
 	{
 		logger = Locator.getInstance().getLoggingService();
 		
+		try
+		{
+			gatewayDAO = new GatewayDAOImpl();
+		}
+		catch (Exception e)
+		{
+			String message = "Unable to create RequestRouter becaue of DAO Failure. Reason: " + e.getMessage(); 
+			logger.fatal(message, e);
+			throw new RuntimeException(message, e);
+		} 
 		preAuthenticationEndpoints = new HashMap<>();
 		authenticationEndpoints = new HashMap<>();
 		endpointRequestProcessorMap = new HashMap<>();
@@ -136,10 +151,10 @@ public class RequestRouter
 	
 	public void registerDefaultRequestValidators()
 	{
-		RequestRouter.getInstance().registerRequestValidator(new SignUpRequestValidator());
-		RequestRouter.getInstance().registerRequestValidator(new LoginRequestValidator());
-		RequestRouter.getInstance().registerRequestValidator(new ChangePasswordRequestValidator());
-		RequestRouter.getInstance().registerRequestValidator(new SubscriptionRequestValidator());
+		registerRequestValidator(new SignUpRequestValidator());
+		registerRequestValidator(new LoginRequestValidator());
+		registerRequestValidator(new ChangePasswordRequestValidator());
+		registerRequestValidator(new SubscriptionRequestValidator());
 	}
 	
 	public void registerPreAuthenticationEndpoint(String endpointName, Enum<?> endpoint)
@@ -156,6 +171,7 @@ public class RequestRouter
 	{
 		if (rp != null)
 		{
+			rp.setGatewayDAO(gatewayDAO);
 			String registringOrOverriding = null; 
 			RequestProcessor existingRP = endpointRequestProcessorMap.get(rp.getEndpoint().name()); 
 			if (existingRP != null)
