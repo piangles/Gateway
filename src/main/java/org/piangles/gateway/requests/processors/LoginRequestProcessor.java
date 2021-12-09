@@ -26,16 +26,21 @@ import org.piangles.backbone.services.auth.AuthenticationType;
 import org.piangles.backbone.services.auth.Credential;
 import org.piangles.backbone.services.auth.FailureReason;
 import org.piangles.backbone.services.session.SessionDetails;
+import org.piangles.backbone.services.session.SessionManagementException;
 import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
+import org.piangles.gateway.requests.UserDeviceInfo;
 import org.piangles.gateway.requests.dto.LoginRequest;
 import org.piangles.gateway.requests.dto.LoginResponse;
 import org.piangles.gateway.requests.dto.Request;
 
 public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginRequest, LoginResponse>
 {
+	private static final String MAX_ACTIVE_SESSION_MESAGE_1 = "already has an active session";
+	private static final String MAX_ACTIVE_SESSION_MESAGE_2 = "has reached maximum active sessions";
+	
 	private SessionManagementService sessionMgmtService = Locator.getInstance().getSessionManagementService();
 	private AuthenticationService authService = Locator.getInstance().getAuthenticationService();
 	
@@ -74,10 +79,33 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 			
 			if (authResponse.isAuthenticated())
 			{
-				SessionDetails sessionDetails = sessionMgmtService.register(authResponse.getUserId());
-				loginResponse = new LoginResponse(authResponse.IsValidatedByToken(), authResponse.getUserId(), 
-													sessionDetails.getSessionId(), 
-													sessionDetails.getInactivityExpiryTimeInSeconds(), authResponse.getLastLoggedInTimestamp());
+				UserDeviceInfo userDeviceInfo = new UserDeviceInfo(authResponse.getUserId(), 
+																	clientDetails.getHostName(), clientDetails.getIPAddress(),
+																	loginRequest.getSystemInfo());
+				getGatewayDAO().insertUserDeviceInfo(userDeviceInfo);
+				
+				SessionDetails sessionDetails = null;
+				try
+				{
+					sessionDetails = sessionMgmtService.register(authResponse.getUserId());
+					
+					loginResponse = new LoginResponse(authResponse.IsValidatedByToken(), authResponse.getUserId(), 
+							sessionDetails.getSessionId(), 
+							sessionDetails.getInactivityExpiryTimeInSeconds(), authResponse.getLastLoggedInTimestamp());
+				}
+				catch(SessionManagementException e)
+				{
+					String message = e.getMessage();
+					//TODO THIS HAS TO BE FIXED - Need a better way to figure this out.
+					if (message.contains(MAX_ACTIVE_SESSION_MESAGE_1) || message.contains(MAX_ACTIVE_SESSION_MESAGE_2))
+					{
+						loginResponse = new LoginResponse(authResponse.getNoOfAttemptsRemaining(), FailureReason.MaximumSessionCountReached);
+					}
+					else
+					{
+						throw e;
+					}
+				}
 			}
 			else
 			{
@@ -91,7 +119,7 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 			{
 				sessionMgmtService.makeLastAccessedCurrent(loginRequest.getId(), loginRequest.getSessionId());
 				loginResponse = new LoginResponse(false, loginRequest.getId(), loginRequest.getSessionId(), 
-													900, 0); //TODO THIS HAS TO BE FIXED 
+													900, 0);  //TODO THIS HAS TO BE FIXED 
 			}
 			else
 			{

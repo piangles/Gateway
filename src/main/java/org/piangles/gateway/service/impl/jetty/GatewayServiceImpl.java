@@ -47,6 +47,7 @@ import org.piangles.gateway.requests.RequestRouter;
 
 public class GatewayServiceImpl implements GatewayService
 {
+	private static final String GATEWAY_METADATA_ENABLED = "gateway.metadata.enabled";
 	private LoggingService logger = null;
 	private Server server = null;
 
@@ -81,7 +82,18 @@ public class GatewayServiceImpl implements GatewayService
          */
         ServletContextHandler defaultContext = new ServletContextHandler();
         defaultContext.setContextPath("/");
-        defaultContext.setWelcomeFiles(new String[] { "index.html" });
+        String welcomePage = null;
+        String apiMetadataEnabled = System.getenv(GATEWAY_METADATA_ENABLED);
+        if (Boolean.parseBoolean(apiMetadataEnabled))
+        {
+        	welcomePage = "index.html";
+        }
+        else
+        {
+        	welcomePage = "emptyIndex.html";
+        }
+        logger.info("APIMetadataEnabled: " + apiMetadataEnabled + " WelcomePage: " + welcomePage);
+        defaultContext.setWelcomeFiles(new String[] { welcomePage });
         /**
          * web is the folder under resources where index.html exists
          * the index.html needs to reside under a subdirectory of resources.
