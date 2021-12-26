@@ -171,6 +171,7 @@ public class GatewayServiceImpl implements GatewayService
         @Override
         public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp)
         {
+        	//req.getH
             return new WebSocketLifecycleEventHandler();
         }
     }

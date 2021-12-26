@@ -50,6 +50,8 @@ public final class WebSocketLifecycleEventHandler
 	{
 		try
 		{
+			session.setIdleTimeout(2 * 60 * 1000); Move to config
+			session.getPolicy().setMaxTextMessageSize(1024 * 64 * 5);  Move to config
 			rpm = new RequestProcessingManager(session.getRemoteAddress(), new ClientEndpointImpl(session));
 		}
 		catch(Throwable t)
