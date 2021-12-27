@@ -19,6 +19,11 @@
  
 package org.piangles.gateway.service.impl.jetty;
 
+import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -26,12 +31,29 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.piangles.core.util.Logger;
+import org.piangles.gateway.GatewayConfiguration;
 import org.piangles.gateway.requests.RequestProcessingManager;
 
 @WebSocket
 public final class WebSocketLifecycleEventHandler
 {
+	private static final String IP_DELIMITER = ",";
+	private static final String PORT_DELIMITER = ",";
+	private static final String DEFAULT_CLIENT_PORT = "5555";
+	
+	private static final String FORWARDED_HEADER = "Forwarded";
+	private static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";
+	
+	private GatewayConfiguration gatewayConfiguration = null;
+	private InetSocketAddress remoteAddr = null;
+	
 	private RequestProcessingManager rpm = null;
+	
+	public WebSocketLifecycleEventHandler(GatewayConfiguration gatewayConfiguration, Map<String, List<String>> headers)
+	{
+		this.gatewayConfiguration = gatewayConfiguration;
+		this.remoteAddr = determineRemoteAddress(headers); 
+	}
 	
 	@OnWebSocketClose
 	public void onClose(int statusCode, String reason)
@@ -50,9 +72,16 @@ public final class WebSocketLifecycleEventHandler
 	{
 		try
 		{
-			session.setIdleTimeout(2 * 60 * 1000); Move to config
-			session.getPolicy().setMaxTextMessageSize(1024 * 64 * 5);  Move to config
-			rpm = new RequestProcessingManager(session.getRemoteAddress(), new ClientEndpointImpl(session));
+			session.setIdleTimeout(gatewayConfiguration.getIdleTimeout());
+			session.getPolicy().setMaxTextMessageSize(gatewayConfiguration.getMaxTextMessageSize());
+			
+			if (remoteAddr == null)
+			{
+				Logger.getInstance().warn("Remote Address was unable to be determined from Headers, using Session.");
+				remoteAddr = session.getRemoteAddress();
+			}
+			
+			rpm = new RequestProcessingManager(remoteAddr, new ClientEndpointImpl(session));
 		}
 		catch(Throwable t)
 		{
@@ -66,5 +95,100 @@ public final class WebSocketLifecycleEventHandler
 	public void onMessage(String message)
 	{
 		rpm.onMessage(message);
+	}
+	
+	private InetSocketAddress determineRemoteAddress(Map<String, List<String>> headers)
+	{
+		InetSocketAddress remoteAddress = null;
+		
+		try
+		{
+			/**
+			 * As per documentation 
+			 * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For
+			 * 
+			 * We are not currently handling TODO Implement extractRemoteAddressFromForwarded
+			 * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Forwarded
+			 * 
+			 * AWS Documentation
+			 * https://docs.aws.amazon.com/elasticloadbalancing/latest/application/x-forwarded-headers.html
+			 * 
+			 */
+			remoteAddress = extractRemoteAddressFromXForwardedFor(headers.get(X_FORWARDED_FOR_HEADER));
+			if (remoteAddress == null)
+			{
+				remoteAddress = extractRemoteAddressFromForwarded(headers.get(FORWARDED_HEADER));
+			}
+		}
+		catch(Exception e)
+		{
+			/**
+			 * Precautionary Exception Catch.
+			 * ------------------------------
+			 * Not able to determine the address here is not an failure, we can
+			 * always recover in onConnect where we determine the RemoteAddress
+			 * from Session.
+			 */
+			Logger.getInstance().warn("Unable to determineRemoteAddress. Reason: " + e.getMessage(), e);
+		}
+		return remoteAddress;
+	}
+	
+	private InetSocketAddress extractRemoteAddressFromXForwardedFor(List<String> xForwardedForHeaderValues)
+	{
+		InetSocketAddress remoteAddress = null;
+		
+		if (xForwardedForHeaderValues != null && !xForwardedForHeaderValues.isEmpty())
+		{
+			//We pick the first element only
+			String valueString = xForwardedForHeaderValues.get(0);
+			
+			if (StringUtils.isNotBlank(valueString))
+			{
+				if (valueString.indexOf(IP_DELIMITER) != -1)
+				{
+					valueString = valueString.substring(0, valueString.indexOf(IP_DELIMITER));	
+				}
+				
+				valueString = valueString.trim();
+				
+				String host = null;
+				String port = null;
+				
+				if (valueString.indexOf(PORT_DELIMITER) != -1)
+				{
+					host = valueString.substring(0, valueString.indexOf(PORT_DELIMITER));
+					port = valueString.substring(valueString.indexOf(PORT_DELIMITER)+1);
+				}
+				else
+				{
+					host = valueString;
+					port = DEFAULT_CLIENT_PORT;
+				}
+
+				if (host != null)
+				{
+					remoteAddress = new InetSocketAddress(host, Integer.parseInt(port));
+				}
+			}
+		}
+
+		return remoteAddress;
+	}
+	
+	private InetSocketAddress extractRemoteAddressFromForwarded(List<String> forwardedHeaderValues)
+	{
+		InetSocketAddress remoteAddress = null;
+		
+		if (forwardedHeaderValues != null && !forwardedHeaderValues.isEmpty())
+		{
+			String valueString = forwardedHeaderValues.get(0);
+			if (StringUtils.isNotBlank(valueString))
+			{
+				
+			}
+		}
+		
+		return remoteAddress;
 	}
 }

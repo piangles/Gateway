@@ -42,6 +42,7 @@ import org.piangles.core.services.remoting.SessionAwareable;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.services.remoting.SessionDetailsCreator;
 import org.piangles.gateway.Constants;
+import org.piangles.gateway.GatewayConfiguration;
 import org.piangles.gateway.GatewayService;
 import org.piangles.gateway.requests.RequestRouter;
 
@@ -64,11 +65,12 @@ public class GatewayServiceImpl implements GatewayService
 		server = new Server(new GatewayThreadPool());
 	}
 
-	public void init(String host, int port) throws Exception
+	@Override
+	public void init(GatewayConfiguration gatewayConfiguration) throws Exception
 	{
 		ServerConnector connector = new ServerConnector(server);
-		connector.setHost(host);
-		connector.setPort(port);
+		connector.setHost(gatewayConfiguration.getHost());
+		connector.setPort(gatewayConfiguration.getPort());
 		
 		//A server can listen on multiple ports ex: http and https
 		server.addConnector(connector);
@@ -128,11 +130,12 @@ public class GatewayServiceImpl implements GatewayService
         // Add the websocket filter
         WebSocketUpgradeFilter wsfilter = WebSocketUpgradeFilter.configure(defaultContext);
         // Add websocket mapping
-        wsfilter.addMapping(new ServletPathSpec("/api/"),new WebSocketCreatorImpl());
+        wsfilter.addMapping(new ServletPathSpec("/api/"),new WebSocketCreatorImpl(gatewayConfiguration));
         
 		server.setHandler(defaultContext);
 	}
 
+	@Override
 	public void startProcessingRequests() throws Exception
 	{
 		System.out.println("GatewayService is being started...");
@@ -168,11 +171,17 @@ public class GatewayServiceImpl implements GatewayService
 
     class WebSocketCreatorImpl implements WebSocketCreator
     {
+    	private GatewayConfiguration gatewayConfiguration = null;
+    	
+    	public WebSocketCreatorImpl(GatewayConfiguration gatewayConfiguration)
+    	{
+    		this.gatewayConfiguration = gatewayConfiguration;
+    	}
+    	
         @Override
         public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp)
         {
-        	//req.getH
-            return new WebSocketLifecycleEventHandler();
+            return new WebSocketLifecycleEventHandler(gatewayConfiguration, req.getHeaders());
         }
     }
 

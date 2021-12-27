@@ -23,6 +23,6 @@ public interface GatewayService
 {
 	public static final String NAME = GatewayService.class.getSimpleName();
 	
-	public void init(String host, int port) throws Exception;
+	public void init(GatewayConfiguration gatewayConfiguration) throws Exception;
 	public void startProcessingRequests() throws Exception;
 }
