@@ -24,7 +24,10 @@ public class AuthenticationDetails
 {
 	@JsonProperty(required = true)
 	private boolean authenticated = false;
-	
+
+	@JsonProperty(required = false)
+	private boolean mfaEnabled = false;
+
 	@JsonProperty(required = false)
 	private boolean authenticatedByToken = false;
 	
@@ -45,11 +48,11 @@ public class AuthenticationDetails
 		
 	}
 
-	public AuthenticationDetails(boolean authenticated, boolean authenticatedByToken, String userId, String sessionId, 
+	public AuthenticationDetails(boolean authenticated, boolean mfaEnabled, boolean authenticatedByToken, String userId, String sessionId, 
 									long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp)
 	{
-		super();
 		this.authenticated = authenticated;
+		this.mfaEnabled = mfaEnabled;
 		this.authenticatedByToken = authenticatedByToken;
 		this.userId = userId;
 		this.sessionId = sessionId;
@@ -60,6 +63,11 @@ public class AuthenticationDetails
 	public final boolean isAuthenticated()
 	{
 		return authenticated;
+	}
+
+	public final boolean isMFAEnabled()
+	{
+		return mfaEnabled;
 	}
 
 	public final boolean isAuthenticatedByToken()

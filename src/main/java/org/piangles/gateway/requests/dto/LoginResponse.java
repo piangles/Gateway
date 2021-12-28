@@ -31,9 +31,9 @@ public final class LoginResponse extends AuthenticationDetails
 	@JsonProperty(required = false)
 	private FailureReason failureReason = null;
 
-	public LoginResponse(boolean authenticatedByToken, String userId, String sessionId, long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp)
+	public LoginResponse(boolean mfaEnabled, boolean authenticatedByToken, String userId, String sessionId, long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp)
 	{
-		super(true, authenticatedByToken, userId, sessionId, inactivityExpiryTimeInSeconds, lastLoggedInTimestamp);
+		super(true, mfaEnabled, authenticatedByToken, userId, sessionId, inactivityExpiryTimeInSeconds, lastLoggedInTimestamp);
 	}
 
 	public LoginResponse(int noOfAttemptsRemaining, FailureReason failureReason)

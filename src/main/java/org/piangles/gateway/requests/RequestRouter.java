@@ -45,10 +45,12 @@ import org.piangles.gateway.requests.processors.SignUpRequestProcessor;
 import org.piangles.gateway.requests.processors.SubscriptionRequestProcessor;
 import org.piangles.gateway.requests.processors.UpdateUserPreferencesRequestProcessor;
 import org.piangles.gateway.requests.processors.UpdateUserProfileRequestProcessor;
+import org.piangles.gateway.requests.processors.UserProfileExistsRequestProcessor;
 import org.piangles.gateway.requests.validators.ChangePasswordRequestValidator;
 import org.piangles.gateway.requests.validators.LoginRequestValidator;
 import org.piangles.gateway.requests.validators.SignUpRequestValidator;
 import org.piangles.gateway.requests.validators.SubscriptionRequestValidator;
+import org.piangles.gateway.requests.validators.UserProfileExistsRequestValidator;
 
 public class RequestRouter
 {
@@ -104,6 +106,7 @@ public class RequestRouter
 		registerPreAuthenticationEndpoint(Endpoints.ListEndpoints.name(), Endpoints.ListEndpoints);
 		registerPreAuthenticationEndpoint(Endpoints.EndpointMetadata.name(), Endpoints.EndpointMetadata);
 		
+		registerPreAuthenticationEndpoint(Endpoints.UserProfileExists.name(), Endpoints.UserProfileExists);
 		registerPreAuthenticationEndpoint(Endpoints.SignUp.name(), Endpoints.SignUp);
 		registerPreAuthenticationEndpoint(Endpoints.Login.name(), Endpoints.Login);
 		registerPreAuthenticationEndpoint(Endpoints.GenerateResetToken.name(), Endpoints.GenerateResetToken);
@@ -126,6 +129,7 @@ public class RequestRouter
 		registerRequestProcessor(createRequestProcessor(ListEndpointsRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(EndpointMetadataRequestProcessor.class));
 		
+		registerRequestProcessor(createRequestProcessor(UserProfileExistsRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(SignUpRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(LoginRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(GenerateTokenRequestProcessor.class));
@@ -151,6 +155,7 @@ public class RequestRouter
 	
 	public void registerDefaultRequestValidators()
 	{
+		registerRequestValidator(new UserProfileExistsRequestValidator());
 		registerRequestValidator(new SignUpRequestValidator());
 		registerRequestValidator(new LoginRequestValidator());
 		registerRequestValidator(new ChangePasswordRequestValidator());

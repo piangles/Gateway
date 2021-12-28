@@ -89,7 +89,8 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 				{
 					sessionDetails = sessionMgmtService.register(authResponse.getUserId());
 					
-					loginResponse = new LoginResponse(authResponse.IsValidatedByToken(), authResponse.getUserId(), 
+					//TODO - Get MFAEnabled from UserProfile
+					loginResponse = new LoginResponse(false, authResponse.IsValidatedByToken(), authResponse.getUserId(), 
 							sessionDetails.getSessionId(), 
 							sessionDetails.getInactivityExpiryTimeInSeconds(), authResponse.getLastLoggedInTimestamp());
 				}
@@ -118,7 +119,8 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 			if (isSessionValid)
 			{
 				sessionMgmtService.makeLastAccessedCurrent(loginRequest.getId(), loginRequest.getSessionId());
-				loginResponse = new LoginResponse(false, loginRequest.getId(), loginRequest.getSessionId(), 
+				//Do not have to do MFA on userId/sessionId authentication
+				loginResponse = new LoginResponse(false, false, loginRequest.getId(), loginRequest.getSessionId(), 
 													900, 0);  //TODO THIS HAS TO BE FIXED 
 			}
 			else

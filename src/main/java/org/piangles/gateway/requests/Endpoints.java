@@ -28,12 +28,17 @@ public enum Endpoints
 	@Description(content="Given an endpoint, the request processor returns the metadat of that endpoint.")
 	EndpointMetadata,
 	
+	@Description(content="Allows to check if a EmailId or PhoneNo is already registered.")
+	UserProfileExists,
 	@Description(content="Enables the user to register for the application.")
 	SignUp,
 	@Description(content="Allows the user to login and on succesful login creates a session.")
 	Login,
 	@Description(content="Enables the user to generate a temporary password in the the event the user does not remember the password.")
 	GenerateResetToken,
+
+	@Description(content="Allows for Multi-factor Authentication check post Login.")
+	MFAValidation,
 	
 	@Description(content="Allows the user to change passoword post login.")
 	ChangePassword,
