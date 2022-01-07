@@ -35,7 +35,7 @@ class ClientEndpointImpl implements ClientEndpoint
 	}
 	
 	@Override
-	public void sendMessage(Message message) throws IOException
+	public synchronized void sendMessage(Message message) throws IOException
 	{
 		String text = null;
 		try
@@ -48,9 +48,17 @@ class ClientEndpointImpl implements ClientEndpoint
 		}
 		try
 		{
+			/**
+			 * This error happens
+			 * java.lang.IllegalStateException: Blocking message pending 10000 for BLOCKING
+			 * 
+			 * https://stackoverflow.com/questions/26264508/websocket-async-send-can-result-in-blocked-send-once-queue-filled
+			 * 
+			 * session.getRemote().sendStringByFuture(text);
+			 */
 			session.getRemote().sendString(text);
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			session.close();
 			throw e;
