@@ -41,6 +41,9 @@ import org.piangles.gateway.requests.processors.KeepSessionAliveRequestProcessor
 import org.piangles.gateway.requests.processors.ListEndpointsRequestProcessor;
 import org.piangles.gateway.requests.processors.LoginRequestProcessor;
 import org.piangles.gateway.requests.processors.LogoutRequestProcessor;
+import org.piangles.gateway.requests.processors.MFAAuthenticationHook;
+import org.piangles.gateway.requests.processors.MidAuthenticationHook;
+import org.piangles.gateway.requests.processors.PostAuthenticationHook;
 import org.piangles.gateway.requests.processors.SignUpRequestProcessor;
 import org.piangles.gateway.requests.processors.SubscriptionRequestProcessor;
 import org.piangles.gateway.requests.processors.UpdateUserPreferencesRequestProcessor;
@@ -59,9 +62,17 @@ public class RequestRouter
 	private LoggingService logger = null;
 
 	private GatewayDAO gatewayDAO = null;
+	
 	private Map<String, Enum<?>> preAuthenticationEndpoints = null;
+
 	private Map<String, Enum<?>> authenticationEndpoints = null;
+	private Map<String, Enum<?>> midAuthenticationEndpoints = null;
+	
 	private Map<String, RequestProcessor> endpointRequestProcessorMap;
+	
+	private MidAuthenticationHook midAuthenticationHook = null;
+	private MFAAuthenticationHook mfaAuthenticationHook = null;
+	private PostAuthenticationHook postAuthenticationHook = null;
 
 	private RequestRouter()
 	{
@@ -77,8 +88,12 @@ public class RequestRouter
 			logger.fatal(message, e);
 			throw new RuntimeException(message, e);
 		} 
+		
 		preAuthenticationEndpoints = new HashMap<>();
+		
 		authenticationEndpoints = new HashMap<>();
+		midAuthenticationEndpoints = new HashMap<>();
+		
 		endpointRequestProcessorMap = new HashMap<>();
 	}
 
@@ -96,6 +111,11 @@ public class RequestRouter
 		}
 
 		return self;
+	}
+	
+	public GatewayDAO getGatewayDAO()
+	{
+		return gatewayDAO;
 	}
 	
 	public void registerDefaultPreAuthenticationEndpoints()
@@ -120,7 +140,16 @@ public class RequestRouter
 		registerAuthenticationEndpoint(Endpoints.SignUp.name(), Endpoints.SignUp);
 		registerAuthenticationEndpoint(Endpoints.Login.name(), Endpoints.Login);
 	}
-	
+
+	public void registerDefaultMidAuthenticationEndpoints()
+	{
+		/**
+		 * Register all MidAuthenticationEndpoints
+		 */
+		registerMidAuthenticationEndpoint(Endpoints.ChangePassword.name(), Endpoints.ChangePassword);
+		registerMidAuthenticationEndpoint(Endpoints.MFAValidation.name(), Endpoints.MFAValidation);
+	}
+
 	public void registerDefaultRequestProcessors()
 	{
 		/**
@@ -172,6 +201,11 @@ public class RequestRouter
 		authenticationEndpoints.put(endpointName, endpoint);
 	}
 
+	public void registerMidAuthenticationEndpoint(String endpointName, Enum<?> endpoint)
+	{
+		midAuthenticationEndpoints.put(endpointName, endpoint);
+	}
+
 	public void registerRequestProcessor(RequestProcessor rp)
 	{
 		if (rp != null)
@@ -214,6 +248,21 @@ public class RequestRouter
 		logger.info(registringOrOverriding + " " + endpoint + " Validator with : " + validator.getClass().getCanonicalName());
 		ValidationManager.getInstance().addValidator(validator);
 	}
+
+	public void registerMidAuthenticationHook(MidAuthenticationHook midAuthenticationHook)
+	{
+		this.midAuthenticationHook = midAuthenticationHook;
+	}
+
+	public void registerMFAAuthenticationHook(MFAAuthenticationHook mfaAuthenticationHook)
+	{
+		this.mfaAuthenticationHook = mfaAuthenticationHook;
+	}
+
+	public void registerPostAuthenticationHook(PostAuthenticationHook postAuthenticationHook)
+	{
+		this.postAuthenticationHook = postAuthenticationHook;
+	}
 	
 	public boolean isPreAuthenticationEndpoint(String endpoint)
 	{
@@ -225,6 +274,11 @@ public class RequestRouter
 		return authenticationEndpoints.containsKey(endpoint);
 	}
 
+	public boolean isMidAuthenticationEndpoint(String endpoint)
+	{
+		return midAuthenticationEndpoints.containsKey(endpoint);
+	}
+
 	public Set<String> getRegisteredEndpoints()
 	{
 		return endpointRequestProcessorMap.keySet();
@@ -234,7 +288,21 @@ public class RequestRouter
 	{
 		return endpointRequestProcessorMap.get(endpoint);
 	}
-	
+
+	public MidAuthenticationHook getMidAuthenticationHook()
+	{
+		return midAuthenticationHook;
+	}
+
+	public MFAAuthenticationHook getMFAAuthenticationHook()
+	{
+		return mfaAuthenticationHook;
+	}
+
+	public PostAuthenticationHook getPostAuthenticationHook()
+	{
+		return postAuthenticationHook;
+	}
 	
 	public void clearRequestProcessors()
 	{

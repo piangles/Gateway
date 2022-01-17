@@ -239,13 +239,13 @@ public final class RequestProcessingManager
 			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
 									request.getTransitTime(), StatusCode.Unauthenticated, errorMessage);
 		}
-		else if (state == ClientState.MidAuthentication && !Endpoints.ChangePassword.name().equals(request.getEndpoint()))
+		else if (state == ClientState.MidAuthentication && !RequestRouter.getInstance().isMidAuthenticationEndpoint(request.getEndpoint()))
 		{
 			/**
 			 * MidAuthenticatin State is when we have sent a GeneratedToken, the only endpoint allowed is 
 			 * for user to change ChangePassword.
 			 */
-			String errorMessage = "This endpoint " + request.getEndpoint() + " requires password to be updated.";
+			String errorMessage = "This endpoint " + request.getEndpoint() + " requires further authentication actions.";
 			logger.warn(errorMessage);
 			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
 									request.getTransitTime(), StatusCode.ValidationFailure, errorMessage);
@@ -300,18 +300,16 @@ public final class RequestProcessingManager
 	
 	private void performPostSynchronousRequestProcessingActions(Request request, Response response) throws ResourceException, Exception
 	{
+		AuthenticationDetails authDetails = null;
 		switch (state)
 		{
 		case PreAuthentication:
 			if (RequestRouter.getInstance().isAuthenticationEndpoint(request.getEndpoint()) && response.isRequestSuccessful())
 			{
-				/**
-				 * TODO Max Sessions allowed need to handle gracefully.
-				 */
-				AuthenticationDetails authDetails = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), AuthenticationDetails.class);
+				authDetails = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), AuthenticationDetails.class);
 				if (authDetails.isAuthenticated())
 				{
-					if (authDetails.isAuthenticatedByToken())
+					if (authDetails.isAuthenticatedByToken() || authDetails.isMFAEnabled())
 					{
 						state = ClientState.MidAuthentication;
 					}
@@ -342,9 +340,9 @@ public final class RequestProcessingManager
 			}
 			break;
 		case MidAuthentication:
-			if (Endpoints.ChangePassword.name().equals(request.getEndpoint()) && response.isRequestSuccessful())
+			if (RequestRouter.getInstance().isMidAuthenticationEndpoint(request.getEndpoint()) && response.isRequestSuccessful())
 			{
-				logger.info("ChangePassword was successful moving to PostAuthentication state for: " + clientDetails);
+				logger.info("ChangePassword/MFAValidation was successful moving to PostAuthentication state for: " + clientDetails);
 				state = ClientState.PostAuthentication;
 			}
 			break;
@@ -355,6 +353,39 @@ public final class RequestProcessingManager
 				clientDetails.getClientEndpoint().close();
 			}
 			break;
+		}
+		
+		HookProcessor hookProcessor = null;
+		if (state == ClientState.MidAuthentication)
+		{
+			if (authDetails.isAuthenticatedByToken() && RequestRouter.getInstance().getMidAuthenticationHook() != null)
+			{
+				logger.info("Calling registered MidAuthenticationHook for: " + clientDetails);
+				hookProcessor = new HookProcessor(request.getTraceId(), clientDetails.getSessionDetails(), ()->{
+					RequestRouter.getInstance().getMidAuthenticationHook().process(clientDetails);
+				});
+			}
+			else if (authDetails.isMFAEnabled())//If a User is MFA Enabled -> we will call Hook Set or Not, let application take care of it.
+			{
+				logger.info("Calling registered MFAAuthenticationHook for: " + clientDetails);
+				hookProcessor = new HookProcessor(request.getTraceId(), clientDetails.getSessionDetails(), ()->{
+					RequestRouter.getInstance().getMFAAuthenticationHook().process(clientDetails);
+				});
+			}
+		}
+		else if (state == ClientState.PostAuthentication && RequestRouter.getInstance().getPostAuthenticationHook() != null)
+		{
+			logger.info("Calling registered PostAuthenticationHook for: " + clientDetails);
+			hookProcessor = new HookProcessor(request.getTraceId(), clientDetails.getSessionDetails(), ()->{
+				RequestRouter.getInstance().getPostAuthenticationHook().process(clientDetails);
+			});
+		}
+		
+		if (hookProcessor != null)
+		{
+			hookProcessor.start();
+			hookProcessor.join();
+			logger.info("HookProcessing completed for: " + clientDetails);
 		}
 	}
 }

@@ -20,10 +20,24 @@
 package org.piangles.gateway.requests.dao;
 
 import org.piangles.core.dao.DAOException;
+import org.piangles.core.dao.nosql.AbstractDAO;
+import org.piangles.core.resources.MongoDataStore;
 
-public interface GatewayDAO
+public class RequestResponseDAOImpl extends AbstractDAO<RequestResponseDetails>
 {
-	public void insertUserDeviceInfo(UserDeviceInfo userDeviceInfo) throws DAOException;
+	public RequestResponseDAOImpl(MongoDataStore mongoDataStore) throws Exception
+	{
+		super.init(mongoDataStore);
+	}
 	
-	public void insertRequestResponseDetails(RequestResponseDetails reqRespDetails) throws DAOException;
+	public void insertRequestResponseDetails(RequestResponseDetails reqRespDetails) throws DAOException
+	{
+		super.create(reqRespDetails);
+	}
+
+	@Override
+	protected Class<RequestResponseDetails> getTClass()
+	{
+		return RequestResponseDetails.class;
+	}
 }

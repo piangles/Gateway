@@ -19,29 +19,18 @@
  
 package org.piangles.gateway.requests;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.session.SessionManagementException;
 import org.piangles.backbone.services.session.SessionManagementService;
-import org.piangles.core.expt.BadRequestException;
-import org.piangles.core.expt.NotFoundException;
-import org.piangles.core.expt.PayloadTooLargeException;
-import org.piangles.core.expt.RequestedFormatNotSupportedException;
 import org.piangles.core.expt.ServiceRuntimeException;
-import org.piangles.core.expt.UnauthenticatedException;
-import org.piangles.core.expt.UnauthorizedException;
-import org.piangles.core.expt.UnsupportedMediaException;
-import org.piangles.core.expt.ValidationException;
-import org.piangles.core.expt.VersionMismatchException;
 import org.piangles.core.services.remoting.AbstractContextAwareThread;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.events.EventProcessingManager;
 import org.piangles.gateway.events.KafkaConsumerManager;
+import org.piangles.gateway.requests.dao.RequestResponseDetails;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.Response;
 import org.piangles.gateway.requests.dto.StatusCode;
@@ -59,8 +48,6 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 	private SessionManagementService sessionMgmtService = Locator.getInstance().getSessionManagementService();
 	protected LoggingService logger = Locator.getInstance().getLoggingService();
 	
-	private Map<String, StatusCode> sreStatusCodeMap = null;
-	
 	public RequestProcessingThread(ClientDetails clientDetails, Request request, RequestProcessor requestProcessor, EventProcessingManager mpm)
 	{
 		super.init(clientDetails.getSessionDetails(), request.getTraceId());
@@ -69,17 +56,6 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 		this.request = request;
 		this.requestProcessor = requestProcessor;
 		this.mpm = mpm;
-		
-		sreStatusCodeMap = new HashMap<>();
-		sreStatusCodeMap.put(BadRequestException.class.getSimpleName(), StatusCode.BadRequest);
-		sreStatusCodeMap.put(NotFoundException.class.getSimpleName(), StatusCode.NotFound);
-		sreStatusCodeMap.put(PayloadTooLargeException.class.getSimpleName(), StatusCode.PayloadTooLarge);
-		sreStatusCodeMap.put(RequestedFormatNotSupportedException.class.getSimpleName(), StatusCode.RequestedFormatNotSupported);
-		sreStatusCodeMap.put(UnauthenticatedException.class.getSimpleName(), StatusCode.Unauthenticated);
-		sreStatusCodeMap.put(UnauthorizedException.class.getSimpleName(), StatusCode.Unauthorized);
-		sreStatusCodeMap.put(UnsupportedMediaException.class.getSimpleName(), StatusCode.UnsupportedMedia);
-		sreStatusCodeMap.put(ValidationException.class.getSimpleName(), StatusCode.ValidationFailure);
-		sreStatusCodeMap.put(VersionMismatchException.class.getSimpleName(), StatusCode.VersionMismatch);
 	}
 	
 	@Override
@@ -165,7 +141,28 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 			response = new Response(getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
 					request.getTransitTime(), StatusCode.InternalError, internalErrorMessage());
 		}
+		
 		ResponseSender.sendResponse(clientDetails, response);
+		
+		try
+		{
+			String userId = null;
+			String sessionId = null;
+			
+			if (clientDetails != null && clientDetails.getSessionDetails() != null)
+			{
+				userId = clientDetails.getSessionDetails().getUserId();
+				sessionId = clientDetails.getSessionDetails().getSessionId();
+			}
+			
+			RequestResponseDetails reqRespDetails = new RequestResponseDetails(userId, sessionId, request, response);
+
+			RequestRouter.getInstance().getGatewayDAO().insertRequestResponseDetails(reqRespDetails);
+		}
+		catch (Throwable e)
+		{
+			logger.warn("IGNORING: Exception while persisting RequestResponseDetails. Reason: " + e.getMessage(), e);
+		}
 	}
 
 	public Response getResponse()
@@ -190,7 +187,7 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 	private Response processServiceRuntimeException(ServiceRuntimeException sre)
 	{
 		Response response = null;
-		StatusCode statusCode = sreStatusCodeMap.get(sre.getClass().getSimpleName());
+		StatusCode statusCode = StatusCodeMapper.getInstance().getStatusCode(sre);
 
 		String errorMessage = null;
 		if (statusCode == null)

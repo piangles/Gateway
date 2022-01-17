@@ -16,7 +16,7 @@
  */
  
  
-package org.piangles.gateway.requests;
+package org.piangles.gateway.requests.dao;
 
 import java.io.Serializable;
 import java.time.LocalDate;

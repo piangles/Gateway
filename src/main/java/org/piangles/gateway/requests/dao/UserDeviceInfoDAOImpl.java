@@ -22,7 +22,6 @@ package org.piangles.gateway.requests.dao;
 import org.piangles.core.dao.DAOException;
 import org.piangles.core.dao.nosql.AbstractDAO;
 import org.piangles.core.resources.MongoDataStore;
-import org.piangles.gateway.requests.UserDeviceInfo;
 
 public class UserDeviceInfoDAOImpl extends AbstractDAO<UserDeviceInfo>
 {

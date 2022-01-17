@@ -22,6 +22,7 @@ package org.piangles.gateway.requests.processors;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.core.expt.BadRequestException;
+import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.core.util.validate.ValidationManager;
 import org.piangles.core.util.validate.Validator;
@@ -177,6 +178,17 @@ public abstract class AbstractRequestProcessor<EndpointReq,EndpointResp> impleme
 			npm = ((RequestProcessingThread)currentThread).getMessageProcessingManager();
 		}
 		return npm;
+	}
+	
+	protected final void setSessionForCurrentThread(org.piangles.backbone.services.session.SessionDetails svcSessionDetails)
+	{
+		Thread currentThread = Thread.currentThread();
+		if (currentThread instanceof RequestProcessingThread)
+		{
+			SessionDetails gatewaySessionDetails = null;
+			gatewaySessionDetails = new SessionDetails(svcSessionDetails.getUserId(), svcSessionDetails.getSessionId()); 
+			((RequestProcessingThread)currentThread).setSessionDetails(gatewaySessionDetails);
+		}
 	}
 	
 	protected abstract EndpointResp processRequest(ClientDetails clientDetails, Request request, EndpointReq endpointRequest) throws Exception;

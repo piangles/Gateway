@@ -25,13 +25,15 @@ import org.piangles.backbone.services.auth.AuthenticationService;
 import org.piangles.backbone.services.auth.AuthenticationType;
 import org.piangles.backbone.services.auth.Credential;
 import org.piangles.backbone.services.auth.FailureReason;
+import org.piangles.backbone.services.profile.BasicUserProfile;
+import org.piangles.backbone.services.profile.UserProfileService;
 import org.piangles.backbone.services.session.SessionDetails;
 import org.piangles.backbone.services.session.SessionManagementException;
 import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
-import org.piangles.gateway.requests.UserDeviceInfo;
+import org.piangles.gateway.requests.dao.UserDeviceInfo;
 import org.piangles.gateway.requests.dto.LoginRequest;
 import org.piangles.gateway.requests.dto.LoginResponse;
 import org.piangles.gateway.requests.dto.Request;
@@ -43,6 +45,7 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 	
 	private SessionManagementService sessionMgmtService = Locator.getInstance().getSessionManagementService();
 	private AuthenticationService authService = Locator.getInstance().getAuthenticationService();
+	private UserProfileService profileService = Locator.getInstance().getUserProfileService();
 	
 	public LoginRequestProcessor()
 	{
@@ -89,10 +92,15 @@ public final class LoginRequestProcessor extends AbstractRequestProcessor<LoginR
 				{
 					sessionDetails = sessionMgmtService.register(authResponse.getUserId());
 					
-					//TODO - Get MFAEnabled from UserProfile
-					loginResponse = new LoginResponse(false, authResponse.IsValidatedByToken(), authResponse.getUserId(), 
+					setSessionForCurrentThread(sessionDetails);
+					
+					BasicUserProfile userProfile = profileService.getProfile(authResponse.getUserId());
+					
+					loginResponse = new LoginResponse(userProfile.isMFAEnabled(), authResponse.IsValidatedByToken(), authResponse.getUserId(), 
 							sessionDetails.getSessionId(), 
 							sessionDetails.getInactivityExpiryTimeInSeconds(), authResponse.getLastLoggedInTimestamp());
+					
+					
 				}
 				catch(SessionManagementException e)
 				{

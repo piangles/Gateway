@@ -40,8 +40,8 @@ import org.piangles.gateway.client.ClientDetails;
 
 /**
  * 
- * “People only see what you allow them to see.” 
- * —Dr. Jennifer Melfi in Sopranos
+ * ï¿½People only see what you allow them to see.ï¿½ 
+ * ï¿½Dr. Jennifer Melfi in Sopranos
  */
 public class EventProcessingManager implements EventDispatcher
 {
@@ -91,7 +91,7 @@ public class EventProcessingManager implements EventDispatcher
 	public synchronized void unsubscribeTopics(List<Topic> topics)
 	{
 		logger.info("Unsubscribing to " + topics);
-		topics.stream().forEach(topic -> topicTraceIdMap.remove(topics));
+		topics.stream().forEach(topic -> topicTraceIdMap.remove(topic));
 		restartEventListener = true;
 	}
 

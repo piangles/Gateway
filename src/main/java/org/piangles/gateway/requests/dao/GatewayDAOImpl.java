@@ -25,14 +25,15 @@ import org.piangles.core.resources.MongoDataStore;
 import org.piangles.core.resources.ResourceManager;
 import org.piangles.core.util.abstractions.ConfigProvider;
 import org.piangles.gateway.GatewayService;
-import org.piangles.gateway.requests.UserDeviceInfo;
 
 public class GatewayDAOImpl implements GatewayDAO
 {
 	private static final String COMPONENT_ID = "cb8e39d5-b0cc-447a-b3d8-ddfbe4af1dd0";
 	
 	private MongoDataStore mongoDataStore = null;
+	
 	private UserDeviceInfoDAOImpl userDeviceInfoDAO = null;
+	private RequestResponseDAOImpl reqRespDetailsDAO = null;
 	
 	public GatewayDAOImpl() throws Exception
 	{
@@ -40,11 +41,18 @@ public class GatewayDAOImpl implements GatewayDAO
 		mongoDataStore = ResourceManager.getInstance().getMongoDataStore(cp);
 		
 		userDeviceInfoDAO = new UserDeviceInfoDAOImpl(mongoDataStore);
+		reqRespDetailsDAO = new RequestResponseDAOImpl(mongoDataStore);
 	}
 	
 	@Override
 	public void insertUserDeviceInfo(UserDeviceInfo userDeviceInfo) throws DAOException
 	{
 		userDeviceInfoDAO.insertUserDeviceInfo(userDeviceInfo);
+	}
+
+	@Override
+	public void insertRequestResponseDetails(RequestResponseDetails reqRespDetails) throws DAOException
+	{
+		reqRespDetailsDAO.insertRequestResponseDetails(reqRespDetails);
 	}
 }
