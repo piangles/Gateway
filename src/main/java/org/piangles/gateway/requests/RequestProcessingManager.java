@@ -65,6 +65,7 @@ public final class RequestProcessingManager
 	private ClientState state = ClientState.PreAuthentication;
 	private ClientDetails clientDetails = null;
 	private EventProcessingManager epm = null;
+	private boolean debugEnabled = false;
 
 	public RequestProcessingManager(InetSocketAddress remoteAddr, ClientEndpoint clientEndpoint)
 	{
@@ -128,15 +129,16 @@ public final class RequestProcessingManager
 		Request request = null;
 		Response response = null;
 
-		//Step 1 : Log the receipt of the Raw Message, not the message itself.
-		logger.info("Message receieved from userId : " + clientDetails.getSessionDetails().getUserId());
+		//Step 1 : Log the receipt of the Raw Message, not the message itself only if debugEnabled, else Ping will kill the logs.
+		if (debugEnabled)
+		{
+			logger.debug("Message receieved from userId : " + clientDetails.getSessionDetails().getUserId());
+		}
 
 		String endpoint = null;
 		RequestProcessor requestProcessor = null;
 		try
 		{
-			logger.info("Message receieved from userId : " + clientDetails.getSessionDetails().getUserId());
-			
 			//Step 2 : Decode the raw message to Request.
 			if (StringUtils.isBlank(messageAsString))
 			{
