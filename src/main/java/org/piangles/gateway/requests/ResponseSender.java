@@ -32,19 +32,25 @@ public final class ResponseSender
 	
 	public static void sendResponse(ClientDetails clientDetails, Response response)
 	{
-		if (response.isRequestSuccessful())
+		if (!Endpoints.Ping.name().equals(response.getEndpoint()))
 		{
-			logger.info("Request was processed successfully.");
-		}
-		else
-		{
-			logger.warn("Request could not be processed successfully because of : " + response.getErrorMessage());
+			if (response.isRequestSuccessful())
+			{
+				logger.info("Request was processed successfully.");
+			}
+			else
+			{
+				logger.warn("Request could not be processed successfully because of : " + response.getErrorMessage());
+			}
 		}
 		
 		try
 		{
 			clientDetails.getClientEndpoint().sendMessage(new Message(MessageType.Response, response));
-			logger.info("Response sent to client successfully.");
+			if (!Endpoints.Ping.name().equals(response.getEndpoint()))
+			{
+				logger.info("Response sent to client successfully.");
+			}
 		}
 		catch (Exception e)
 		{
