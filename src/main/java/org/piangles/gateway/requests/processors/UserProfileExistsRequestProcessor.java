@@ -26,21 +26,21 @@ import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.BooleanResponse;
 import org.piangles.gateway.requests.dto.Request;
-import org.piangles.gateway.requests.dto.UserProfileExistsRequest;
+import org.piangles.gateway.requests.dto.GenericContactRequest;
 
 import software.amazon.awssdk.utils.StringUtils;
 
-public class UserProfileExistsRequestProcessor extends AbstractRequestProcessor<UserProfileExistsRequest, BooleanResponse>
+public class UserProfileExistsRequestProcessor extends AbstractRequestProcessor<GenericContactRequest, BooleanResponse>
 {
 	private UserProfileService profileService = Locator.getInstance().getUserProfileService();
 	
 	public UserProfileExistsRequestProcessor()
 	{
-		super(Endpoints.UserProfileExists, UserProfileExistsRequest.class, BooleanResponse.class);
+		super(Endpoints.UserProfileExists, GenericContactRequest.class, BooleanResponse.class);
 	}
 	
 	@Override
-	protected BooleanResponse processRequest(ClientDetails clientDetails, Request request, UserProfileExistsRequest userProfileExistsRequest) throws Exception
+	protected BooleanResponse processRequest(ClientDetails clientDetails, Request request, GenericContactRequest userProfileExistsRequest) throws Exception
 	{
 		BooleanResponse response = null;
 		

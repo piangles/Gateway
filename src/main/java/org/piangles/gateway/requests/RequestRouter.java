@@ -50,10 +50,10 @@ import org.piangles.gateway.requests.processors.UpdateUserPreferencesRequestProc
 import org.piangles.gateway.requests.processors.UpdateUserProfileRequestProcessor;
 import org.piangles.gateway.requests.processors.UserProfileExistsRequestProcessor;
 import org.piangles.gateway.requests.validators.ChangePasswordRequestValidator;
+import org.piangles.gateway.requests.validators.GenericContactRequestValidator;
 import org.piangles.gateway.requests.validators.LoginRequestValidator;
 import org.piangles.gateway.requests.validators.SignUpRequestValidator;
 import org.piangles.gateway.requests.validators.SubscriptionRequestValidator;
-import org.piangles.gateway.requests.validators.UserProfileExistsRequestValidator;
 
 public class RequestRouter
 {
@@ -184,7 +184,7 @@ public class RequestRouter
 	
 	public void registerDefaultRequestValidators()
 	{
-		registerRequestValidator(new UserProfileExistsRequestValidator());
+		registerRequestValidator(new GenericContactRequestValidator(Endpoints.UserProfileExists));
 		registerRequestValidator(new SignUpRequestValidator());
 		registerRequestValidator(new LoginRequestValidator());
 		registerRequestValidator(new ChangePasswordRequestValidator());

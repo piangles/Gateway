@@ -1,11 +1,11 @@
 package org.piangles.gateway.requests.dto;
 
-public final class UserProfileExistsRequest
+public final class GenericContactRequest
 {
 	private String emailId = null;
 	private String phoneNo = null;
 	
-	public UserProfileExistsRequest(String emailId, String phoneNo)
+	public GenericContactRequest(String emailId, String phoneNo)
 	{
 		this.emailId = emailId;
 		this.phoneNo = phoneNo;

@@ -21,23 +21,22 @@ package org.piangles.gateway.requests.validators;
 import org.apache.commons.lang3.StringUtils;
 import org.piangles.core.expt.ValidationException;
 import org.piangles.gateway.client.ClientDetails;
-import org.piangles.gateway.requests.Endpoints;
+import org.piangles.gateway.requests.dto.GenericContactRequest;
 import org.piangles.gateway.requests.dto.Request;
-import org.piangles.gateway.requests.dto.UserProfileExistsRequest;
 
-public class UserProfileExistsRequestValidator extends AbstractRequestValidator<UserProfileExistsRequest>
+public class GenericContactRequestValidator extends AbstractRequestValidator<GenericContactRequest>
 {
-	public UserProfileExistsRequestValidator()
+	public GenericContactRequestValidator(Enum<?> endpoint)
 	{
-		super(Endpoints.UserProfileExists);
+		super(endpoint);
 	}
 	
 	@Override
-	public void validate(ClientDetails clientDetails, Request request, UserProfileExistsRequest userProfileExistsRequest) throws ValidationException
+	public void validate(ClientDetails clientDetails, Request request, GenericContactRequest userProfileExistsRequest) throws ValidationException
 	{
 		if (StringUtils.isAllBlank(userProfileExistsRequest.getEmailId(), userProfileExistsRequest.getPhoneNo()))
 		{
-			throw new ValidationException("Invalid UserProfileExistsRequest, either emailId and phoneNo are required.");
+			throw new ValidationException("Invalid GenericContactRequest, either emailId or phoneNo needs to be present.");
 		}
 	}
 }
