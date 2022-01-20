@@ -4,5 +4,5 @@ import org.piangles.gateway.client.ClientDetails;
 
 public interface MidAuthenticationHook
 {
-	public void process(ClientDetails clientDetails);
+	public void process(String endpoint, ClientDetails clientDetails);
 }

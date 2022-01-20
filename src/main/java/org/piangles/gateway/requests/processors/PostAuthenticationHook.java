@@ -4,5 +4,5 @@ import org.piangles.gateway.client.ClientDetails;
 
 public interface PostAuthenticationHook
 {
-	public void process(ClientDetails clientDetails);
+	public void process(String endpoint, ClientDetails clientDetails);
 }

@@ -364,14 +364,14 @@ public final class RequestProcessingManager
 			{
 				logger.info("Calling registered MidAuthenticationHook for: " + clientDetails);
 				hookProcessor = new HookProcessor(request.getTraceId(), clientDetails.getSessionDetails(), ()->{
-					RequestRouter.getInstance().getMidAuthenticationHook().process(clientDetails);
+					RequestRouter.getInstance().getMidAuthenticationHook().process(request.getEndpoint(), clientDetails);
 				});
 			}
 			else if (authDetails.isMFAEnabled())//If a User is MFA Enabled -> we will call Hook Set or Not, let application take care of it.
 			{
 				logger.info("Calling registered MFAAuthenticationHook for: " + clientDetails);
 				hookProcessor = new HookProcessor(request.getTraceId(), clientDetails.getSessionDetails(), ()->{
-					RequestRouter.getInstance().getMFAAuthenticationHook().process(clientDetails);
+					RequestRouter.getInstance().getMFAAuthenticationHook().process(request.getEndpoint(), clientDetails);
 				});
 			}
 		}
@@ -379,7 +379,7 @@ public final class RequestProcessingManager
 		{
 			logger.info("Calling registered PostAuthenticationHook for: " + clientDetails);
 			hookProcessor = new HookProcessor(request.getTraceId(), clientDetails.getSessionDetails(), ()->{
-				RequestRouter.getInstance().getPostAuthenticationHook().process(clientDetails);
+				RequestRouter.getInstance().getPostAuthenticationHook().process(request.getEndpoint(), clientDetails);
 			});
 		}
 		
