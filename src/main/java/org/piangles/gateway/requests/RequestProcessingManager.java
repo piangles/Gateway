@@ -27,6 +27,7 @@ import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.session.SessionManagementException;
 import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.core.expt.BadRequestException;
+import org.piangles.core.expt.ServiceRuntimeException;
 import org.piangles.core.resources.ResourceException;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
@@ -212,10 +213,16 @@ public final class RequestProcessingManager
 										request.getTransitTime(), StatusCode.InternalError, e.getMessage());
 			
 		}
-		catch (Exception e)
+		catch (BadRequestException e)
 		{
 			logger.warn("Message receieved from userId : " + clientDetails.getSessionDetails().getUserId() + " could not be decoded.", e);
 			response = new Response(StatusCode.BadRequest, "Request could not be decoded because of : " + e.getMessage());
+		}
+		catch (Exception e)
+		{
+			logger.warn("RequestProcessingManager Exception processing message from userId : " + clientDetails.getSessionDetails().getUserId(), e);
+			response = new Response(request.getTraceId(), request.getEndpoint(),request.getReceiptTime(), 
+										request.getTransitTime(), StatusCode.InternalError, e.getMessage());
 		}
 
 		/**
