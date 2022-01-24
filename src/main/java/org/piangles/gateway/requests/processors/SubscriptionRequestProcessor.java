@@ -54,7 +54,12 @@ public class SubscriptionRequestProcessor extends AbstractRequestProcessor<Subsc
 		String alias = subscribeRequest.getTopicAlias();
 		boolean entityRelated = false;
 		
-		
+		/**
+		 * Topic Alias could be either
+		 * 1. Entity Related 
+		 * or
+		 * 2. Actual Alias
+		 */
 		if (subscribeRequest.getTopicAlias().startsWith(ENTITY_ALIAS))
 		{
 			entityRelated = true;
@@ -67,10 +72,7 @@ public class SubscriptionRequestProcessor extends AbstractRequestProcessor<Subsc
 		{
 			topics = msgService.getTopicsForAlias(alias);
 		}
-		/**
-		 * Restart the notification processing manager to stop any previous
-		 * event listeners and start a new one.
-		 */
+
 		if (topics == null)
 		{
 			String message = null;
@@ -89,8 +91,8 @@ public class SubscriptionRequestProcessor extends AbstractRequestProcessor<Subsc
 			Map<Topic, UUID> topicTraceIdMap = new HashMap<>();
 			
 			topics.stream().forEach(topic -> topicTraceIdMap.put(topic, request.getTraceId()));
+			
 			getEventProcessingManager().subscribeToTopics(topicTraceIdMap);
-			getEventProcessingManager().restart();
 		}
 
 		return new SimpleResponse("Subscription was successful.");

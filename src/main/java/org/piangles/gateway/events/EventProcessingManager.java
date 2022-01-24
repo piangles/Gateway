@@ -25,27 +25,21 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.piangles.backbone.services.Locator;
-import org.piangles.backbone.services.config.DefaultConfigProvider;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.msg.Event;
 import org.piangles.backbone.services.msg.Topic;
 import org.piangles.core.resources.ConsumerProperties;
-import org.piangles.core.resources.KafkaMessagingSystem;
 import org.piangles.core.resources.ResourceException;
-import org.piangles.core.resources.ResourceManager;
-import org.piangles.gateway.Constants;
 import org.piangles.gateway.client.ClientDetails;
 
 /**
  * 
- * �People only see what you allow them to see.� 
- * �Dr. Jennifer Melfi in Sopranos
+ * People only see what you allow them to see. 
+ * Dr. Jennifer Melfi in Sopranos
  */
 public class EventProcessingManager implements EventDispatcher
 {
-	private static final String COMPONENT_ID = "1a465968-c647-4fac-9d25-fbd70fa86fee";
 	private LoggingService logger = Locator.getInstance().getLoggingService();
 
 	
@@ -53,9 +47,7 @@ public class EventProcessingManager implements EventDispatcher
 	private ClientDetails clientDetails = null;
 	private Map<Topic, UUID> topicTraceIdMap = null;
 	
-	private boolean restartEventListener = true;
-	private KafkaMessagingSystem kms = null;
-	private KafkaConsumer<String, String> consumer = null;
+	private ConsumerProperties consumerProps = null;
 	private EventListener eventListener = null;
 
 	public EventProcessingManager(ClientDetails clientDetails) throws ResourceException
@@ -63,18 +55,22 @@ public class EventProcessingManager implements EventDispatcher
 		this.clientDetails = clientDetails;
 		topicTraceIdMap = new HashMap<>();
 
-		kms = ResourceManager.getInstance().getKafkaMessagingSystem(new DefaultConfigProvider(Constants.SERVICE_NAME, COMPONENT_ID));
+		/**
+		 * ConsumerProperties uses the userId as consumerGroupId, the Kafka servers uses the
+		 * consumergroupId to maintain offset of the Consumer. This is how Kafka figures out
+		 * how many messages a consumer has consumed from a Topic and when the consumer connects
+		 * next time it uses this to start from the correct offset.
+		 */
+		consumerProps = new ConsumerProperties(clientDetails.getSessionDetails().getUserId());
+		eventListener = new EventListener(clientDetails, consumerProps, this);
 	}
 
-	public synchronized void restart()
-	{
-		stop();
-		start();
-	}
-
+	/**
+	 * Restart the notification processing manager to stop any previous
+	 * event listeners and start a new one.
+	 */
 	public synchronized void stop()
 	{
-		KafkaConsumerManager.getInstance().closeOrMarkForClose(consumer);
 		if (eventListener != null)
 		{
 			eventListener.markForStopping();
@@ -85,14 +81,28 @@ public class EventProcessingManager implements EventDispatcher
 	{
 		logger.info("Subscribing to " + topicTraceIdMap.keySet());
 		this.topicTraceIdMap.putAll(topicTraceIdMap);
-		restartEventListener = true;
+		
+		// create ConsumerProperties from list of Topics
+		List<ConsumerProperties.Topic> modifiedTopics = this.topicTraceIdMap.keySet().stream().map(topic -> {
+			return consumerProps.new Topic(topic.getTopicName(), topic.getPartition(), topic.shouldReadEarliest());
+		}).collect(Collectors.toList());
+		
+		synchronized (consumerProps)
+		{
+			consumerProps.setTopics(modifiedTopics);
+			eventListener.topicsHaveChanged();
+		}
 	}
 
 	public synchronized void unsubscribeTopics(List<Topic> topics)
 	{
+		/**
+		 * TODO FIX THIS : When unsubscribing it will retrigger all subscriptions again
+		 */
 		logger.info("Unsubscribing to " + topics);
 		topics.stream().forEach(topic -> topicTraceIdMap.remove(topic));
-		restartEventListener = true;
+		
+		// consumerProps.setTopics(null);
 	}
 
 	public synchronized void dispatchAllEvents(Map<Event, Topic> toBeDispactedTopicEventMap) throws Exception
@@ -113,44 +123,6 @@ public class EventProcessingManager implements EventDispatcher
 			{
 				logger.error("Unexpected Eror while processing Event : " + event, e);
 			}
-		}
-
-		if (restartEventListener)
-		{
-			// restart consumer
-			restart();
-		}
-	}
-
-	private void start()
-	{
-		restartEventListener = false;
-
-		if (topicTraceIdMap.size() != 0)
-		{
-			/**
-			 * ConsumerProperties uses the userId as consumerGroupId, the Kafka servers uses the
-			 * consumergroupId to maintain offset of the Consumer. This is how Kafka figures out
-			 * how many messages a consumer has consumed from a Topic and when the consumer connects
-			 * next time it uses this to start from the correct offset.
-			 */
-			ConsumerProperties consumerProps = new ConsumerProperties(clientDetails.getSessionDetails().getUserId());
-			// create ConsumerProperties from list of Topics
-			List<ConsumerProperties.Topic> modifiedTopics = topicTraceIdMap.keySet().stream().map(topic -> {
-				return consumerProps.new Topic(topic.getTopicName(), topic.getPartition(), topic.shouldReadEarliest());
-			}).collect(Collectors.toList());
-			
-			consumerProps.setTopics(modifiedTopics);
-			consumer = kms.createConsumer(consumerProps);
-			KafkaConsumerManager.getInstance().addNewConsumer(consumer);
-
-			eventListener = new EventListener(clientDetails, consumer, this);
-			Thread thread = new Thread(eventListener);
-			thread.start();
-		}
-		else
-		{
-			logger.info("No topics to listen for: " + clientDetails);
 		}
 	}
 }
