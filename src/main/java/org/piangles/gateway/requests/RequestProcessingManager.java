@@ -259,7 +259,7 @@ public final class RequestProcessingManager
 									request.getTransitTime(), StatusCode.ValidationFailure, errorMessage);
 		}
 		else if (!(state == ClientState.PreAuthentication && RequestRouter.getInstance().isPreAuthenticationEndpoint(request.getEndpoint()))
-				&& (clientDetails.getSessionDetails() != null && !StringUtils.equals(clientDetails.getSessionDetails().getSessionId(), request.getSessionId())))
+				&& !doesSessionIdsMatch(request.getSessionId()))
 		{
 			String errorMessage = "SessionId between client and server does not match.";
 			logger.warn(errorMessage + " SessionIds ClientDetails["+clientDetails.getSessionDetails().getSessionId()+"] Request[" + request.getSessionId() + "]");
@@ -395,5 +395,10 @@ public final class RequestProcessingManager
 			hookProcessor.join();
 			logger.info("HookProcessing completed for: " + clientDetails);
 		}
+	}
+	
+	private boolean doesSessionIdsMatch(String sessionId)
+	{
+		return clientDetails.getSessionDetails() != null && StringUtils.equals(clientDetails.getSessionDetails().getSessionId(), sessionId);
 	}
 }

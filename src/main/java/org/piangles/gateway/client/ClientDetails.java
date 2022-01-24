@@ -20,8 +20,6 @@
 package org.piangles.gateway.client;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.piangles.core.services.remoting.SessionDetails;
@@ -38,7 +36,7 @@ public final class ClientDetails
 	
 	private AtomicLong lastAccessed = null;
 	private Location location = null;
-	private Map<String, Object> applicationDataMap;
+	private Object applicationData;
 	
 	public ClientDetails(InetSocketAddress remoteAddress, ClientEndpoint clientEndpoint, SessionDetails sessionDetails, long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp, Location location)
 	{
@@ -51,7 +49,6 @@ public final class ClientDetails
 		
 		this.lastAccessed = new AtomicLong(); 
 		this.location = location;
-		this.applicationDataMap = new HashMap<>();
 	}
 
 	public ClientEndpoint getClientEndpoint()
@@ -99,14 +96,15 @@ public final class ClientDetails
 		return location;
 	}
 
-	public Object getApplicationData(String name)
+	@SuppressWarnings("unchecked")
+	public <T> T getApplicationData(String name)
 	{
-		return applicationDataMap.get(name);
+		return (T)applicationData;
 	}
 
-	public void putApplicationData(String name, Object value)
+	public void setApplicationData(Object applicationData)
 	{
-		applicationDataMap.put(name, value);
+		this.applicationData = applicationData;
 	}
 
 	public void markLastAccessed()

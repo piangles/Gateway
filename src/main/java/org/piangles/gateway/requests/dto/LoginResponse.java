@@ -37,6 +37,7 @@ public final class LoginResponse extends AuthenticationDetails
 	public LoginResponse(boolean mfaEnabled, boolean authenticatedByToken, boolean loggedInAsGuest, String userId, String sessionId, long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp)
 	{
 		super(true, mfaEnabled, authenticatedByToken, userId, sessionId, inactivityExpiryTimeInSeconds, lastLoggedInTimestamp);
+		this.loggedInAsGuest = loggedInAsGuest;
 	}
 
 	public LoginResponse(int noOfAttemptsRemaining, FailureReason failureReason)
