@@ -72,7 +72,7 @@ public final class LoginRequestProcessor extends AbstractAuthenticationProcessor
 			
 			if (authResponse.isAuthenticated())
 			{
-				loginResponse = process(authResponse.getUserId(), authResponse.IsValidatedByToken(), authResponse.getLastLoggedInTimestamp(),clientDetails, loginRequest.getSystemInfo());
+				loginResponse = processRegularLogin(authResponse.getUserId(), authResponse.IsValidatedByToken(), false, authResponse.getLastLoggedInTimestamp(),clientDetails, loginRequest.getSystemInfo());
 			}
 			else
 			{
@@ -85,8 +85,12 @@ public final class LoginRequestProcessor extends AbstractAuthenticationProcessor
 			if (isSessionValid)
 			{
 				sessionMgmtService.makeLastAccessedCurrent(loginRequest.getId(), loginRequest.getSessionId());
+				
+				boolean authEntryExists = authService.doesAuthenticationEntryExist(loginRequest.getId());
+				boolean loggedInAsGuest = !authEntryExists;
+				
 				//Do not have to do MFA on userId/sessionId authentication
-				loginResponse = new LoginResponse(false, false, loginRequest.getId(), loginRequest.getSessionId(), 
+				loginResponse = new LoginResponse(false, false, loggedInAsGuest, loginRequest.getId(), loginRequest.getSessionId(), 
 													900, 0);  //TODO THIS HAS TO BE FIXED 
 			}
 			else

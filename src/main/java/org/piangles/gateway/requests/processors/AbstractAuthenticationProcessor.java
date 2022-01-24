@@ -45,12 +45,12 @@ public abstract class AbstractAuthenticationProcessor<EndpointReq, EndpointResp>
 		super(endpoint, CommunicationPattern.RequestResponse, requestClass, responseClass);
 	}
 	
-	public LoginResponse process(String userId, ClientDetails clientDetails, SystemInfo systemInfo) throws Exception
+	public LoginResponse processGuestLogin(String userId, ClientDetails clientDetails, SystemInfo systemInfo) throws Exception
 	{
-		return process(userId, false, System.currentTimeMillis(), clientDetails, systemInfo);
+		return processRegularLogin(userId, false, true, System.currentTimeMillis(), clientDetails, systemInfo);
 	}
 
-	public LoginResponse process(String userId, boolean validatedByToken, long lastLoggedInTimestamp, ClientDetails clientDetails, SystemInfo systemInfo) throws Exception
+	public LoginResponse processRegularLogin(String userId, boolean validatedByToken, boolean loggedInAsGuest, long lastLoggedInTimestamp, ClientDetails clientDetails, SystemInfo systemInfo) throws Exception
 	{
 		LoginResponse loginResponse = null;
 		
@@ -66,7 +66,7 @@ public abstract class AbstractAuthenticationProcessor<EndpointReq, EndpointResp>
 
 			BasicUserProfile userProfile = profileService.getProfile(userId);
 
-			loginResponse = new LoginResponse(userProfile.isMFAEnabled(), validatedByToken, userId, sessionDetails.getSessionId(),
+			loginResponse = new LoginResponse(userProfile.isMFAEnabled(), validatedByToken, loggedInAsGuest, userId, sessionDetails.getSessionId(),
 					sessionDetails.getInactivityExpiryTimeInSeconds(), lastLoggedInTimestamp);
 
 		}

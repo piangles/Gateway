@@ -27,7 +27,6 @@ import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.session.SessionManagementException;
 import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.core.expt.BadRequestException;
-import org.piangles.core.expt.ServiceRuntimeException;
 import org.piangles.core.resources.ResourceException;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
