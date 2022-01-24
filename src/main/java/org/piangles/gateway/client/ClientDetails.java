@@ -97,7 +97,7 @@ public final class ClientDetails
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T getApplicationData(String name)
+	public <T> T getApplicationData()
 	{
 		return (T)applicationData;
 	}
