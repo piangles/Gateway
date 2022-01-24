@@ -63,6 +63,7 @@ public class EventProcessingManager implements EventDispatcher
 		 */
 		consumerProps = new ConsumerProperties(clientDetails.getSessionDetails().getUserId());
 		eventListener = new EventListener(clientDetails, consumerProps, this);
+		eventListener.start();
 	}
 
 	/**
