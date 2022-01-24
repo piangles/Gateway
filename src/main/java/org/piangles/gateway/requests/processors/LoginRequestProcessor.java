@@ -72,7 +72,7 @@ public final class LoginRequestProcessor extends AbstractAuthenticationProcessor
 			
 			if (authResponse.isAuthenticated())
 			{
-				process(authResponse.getUserId(), authResponse.IsValidatedByToken(), authResponse.getLastLoggedInTimestamp(),clientDetails, loginRequest.getSystemInfo());
+				loginResponse = process(authResponse.getUserId(), authResponse.IsValidatedByToken(), authResponse.getLastLoggedInTimestamp(),clientDetails, loginRequest.getSystemInfo());
 			}
 			else
 			{
