@@ -44,7 +44,7 @@ public final class EventListener extends Thread
 {
 	private static final String COMPONENT_ID = "1a465968-c647-4fac-9d25-fbd70fa86fee";
 
-	private static final int DEFAULT_SLEEP_TIME = 2000;
+	private static final int DEFAULT_SLEEP_TIME = 1500;
 	private static final int DEFAULT_WAIT_TIME = 100;
 	private static final int MAX_ERROR_LIMIT = 10;
 	

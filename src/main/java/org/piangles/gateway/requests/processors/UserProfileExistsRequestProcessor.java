@@ -48,11 +48,11 @@ public class UserProfileExistsRequestProcessor extends AbstractRequestProcessor<
 		
 		if (StringUtils.isNotBlank(userId))
 		{
-			response = new BooleanResponse(true, "Email/Phone is already registered."); 	
+			response = new BooleanResponse(true, "User already exists."); 	
 		}
 		else
 		{
-			response = new BooleanResponse(false, "Email/Phone is not registered.");
+			response = new BooleanResponse(false, "User does not exist.");
 		}
 		
 		return response; 
