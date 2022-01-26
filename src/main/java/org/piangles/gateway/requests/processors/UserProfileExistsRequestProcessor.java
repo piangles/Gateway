@@ -19,16 +19,15 @@
  
 package org.piangles.gateway.requests.processors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.profile.BasicUserProfile;
 import org.piangles.backbone.services.profile.UserProfileService;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.BooleanResponse;
-import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.GenericContactRequest;
-
-import software.amazon.awssdk.utils.StringUtils;
+import org.piangles.gateway.requests.dto.Request;
 
 public class UserProfileExistsRequestProcessor extends AbstractRequestProcessor<GenericContactRequest, BooleanResponse>
 {
