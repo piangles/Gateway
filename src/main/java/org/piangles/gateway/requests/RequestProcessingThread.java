@@ -158,6 +158,10 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 			RequestResponseDetails reqRespDetails = new RequestResponseDetails(userId, sessionId, request, response);
 
 			RequestRouter.getInstance().getGatewayDAO().insertRequestResponseDetails(reqRespDetails);
+			if (RequestRouter.getInstance().getPostRequestProcessingHook() != null)
+			{
+				RequestRouter.getInstance().getPostRequestProcessingHook().process(clientDetails, reqRespDetails);
+			}
 		}
 		catch (Throwable e)
 		{

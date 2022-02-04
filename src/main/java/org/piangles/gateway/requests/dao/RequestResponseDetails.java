@@ -30,6 +30,19 @@ public class RequestResponseDetails implements Serializable
 	private StatusCode statusCode = null;
 	private boolean requestSuccessful = false;
 	
+	/**
+	 * README
+	 * ------
+	 * Even though Request and Response are passed in as parameters,
+	 * they are only used to construct the RequestResponseDetails and nothing more.
+	 * This is important because sensitive information can be present in Request and Response
+	 * that we do not want to capture in DB.
+	 *  
+	 * @param userId
+	 * @param sessionId
+	 * @param request
+	 * @param response
+	 */
 	public RequestResponseDetails(String userId, String sessionId, Request request, Response response)
 	{
 		this.traceId = request.getTraceId();

@@ -44,6 +44,7 @@ import org.piangles.gateway.requests.processors.LogoutRequestProcessor;
 import org.piangles.gateway.requests.processors.MFAAuthenticationHook;
 import org.piangles.gateway.requests.processors.MidAuthenticationHook;
 import org.piangles.gateway.requests.processors.PostAuthenticationHook;
+import org.piangles.gateway.requests.processors.PostRequestProcessingHook;
 import org.piangles.gateway.requests.processors.SignUpRequestProcessor;
 import org.piangles.gateway.requests.processors.SubscriptionRequestProcessor;
 import org.piangles.gateway.requests.processors.UpdateUserPreferencesRequestProcessor;
@@ -70,6 +71,7 @@ public class RequestRouter
 	
 	private Map<String, RequestProcessor> endpointRequestProcessorMap;
 	
+	private PostRequestProcessingHook postRequestProcessingHook = null; 
 	private MidAuthenticationHook midAuthenticationHook = null;
 	private MFAAuthenticationHook mfaAuthenticationHook = null;
 	private PostAuthenticationHook postAuthenticationHook = null;
@@ -249,6 +251,11 @@ public class RequestRouter
 		ValidationManager.getInstance().addValidator(validator);
 	}
 
+	public void registerPostRequestProcessingHook(PostRequestProcessingHook postRequestProcessingHook)
+	{
+		this.postRequestProcessingHook = postRequestProcessingHook;
+	}
+
 	public void registerMidAuthenticationHook(MidAuthenticationHook midAuthenticationHook)
 	{
 		this.midAuthenticationHook = midAuthenticationHook;
@@ -287,6 +294,11 @@ public class RequestRouter
 	public RequestProcessor getRequestProcessor(String endpoint)
 	{
 		return endpointRequestProcessorMap.get(endpoint);
+	}
+
+	public PostRequestProcessingHook getPostRequestProcessingHook()
+	{
+		return postRequestProcessingHook;
 	}
 
 	public MidAuthenticationHook getMidAuthenticationHook()
