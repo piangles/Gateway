@@ -91,11 +91,14 @@ public final class RequestProcessingManager
 		logger.info(String.format("Close received for UserId=%s with StatusCode=%d and Reason=%s", clientDetails.getSessionDetails().getUserId(), statusCode, reason));
 		try
 		{
-			sessionService.markForUnregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+			if (StringUtils.isNoneBlank(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId()))
+			{
+				sessionService.markForUnregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+			}
 		}
 		catch (SessionManagementException e)
 		{
-			logger.error("Unable to markForUnregister Session for UserId:" + clientDetails.getSessionDetails().getUserId(), e);
+			logger.error("RequestProcessingManager->onClose: Unable to markForUnregister Session for UserId:" + clientDetails.getSessionDetails().getUserId(), e);
 		}
 		if (epm != null)
 		{
@@ -108,11 +111,14 @@ public final class RequestProcessingManager
 		logger.error(String.format("Error received for UserId=%s with Message=%s", clientDetails.getSessionDetails().getUserId(), t.getMessage()), t);
 		try
 		{
-			sessionService.markForUnregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+			if (StringUtils.isNoneBlank(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId()))
+			{
+				sessionService.markForUnregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+			}
 		}
 		catch (SessionManagementException e)
 		{
-			logger.error("Unable to markForUnregister Session for UserId:" + clientDetails.getSessionDetails().getUserId(), e);
+			logger.error("RequestProcessingManager->onError: Unable to markForUnregister Session for UserId:" + clientDetails.getSessionDetails().getUserId(), e);
 		}
 		if (epm != null)
 		{

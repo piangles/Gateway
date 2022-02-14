@@ -23,5 +23,5 @@ import org.piangles.gateway.requests.dao.RequestResponseDetails;
 
 public interface PostRequestProcessingHook
 {
-	public void process(ClientDetails clientDetails, RequestResponseDetails reqRespDetails);
+	public void process(ClientDetails clientDetails, RequestResponseDetails reqRespDetails, Object epRequest, Object epResponse);
 }

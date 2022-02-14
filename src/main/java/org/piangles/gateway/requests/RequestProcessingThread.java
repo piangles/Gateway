@@ -146,22 +146,9 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 		
 		try
 		{
-			String userId = null;
-			String sessionId = null;
-			
-			if (clientDetails != null && clientDetails.getSessionDetails() != null)
-			{
-				userId = clientDetails.getSessionDetails().getUserId();
-				sessionId = clientDetails.getSessionDetails().getSessionId();
-			}
-			
-			RequestResponseDetails reqRespDetails = new RequestResponseDetails(userId, sessionId, request, response);
+			RequestResponseDetails reqRespDetails = new RequestResponseDetails(clientDetails, request, response);
 
 			RequestRouter.getInstance().getGatewayDAO().insertRequestResponseDetails(reqRespDetails);
-			if (RequestRouter.getInstance().getPostRequestProcessingHook() != null)
-			{
-				RequestRouter.getInstance().getPostRequestProcessingHook().process(clientDetails, reqRespDetails);
-			}
 		}
 		catch (Throwable e)
 		{

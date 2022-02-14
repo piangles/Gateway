@@ -3,6 +3,7 @@ package org.piangles.gateway.requests.dao;
 import java.io.Serializable;
 import java.util.UUID;
 
+import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.Response;
 import org.piangles.gateway.requests.dto.StatusCode;
@@ -43,12 +44,15 @@ public class RequestResponseDetails implements Serializable
 	 * @param request
 	 * @param response
 	 */
-	public RequestResponseDetails(String userId, String sessionId, Request request, Response response)
+	public RequestResponseDetails(ClientDetails clientDetails, Request request, Response response)
 	{
 		this.traceId = request.getTraceId();
 		
-		this.userId = userId;
-		this.sessionId = sessionId;
+		if (clientDetails != null && clientDetails.getSessionDetails() != null)
+		{
+			this.userId = clientDetails.getSessionDetails().getUserId();
+			this.sessionId = clientDetails.getSessionDetails().getSessionId();
+		}
 		
 		this.endpoint = request.getEndpoint();
 		

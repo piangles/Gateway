@@ -31,7 +31,9 @@ import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.events.EventProcessingManager;
 import org.piangles.gateway.requests.RequestProcessingThread;
 import org.piangles.gateway.requests.RequestProcessor;
+import org.piangles.gateway.requests.RequestRouter;
 import org.piangles.gateway.requests.dao.GatewayDAO;
+import org.piangles.gateway.requests.dao.RequestResponseDetails;
 import org.piangles.gateway.requests.dto.EmptyRequest;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.Response;
@@ -124,6 +126,20 @@ public abstract class AbstractRequestProcessor<EndpointReq,EndpointResp> impleme
 
 		response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(),
 								request.getTransitTime(), StatusCode.Success, epResponseAsStr);
+		
+		if (RequestRouter.getInstance().getPostRequestProcessingHook() != null)
+		{
+			try
+			{
+				RequestResponseDetails reqRespDetails = new RequestResponseDetails(clientDetails, request, response);
+				
+				RequestRouter.getInstance().getPostRequestProcessingHook().process(clientDetails, reqRespDetails, epRequest, epResponse);
+			}
+			catch (Throwable e)
+			{
+				logger.warn("IGNORING: Exception while PostRequestProcessingHook. Reason: " + e.getMessage(), e);
+			}
+		}
 		
 		return response;
 	}
