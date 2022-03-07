@@ -29,6 +29,10 @@ import org.piangles.core.util.validate.ValidationManager;
 import org.piangles.core.util.validate.Validator;
 import org.piangles.gateway.requests.dao.GatewayDAO;
 import org.piangles.gateway.requests.dao.GatewayDAOImpl;
+import org.piangles.gateway.requests.hooks.MFAAuthenticationHook;
+import org.piangles.gateway.requests.hooks.MidAuthenticationHook;
+import org.piangles.gateway.requests.hooks.PostAuthenticationHook;
+import org.piangles.gateway.requests.hooks.PostRequestProcessingHook;
 import org.piangles.gateway.requests.processors.AutoSuggestRequestProcessor;
 import org.piangles.gateway.requests.processors.ChangePasswordRequestProcessor;
 import org.piangles.gateway.requests.processors.CreateUserProfileRequestProcessor;
@@ -41,10 +45,6 @@ import org.piangles.gateway.requests.processors.KeepSessionAliveRequestProcessor
 import org.piangles.gateway.requests.processors.ListEndpointsRequestProcessor;
 import org.piangles.gateway.requests.processors.LoginRequestProcessor;
 import org.piangles.gateway.requests.processors.LogoutRequestProcessor;
-import org.piangles.gateway.requests.processors.MFAAuthenticationHook;
-import org.piangles.gateway.requests.processors.MidAuthenticationHook;
-import org.piangles.gateway.requests.processors.PostAuthenticationHook;
-import org.piangles.gateway.requests.processors.PostRequestProcessingHook;
 import org.piangles.gateway.requests.processors.SignUpRequestProcessor;
 import org.piangles.gateway.requests.processors.SubscriptionRequestProcessor;
 import org.piangles.gateway.requests.processors.UpdateUserPreferencesRequestProcessor;
@@ -148,7 +148,7 @@ public class RequestRouter
 		/**
 		 * Register all MidAuthenticationEndpoints
 		 */
-		registerMidAuthenticationEndpoint(Endpoints.ChangePassword.name(), Endpoints.ChangePassword);
+		registerMidAuthenticationEndpoint(Endpoints.GenerateResetToken.name(), Endpoints.GenerateResetToken);
 		registerMidAuthenticationEndpoint(Endpoints.MFAValidation.name(), Endpoints.MFAValidation);
 	}
 
