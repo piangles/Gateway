@@ -356,7 +356,7 @@ public final class RequestProcessingManager
 		case MidAuthentication:
 			if (RequestRouter.getInstance().isMidAuthenticationEndpoint(request.getEndpoint()) && response.isRequestSuccessful())
 			{
-				logger.info("ChangePassword/MFAValidation was successful moving to PostAuthentication state for: " + clientDetails);
+				logger.info("GenerateResetToken/MFAValidation was successful moving to PostAuthentication state for: " + clientDetails);
 				state = ClientState.PostAuthentication;
 			}
 			break;
@@ -372,18 +372,11 @@ public final class RequestProcessingManager
 		HookProcessor hookProcessor = null;
 		if (state == ClientState.MidAuthentication)
 		{
-			if (authDetails.isAuthenticatedByToken() && RequestRouter.getInstance().getMidAuthenticationHook() != null)
+			if (RequestRouter.getInstance().getMidAuthenticationHook() != null)
 			{
 				logger.info("Calling registered MidAuthenticationHook for: " + clientDetails);
 				hookProcessor = new HookProcessor(request.getTraceId(), clientDetails.getSessionDetails(), ()->{
 					RequestRouter.getInstance().getMidAuthenticationHook().process(request.getEndpoint(), clientDetails);
-				});
-			}
-			else if (authDetails.isMFAEnabled())//If a User is MFA Enabled -> we will call Hook Set or Not, let application take care of it.
-			{
-				logger.info("Calling registered MFAAuthenticationHook for: " + clientDetails);
-				hookProcessor = new HookProcessor(request.getTraceId(), clientDetails.getSessionDetails(), ()->{
-					RequestRouter.getInstance().getMFAAuthenticationHook().process(request.getEndpoint(), clientDetails);
 				});
 			}
 		}

@@ -22,11 +22,14 @@ package org.piangles.gateway.requests.processors;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.auth.AuthenticationResponse;
 import org.piangles.backbone.services.auth.AuthenticationService;
+import org.piangles.backbone.services.profile.BasicUserProfile;
+import org.piangles.backbone.services.profile.UserProfileService;
 import org.piangles.core.expt.NotFoundException;
 import org.piangles.core.expt.ServiceRuntimeException;
 import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
+import org.piangles.gateway.requests.RequestRouter;
 import org.piangles.gateway.requests.dto.GenerateTokenRequest;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.SimpleResponse;
@@ -34,6 +37,7 @@ import org.piangles.gateway.requests.dto.SimpleResponse;
 public final class GenerateTokenRequestProcessor extends AbstractRequestProcessor<GenerateTokenRequest, SimpleResponse>
 {
 	private AuthenticationService authService = Locator.getInstance().getAuthenticationService();
+	private UserProfileService upService = Locator.getInstance().getUserProfileService();
 	
 	public GenerateTokenRequestProcessor()
 	{
@@ -46,6 +50,13 @@ public final class GenerateTokenRequestProcessor extends AbstractRequestProcesso
 		SimpleResponse simpleResponse = null;
 		
 		AuthenticationResponse authResponse = authService.generateResetToken(tokenRequest.getEmailId());
+		
+		if (RequestRouter.getInstance().getCommunicator() != null && authResponse.isRequestSuccessful())
+		{
+			String userId = upService.searchProfile(new BasicUserProfile(null, null, tokenRequest.getEmailId(), null));
+
+			RequestRouter.getInstance().getCommunicator().sendGenerateResetTokenCommunication(userId, authResponse);
+		}
 		
 		if (authResponse.isRequestSuccessful())
 		{

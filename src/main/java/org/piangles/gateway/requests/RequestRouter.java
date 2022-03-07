@@ -75,6 +75,9 @@ public class RequestRouter
 	private MidAuthenticationHook midAuthenticationHook = null;
 	private MFAAuthenticationHook mfaAuthenticationHook = null;
 	private PostAuthenticationHook postAuthenticationHook = null;
+	
+	private Communicator communicator = null;
+	private MFAManager mfaManager = null;
 
 	private RequestRouter()
 	{
@@ -119,12 +122,12 @@ public class RequestRouter
 	{
 		return gatewayDAO;
 	}
-	
+
+	/**
+	 * Register all preAuthenticationEndpoints
+	 */
 	public void registerDefaultPreAuthenticationEndpoints()
 	{
-		/**
-		 * Register all preAuthenticationEndpoints
-		 */
 		registerPreAuthenticationEndpoint(Endpoints.ListEndpoints.name(), Endpoints.ListEndpoints);
 		registerPreAuthenticationEndpoint(Endpoints.EndpointMetadata.name(), Endpoints.EndpointMetadata);
 		
@@ -133,30 +136,30 @@ public class RequestRouter
 		registerPreAuthenticationEndpoint(Endpoints.Login.name(), Endpoints.Login);
 		registerPreAuthenticationEndpoint(Endpoints.GenerateResetToken.name(), Endpoints.GenerateResetToken);
 	}
-	
+
+	/**
+	 * Register all authenticationEndpoints
+	 */
 	public void registerDefaultAuthenticationEndpoints()
 	{
-		/**
-		 * Register all authenticationEndpoints
-		 */
 		registerAuthenticationEndpoint(Endpoints.SignUp.name(), Endpoints.SignUp);
 		registerAuthenticationEndpoint(Endpoints.Login.name(), Endpoints.Login);
 	}
 
+	/**
+	 * Register all MidAuthenticationEndpoints
+	 */
 	public void registerDefaultMidAuthenticationEndpoints()
 	{
-		/**
-		 * Register all MidAuthenticationEndpoints
-		 */
-		registerMidAuthenticationEndpoint(Endpoints.GenerateResetToken.name(), Endpoints.GenerateResetToken);
-		registerMidAuthenticationEndpoint(Endpoints.MFAValidation.name(), Endpoints.MFAValidation);
+		registerMidAuthenticationEndpoint(Endpoints.ChangePassword.name(), Endpoints.ChangePassword);
+		registerMidAuthenticationEndpoint(Endpoints.ValidateMFAToken.name(), Endpoints.ValidateMFAToken);
 	}
 
+	/**
+	 * Register all standard endpoints and request processors
+	 */
 	public void registerDefaultRequestProcessors()
 	{
-		/**
-		 * Register all standard endpoints and request processors
-		 */
 		registerRequestProcessor(createRequestProcessor(ListEndpointsRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(EndpointMetadataRequestProcessor.class));
 		
@@ -271,6 +274,20 @@ public class RequestRouter
 		this.postAuthenticationHook = postAuthenticationHook;
 	}
 	
+	public void registerCommunicator(Communicator communicator)
+	{
+		this.communicator = communicator;
+	}
+	
+	public void registerMFAManager(MFAManager mfaManager)
+	{
+		this.mfaManager = mfaManager;
+	}
+	
+	/**
+	 * Accessor methods and Helper methods for the above setters / registers
+	 */
+	
 	public boolean isPreAuthenticationEndpoint(String endpoint)
 	{
 		return preAuthenticationEndpoints.containsKey(endpoint);
@@ -316,6 +333,20 @@ public class RequestRouter
 		return postAuthenticationHook;
 	}
 	
+	public Communicator getCommunicator()
+	{
+		return communicator;
+	}
+	
+	public MFAManager getMFAManager()
+	{
+		return mfaManager;
+	}
+	
+	/**
+	 * Clearning methods for the internal maps
+	 */
+	
 	public void clearRequestProcessors()
 	{
 		endpointRequestProcessorMap.clear();
@@ -326,6 +357,10 @@ public class RequestRouter
 		ValidationManager.getInstance().clear();
 	}
 
+	/**
+	 * Private methods for setting up RequestProcessors
+	 */
+	
 	private RequestProcessor createRequestProcessor(Class<?> rpClass)
 	{
 		RequestProcessor rp = null;

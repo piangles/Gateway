@@ -37,8 +37,14 @@ public enum Endpoints
 	@Description(content="Enables the user to generate a temporary password in the the event the user does not remember the password.")
 	GenerateResetToken,
 
-	@Description(content="Allows for Multi-factor Authentication check post Login.")
-	MFAValidation,
+	@Description(content="Setup Multi-factor Authentication for a user.")
+	SetupMFA,
+
+	@Description(content="Sends Multi-factor Authentication Token post Login.")
+	SendMFAToken,
+
+	@Description(content="Validates the Multi-factor Authentication Token.")
+	ValidateMFAToken,
 	
 	@Description(content="Allows the user to change passoword post login.")
 	ChangePassword,
