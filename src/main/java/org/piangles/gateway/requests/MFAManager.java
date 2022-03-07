@@ -6,5 +6,5 @@ public interface MFAManager
 {
 	public void sendMFAToken(ClientDetails clientDetails);
 	
-	public void validateMFAToken(ClientDetails clientDetails, String token);
+	public boolean validateMFAToken(ClientDetails clientDetails, String token);
 }

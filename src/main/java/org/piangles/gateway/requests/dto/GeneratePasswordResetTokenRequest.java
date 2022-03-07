@@ -21,12 +21,12 @@ package org.piangles.gateway.requests.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class GenerateTokenRequest
+public class GeneratePasswordResetTokenRequest
 {
 	@JsonProperty(required = true)
 	private String emailId;
 
-	public GenerateTokenRequest(String emailId)
+	public GeneratePasswordResetTokenRequest(String emailId)
 	{
 		this.emailId = emailId;
 	}
@@ -39,6 +39,6 @@ public class GenerateTokenRequest
 	@Override
 	public String toString()
 	{
-		return "GenerateTokenRequest [emailId=" + emailId + "]";
+		return "GeneratePasswordResetTokenRequest [emailId=" + emailId + "]";
 	}
 }

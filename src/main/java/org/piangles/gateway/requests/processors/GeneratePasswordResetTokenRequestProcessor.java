@@ -30,22 +30,22 @@ import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.RequestRouter;
-import org.piangles.gateway.requests.dto.GenerateTokenRequest;
+import org.piangles.gateway.requests.dto.GeneratePasswordResetTokenRequest;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.SimpleResponse;
 
-public final class GeneratePasswordResetTokenRequestProcessor extends AbstractRequestProcessor<GenerateTokenRequest, SimpleResponse>
+public final class GeneratePasswordResetTokenRequestProcessor extends AbstractRequestProcessor<GeneratePasswordResetTokenRequest, SimpleResponse>
 {
 	private AuthenticationService authService = Locator.getInstance().getAuthenticationService();
 	private UserProfileService upService = Locator.getInstance().getUserProfileService();
 	
 	public GeneratePasswordResetTokenRequestProcessor()
 	{
-		super(Endpoints.GeneratePasswordResetToken, CommunicationPattern.RequestResponse, GenerateTokenRequest.class, SimpleResponse.class);
+		super(Endpoints.GeneratePasswordResetToken, CommunicationPattern.RequestResponse, GeneratePasswordResetTokenRequest.class, SimpleResponse.class);
 	}
 	
 	@Override
-	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, GenerateTokenRequest tokenRequest) throws Exception
+	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, GeneratePasswordResetTokenRequest tokenRequest) throws Exception
 	{
 		SimpleResponse simpleResponse = null;
 		

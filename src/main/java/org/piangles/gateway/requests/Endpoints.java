@@ -38,7 +38,7 @@ public enum Endpoints
 	GeneratePasswordResetToken,
 
 	@Description(content="Setup Multi-factor Authentication for a user.")
-	SetupMFA,
+	MFASetup,
 
 	@Description(content="Sends Multi-factor Authentication Token post Login.")
 	SendMFAToken,

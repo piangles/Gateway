@@ -44,11 +44,14 @@ import org.piangles.gateway.requests.processors.KeepSessionAliveRequestProcessor
 import org.piangles.gateway.requests.processors.ListEndpointsRequestProcessor;
 import org.piangles.gateway.requests.processors.LoginRequestProcessor;
 import org.piangles.gateway.requests.processors.LogoutRequestProcessor;
+import org.piangles.gateway.requests.processors.SendMFATokenRequestProcessor;
+import org.piangles.gateway.requests.processors.MFASetupRequestProcessor;
 import org.piangles.gateway.requests.processors.SignUpRequestProcessor;
 import org.piangles.gateway.requests.processors.SubscriptionRequestProcessor;
 import org.piangles.gateway.requests.processors.UpdateUserPreferencesRequestProcessor;
 import org.piangles.gateway.requests.processors.UpdateUserProfileRequestProcessor;
 import org.piangles.gateway.requests.processors.UserProfileExistsRequestProcessor;
+import org.piangles.gateway.requests.processors.ValidateMFATokenRequestProcessor;
 import org.piangles.gateway.requests.validators.ChangePasswordRequestValidator;
 import org.piangles.gateway.requests.validators.GenericContactRequestValidator;
 import org.piangles.gateway.requests.validators.LoginRequestValidator;
@@ -164,7 +167,11 @@ public class RequestRouter
 		registerRequestProcessor(createRequestProcessor(UserProfileExistsRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(SignUpRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(LoginRequestProcessor.class));
+		
 		registerRequestProcessor(createRequestProcessor(GeneratePasswordResetTokenRequestProcessor.class));
+		registerRequestProcessor(createRequestProcessor(MFASetupRequestProcessor.class));
+		registerRequestProcessor(createRequestProcessor(SendMFATokenRequestProcessor.class));
+		registerRequestProcessor(createRequestProcessor(ValidateMFATokenRequestProcessor.class));
 		
 		registerRequestProcessor(createRequestProcessor(ChangePasswordRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(LogoutRequestProcessor.class));
