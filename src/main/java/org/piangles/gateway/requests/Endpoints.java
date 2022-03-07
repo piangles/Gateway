@@ -35,7 +35,7 @@ public enum Endpoints
 	@Description(content="Allows the user to login and on succesful login creates a session.")
 	Login,
 	@Description(content="Enables the user to generate a temporary password in the the event the user does not remember the password.")
-	GenerateResetToken,
+	GeneratePasswordResetToken,
 
 	@Description(content="Setup Multi-factor Authentication for a user.")
 	SetupMFA,

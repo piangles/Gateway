@@ -29,7 +29,6 @@ import org.piangles.core.util.validate.ValidationManager;
 import org.piangles.core.util.validate.Validator;
 import org.piangles.gateway.requests.dao.GatewayDAO;
 import org.piangles.gateway.requests.dao.GatewayDAOImpl;
-import org.piangles.gateway.requests.hooks.MFAAuthenticationHook;
 import org.piangles.gateway.requests.hooks.MidAuthenticationHook;
 import org.piangles.gateway.requests.hooks.PostAuthenticationHook;
 import org.piangles.gateway.requests.hooks.PostRequestProcessingHook;
@@ -37,7 +36,7 @@ import org.piangles.gateway.requests.processors.AutoSuggestRequestProcessor;
 import org.piangles.gateway.requests.processors.ChangePasswordRequestProcessor;
 import org.piangles.gateway.requests.processors.CreateUserProfileRequestProcessor;
 import org.piangles.gateway.requests.processors.EndpointMetadataRequestProcessor;
-import org.piangles.gateway.requests.processors.GenerateTokenRequestProcessor;
+import org.piangles.gateway.requests.processors.GeneratePasswordResetTokenRequestProcessor;
 import org.piangles.gateway.requests.processors.GetConfigRequestProcessor;
 import org.piangles.gateway.requests.processors.GetUserPreferencesRequestProcessor;
 import org.piangles.gateway.requests.processors.GetUserProfileRequestProcessor;
@@ -73,7 +72,6 @@ public class RequestRouter
 	
 	private PostRequestProcessingHook postRequestProcessingHook = null; 
 	private MidAuthenticationHook midAuthenticationHook = null;
-	private MFAAuthenticationHook mfaAuthenticationHook = null;
 	private PostAuthenticationHook postAuthenticationHook = null;
 	
 	private Communicator communicator = null;
@@ -134,7 +132,7 @@ public class RequestRouter
 		registerPreAuthenticationEndpoint(Endpoints.UserProfileExists.name(), Endpoints.UserProfileExists);
 		registerPreAuthenticationEndpoint(Endpoints.SignUp.name(), Endpoints.SignUp);
 		registerPreAuthenticationEndpoint(Endpoints.Login.name(), Endpoints.Login);
-		registerPreAuthenticationEndpoint(Endpoints.GenerateResetToken.name(), Endpoints.GenerateResetToken);
+		registerPreAuthenticationEndpoint(Endpoints.GeneratePasswordResetToken.name(), Endpoints.GeneratePasswordResetToken);
 	}
 
 	/**
@@ -166,7 +164,7 @@ public class RequestRouter
 		registerRequestProcessor(createRequestProcessor(UserProfileExistsRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(SignUpRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(LoginRequestProcessor.class));
-		registerRequestProcessor(createRequestProcessor(GenerateTokenRequestProcessor.class));
+		registerRequestProcessor(createRequestProcessor(GeneratePasswordResetTokenRequestProcessor.class));
 		
 		registerRequestProcessor(createRequestProcessor(ChangePasswordRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(LogoutRequestProcessor.class));
@@ -264,11 +262,6 @@ public class RequestRouter
 		this.midAuthenticationHook = midAuthenticationHook;
 	}
 
-	public void registerMFAAuthenticationHook(MFAAuthenticationHook mfaAuthenticationHook)
-	{
-		this.mfaAuthenticationHook = mfaAuthenticationHook;
-	}
-
 	public void registerPostAuthenticationHook(PostAuthenticationHook postAuthenticationHook)
 	{
 		this.postAuthenticationHook = postAuthenticationHook;
@@ -321,11 +314,6 @@ public class RequestRouter
 	public MidAuthenticationHook getMidAuthenticationHook()
 	{
 		return midAuthenticationHook;
-	}
-
-	public MFAAuthenticationHook getMFAAuthenticationHook()
-	{
-		return mfaAuthenticationHook;
 	}
 
 	public PostAuthenticationHook getPostAuthenticationHook()

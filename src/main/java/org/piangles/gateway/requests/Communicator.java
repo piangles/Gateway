@@ -5,7 +5,7 @@ import org.piangles.gateway.client.ClientDetails;
 
 public interface Communicator
 {
-	public void sendGenerateResetTokenCommunication(String emailId, AuthenticationResponse authResponse);
+	public void sendGeneratePasswordResetTokenCommunication(String emailId, AuthenticationResponse authResponse);
 
 	public void sendPasswordChangeAttemptCommunication(ClientDetails clientDetails, AuthenticationResponse authResponse);
 	

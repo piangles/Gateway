@@ -34,14 +34,14 @@ import org.piangles.gateway.requests.dto.GenerateTokenRequest;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.SimpleResponse;
 
-public final class GenerateTokenRequestProcessor extends AbstractRequestProcessor<GenerateTokenRequest, SimpleResponse>
+public final class GeneratePasswordResetTokenRequestProcessor extends AbstractRequestProcessor<GenerateTokenRequest, SimpleResponse>
 {
 	private AuthenticationService authService = Locator.getInstance().getAuthenticationService();
 	private UserProfileService upService = Locator.getInstance().getUserProfileService();
 	
-	public GenerateTokenRequestProcessor()
+	public GeneratePasswordResetTokenRequestProcessor()
 	{
-		super(Endpoints.GenerateResetToken, CommunicationPattern.RequestResponse, GenerateTokenRequest.class, SimpleResponse.class);
+		super(Endpoints.GeneratePasswordResetToken, CommunicationPattern.RequestResponse, GenerateTokenRequest.class, SimpleResponse.class);
 	}
 	
 	@Override
@@ -55,7 +55,7 @@ public final class GenerateTokenRequestProcessor extends AbstractRequestProcesso
 		{
 			String userId = upService.searchProfile(new BasicUserProfile(null, null, tokenRequest.getEmailId(), null));
 
-			RequestRouter.getInstance().getCommunicator().sendGenerateResetTokenCommunication(userId, authResponse);
+			RequestRouter.getInstance().getCommunicator().sendGeneratePasswordResetTokenCommunication(userId, authResponse);
 		}
 		
 		if (authResponse.isRequestSuccessful())
