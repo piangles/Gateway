@@ -43,17 +43,17 @@ public class SendMFATokenRequestProcessor extends AbstractRequestProcessor<Basic
 	{
 		SimpleResponse simpleResponse = null;
 		
-		BasicUserProfile userProfile = profileService.getProfile(clientDetails.getSessionDetails().getUserId());
-
 		if (RequestRouter.getInstance().getMFAManager() != null)
 		{
-			userProfile = new BasicUserProfile(userProfile.getFirstName(), userProfile.getLastName(), 
-												userProfile.getEMailId(), userProfile.isEmailIdVerified(),
-												upRequest.getPhoneNo(), false,
-												false
-												);	
-			
-			profileService.updateProfile(clientDetails.getSessionDetails().getUserId(), userProfile);
+//			BasicUserProfile userProfile = profileService.getProfile(clientDetails.getSessionDetails().getUserId());
+//
+//			userProfile = new BasicUserProfile(	userProfile.getUserId(), userProfile.getFirstName(), userProfile.getLastName(), 
+//												userProfile.getEMailId(), userProfile.isEmailIdVerified(),
+//												upRequest.getPhoneNo(), false,
+//												false
+//												);	
+//			
+//			profileService.updateProfile(clientDetails.getSessionDetails().getUserId(), userProfile);
 
 			RequestRouter.getInstance().getMFAManager().sendMFAToken(clientDetails);
 			

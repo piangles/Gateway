@@ -51,15 +51,13 @@ public final class GeneratePasswordResetTokenRequestProcessor extends AbstractRe
 		
 		AuthenticationResponse authResponse = authService.generateResetToken(tokenRequest.getEmailId());
 		
-		if (RequestRouter.getInstance().getCommunicator() != null && authResponse.isRequestSuccessful())
-		{
-			String userId = upService.searchProfile(new BasicUserProfile(null, null, tokenRequest.getEmailId(), null));
-
-			RequestRouter.getInstance().getCommunicator().sendGeneratePasswordResetTokenCommunication(userId, authResponse);
-		}
-		
 		if (authResponse.isRequestSuccessful())
 		{
+			if (RequestRouter.getInstance().getCommunicator() != null)
+			{
+				RequestRouter.getInstance().getCommunicator().sendGeneratePasswordResetTokenCommunication(authResponse.getUserId(), authResponse);
+			}
+
 			simpleResponse = new SimpleResponse("Please check your registered email for the token.");
 		}
 		else

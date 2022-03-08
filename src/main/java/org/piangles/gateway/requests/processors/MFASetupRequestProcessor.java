@@ -52,7 +52,7 @@ public class MFASetupRequestProcessor extends AbstractRequestProcessor<MFASetupR
 			{
 				boolean validation = RequestRouter.getInstance().getMFAManager().validateMFAToken(clientDetails, mfaSetupRequest.getToken());
 				
-				userProfile = new BasicUserProfile(userProfile.getFirstName(), userProfile.getLastName(), 
+				userProfile = new BasicUserProfile(	userProfile.getUserId(), userProfile.getFirstName(), userProfile.getLastName(), 
 													userProfile.getEMailId(), userProfile.isEmailIdVerified(),
 													userProfile.getPhoneNo(), validation,
 													validation
@@ -67,7 +67,7 @@ public class MFASetupRequestProcessor extends AbstractRequestProcessor<MFASetupR
 		}
 		else
 		{
-			userProfile = new BasicUserProfile(userProfile.getFirstName(), userProfile.getLastName(), 
+			userProfile = new BasicUserProfile(	userProfile.getUserId(), userProfile.getFirstName(), userProfile.getLastName(), 
 												userProfile.getEMailId(), userProfile.isEmailIdVerified(),
 												userProfile.getPhoneNo(), false,
 												false
