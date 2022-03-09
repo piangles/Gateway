@@ -356,7 +356,7 @@ public final class RequestProcessingManager
 		case MidAuthentication:
 			if (RequestRouter.getInstance().isMidAuthenticationEndpoint(request.getEndpoint()) && response.isRequestSuccessful())
 			{
-				logger.info("GenerateResetToken/MFAValidation was successful moving to PostAuthentication state for: " + clientDetails);
+				logger.info("GenerateResetToken/MFARelated was successful moving to PostAuthentication state for: " + clientDetails);
 				state = ClientState.PostAuthentication;
 			}
 			break;

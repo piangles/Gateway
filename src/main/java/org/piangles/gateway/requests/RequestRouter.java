@@ -154,6 +154,7 @@ public class RequestRouter
 	{
 		registerMidAuthenticationEndpoint(Endpoints.ChangePassword.name(), Endpoints.ChangePassword);
 		registerMidAuthenticationEndpoint(Endpoints.ValidateMFAToken.name(), Endpoints.ValidateMFAToken);
+		registerMidAuthenticationEndpoint(Endpoints.SendMFAToken.name(), Endpoints.SendMFAToken);
 	}
 
 	/**

@@ -20,17 +20,24 @@
 package org.piangles.gateway.requests.processors;
 
 import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.profile.BasicUserProfile;
+import org.piangles.backbone.services.profile.UserProfileException;
 import org.piangles.backbone.services.profile.UserProfileService;
 import org.piangles.core.expt.UnsupportedMediaException;
+import org.piangles.core.expt.ValidationException;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.RequestRouter;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.SimpleResponse;
 
+import software.amazon.awssdk.utils.StringUtils;
+
 public class SendMFATokenRequestProcessor extends AbstractRequestProcessor<BasicUserProfile, SimpleResponse>
 {
+	private LoggingService logger = Locator.getInstance().getLoggingService();
+	
 	private UserProfileService profileService = Locator.getInstance().getUserProfileService();
 	
 	public SendMFATokenRequestProcessor()
@@ -45,15 +52,32 @@ public class SendMFATokenRequestProcessor extends AbstractRequestProcessor<Basic
 		
 		if (RequestRouter.getInstance().getMFAManager() != null)
 		{
-//			BasicUserProfile userProfile = profileService.getProfile(clientDetails.getSessionDetails().getUserId());
-//
-//			userProfile = new BasicUserProfile(	userProfile.getUserId(), userProfile.getFirstName(), userProfile.getLastName(), 
-//												userProfile.getEMailId(), userProfile.isEmailIdVerified(),
-//												upRequest.getPhoneNo(), false,
-//												false
-//												);	
-//			
-//			profileService.updateProfile(clientDetails.getSessionDetails().getUserId(), userProfile);
+			BasicUserProfile userProfile = profileService.getProfile(clientDetails.getSessionDetails().getUserId());
+			
+			if (StringUtils.isBlank(userProfile.getPhoneNo()))
+			{
+				logger.info("User with UserId: " + userProfile.getUserId() + " requesting a Token for setting up MFA.");
+				
+				updateUserProfile(userProfile, upRequest.getPhoneNo());
+			}
+			else if (StringUtils.isNotBlank(upRequest.getPhoneNo()))
+			{
+				if (!userProfile.getPhoneNo().equals(upRequest.getPhoneNo()))
+				{
+					logger.info("User with UserId: " + userProfile.getUserId() + " requesting a Token for setting up MFA for updated phone number.");
+
+					updateUserProfile(userProfile, upRequest.getPhoneNo());
+				}
+				else
+				{
+					logger.info("User with UserId: " + userProfile.getUserId() + " requesting a MFA Token for a previously registered phone number.");
+				}
+			}
+			else
+			{
+				logger.info("User with UserId: " + userProfile.getUserId() + " requesting a Resend->MFAToken.");
+			}
+
 
 			RequestRouter.getInstance().getMFAManager().sendMFAToken(clientDetails);
 			
@@ -65,5 +89,23 @@ public class SendMFATokenRequestProcessor extends AbstractRequestProcessor<Basic
 		}
 
 		return simpleResponse; 
+	}
+	
+	private void updateUserProfile(BasicUserProfile userProfile, String phoneNo) throws UserProfileException
+	{
+		if (StringUtils.isBlank(phoneNo))
+		{
+			throw new ValidationException(Endpoints.SendMFAToken.name() + " Phone Number is blank.");
+		}
+		
+		phoneNo = phoneNo.trim();
+		
+		userProfile = new BasicUserProfile(	userProfile.getUserId(), userProfile.getFirstName(), userProfile.getLastName(), 
+											userProfile.getEMailId(), userProfile.isEmailIdVerified(),
+											phoneNo, false,
+											false
+											);	
+
+		profileService.updateProfile(userProfile.getUserId(), userProfile);
 	}
 }
