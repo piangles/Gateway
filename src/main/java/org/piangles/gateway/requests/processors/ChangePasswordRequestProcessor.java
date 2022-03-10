@@ -25,6 +25,7 @@ import org.piangles.backbone.services.auth.AuthenticationService;
 import org.piangles.core.expt.NotFoundException;
 import org.piangles.core.expt.ServiceRuntimeException;
 import org.piangles.core.expt.ValidationException;
+import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.RequestRouter;
@@ -38,7 +39,7 @@ public class ChangePasswordRequestProcessor extends AbstractRequestProcessor<Cha
 	
 	public ChangePasswordRequestProcessor()
 	{
-		super(Endpoints.ChangePassword, ChangePasswordRequest.class, SimpleResponse.class);
+		super(Endpoints.ChangePassword, CommunicationPattern.RequestResponse, ChangePasswordRequest.class, SimpleResponse.class);
 	}
 	
 	@Override

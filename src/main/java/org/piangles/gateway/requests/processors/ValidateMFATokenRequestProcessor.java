@@ -20,6 +20,7 @@
 package org.piangles.gateway.requests.processors;
 
 import org.piangles.core.expt.UnsupportedMediaException;
+import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.RequestRouter;
@@ -31,7 +32,7 @@ public class ValidateMFATokenRequestProcessor extends AbstractRequestProcessor<V
 {
 	public ValidateMFATokenRequestProcessor()
 	{
-		super(Endpoints.ValidateMFAToken, ValidateMFATokenRequest.class, BooleanResponse.class);
+		super(Endpoints.ValidateMFAToken, CommunicationPattern.RequestResponse, ValidateMFATokenRequest.class, BooleanResponse.class);
 	}
 	
 	@Override
