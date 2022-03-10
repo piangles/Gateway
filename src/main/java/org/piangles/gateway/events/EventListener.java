@@ -96,7 +96,7 @@ public final class EventListener extends Thread
 				}
 				else
 				{
-					logger.info("No consumer yet going to sleep for " + DEFAULT_SLEEP_TIME + " Milliseconds.");
+					//logger.info("No consumer yet going to sleep for " + DEFAULT_SLEEP_TIME + " Milliseconds.");
 					Thread.sleep(DEFAULT_SLEEP_TIME);
 				}
 				
