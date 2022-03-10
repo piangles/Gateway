@@ -27,6 +27,7 @@ import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.session.SessionManagementException;
 import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.core.expt.BadRequestException;
+import org.piangles.core.expt.UnsupportedMediaException;
 import org.piangles.core.resources.ResourceException;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
@@ -323,15 +324,6 @@ public final class RequestProcessingManager
 				authDetails = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), AuthenticationDetails.class);
 				if (authDetails.isAuthenticated())
 				{
-					if (authDetails.isAuthenticatedByToken() || authDetails.isMFAEnabled())
-					{
-						state = ClientState.MidAuthentication;
-					}
-					else
-					{
-						state = ClientState.PostAuthentication;
-					}
-
 					/**
 					 * Now create a new client details from the original one but 
 					 * with new SessionDetails. ClientDetails and SessionDetails are
@@ -344,6 +336,20 @@ public final class RequestProcessingManager
 							authDetails.getInactivityExpiryTimeInSeconds(), authDetails.getLastLoggedInTimestamp(), null);
 					clientDetails.markLastAccessed();
 					//Location.convert(geoLocation, false));
+
+					if (authDetails.isAuthenticatedByToken())
+					{
+						state = ClientState.MidAuthentication;
+					}
+					else if (authDetails.isMFAEnabled())
+					{
+						sendMFAToken();
+						state = ClientState.MidAuthentication;
+					}
+					else
+					{
+						state = ClientState.PostAuthentication;
+					}
 
 					/**
 					 * Now that client is authenticated, create the MessageProcessingManager
@@ -399,5 +405,17 @@ public final class RequestProcessingManager
 	private boolean doesSessionIdsMatch(String sessionId)
 	{
 		return clientDetails.getSessionDetails() != null && StringUtils.equals(clientDetails.getSessionDetails().getSessionId(), sessionId);
+	}
+	
+	private void sendMFAToken()
+	{
+		if (RequestRouter.getInstance().getMFAManager() != null)
+		{
+			RequestRouter.getInstance().getMFAManager().sendMFAToken(clientDetails);
+		}
+		else
+		{
+			throw new UnsupportedMediaException("Multi-Factor Authentication has not been setup.");
+		}
 	}
 }

@@ -25,21 +25,25 @@ import org.piangles.backbone.services.profile.UserProfileService;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.Request;
-import org.piangles.gateway.requests.dto.SimpleResponse;
 
-public class UpdateUserProfileRequestProcessor extends AbstractRequestProcessor<BasicUserProfile, SimpleResponse>
+public class UpdateUserProfileRequestProcessor extends AbstractRequestProcessor<BasicUserProfile, BasicUserProfile>
 {
 	private UserProfileService profileService = Locator.getInstance().getUserProfileService();
 	
 	public UpdateUserProfileRequestProcessor()
 	{
-		super(Endpoints.UpdateUserProfile, BasicUserProfile.class, SimpleResponse.class);
+		super(Endpoints.UpdateUserProfile, BasicUserProfile.class, BasicUserProfile.class);
 	}
 
 	@Override
-	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, BasicUserProfile userProfile) throws Exception
+	protected BasicUserProfile processRequest(ClientDetails clientDetails, Request request, BasicUserProfile userProfile) throws Exception
 	{
+		BasicUserProfile updatedUserProfile = null;
+		
 		profileService.updateProfile(clientDetails.getSessionDetails().getUserId(), userProfile);
-		return new SimpleResponse("UserProfile was updated successfully.");
+		
+		updatedUserProfile = profileService.getProfile(clientDetails.getSessionDetails().getUserId());
+		
+		return updatedUserProfile;
 	}
 }
