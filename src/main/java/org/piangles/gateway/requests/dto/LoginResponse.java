@@ -34,9 +34,9 @@ public final class LoginResponse extends AuthenticationDetails
 	@JsonProperty(required = true)
 	private boolean loggedInAsGuest = false; 
 
-	public LoginResponse(boolean mfaEnabled, boolean authenticatedByToken, boolean loggedInAsGuest, String userId, String sessionId, long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp)
+	public LoginResponse(boolean mfaEnabled, boolean authenticatedByToken, boolean loggedInAsGuest, String userId, String sessionId, String phoneNo, long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp)
 	{
-		super(true, mfaEnabled, authenticatedByToken, userId, sessionId, inactivityExpiryTimeInSeconds, lastLoggedInTimestamp);
+		super(true, mfaEnabled, authenticatedByToken, userId, sessionId, phoneNo, inactivityExpiryTimeInSeconds, lastLoggedInTimestamp);
 		this.loggedInAsGuest = loggedInAsGuest;
 	}
 

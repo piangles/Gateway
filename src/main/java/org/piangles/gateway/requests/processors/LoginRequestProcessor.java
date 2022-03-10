@@ -90,7 +90,7 @@ public final class LoginRequestProcessor extends AbstractAuthenticationProcessor
 				boolean loggedInAsGuest = !authEntryExists;
 				
 				//Do not have to do MFA on userId/sessionId authentication
-				loginResponse = new LoginResponse(false, false, loggedInAsGuest, loginRequest.getId(), loginRequest.getSessionId(), 
+				loginResponse = new LoginResponse(false, false, loggedInAsGuest, loginRequest.getId(), loginRequest.getSessionId(), null,
 													900, 0);  //TODO THIS HAS TO BE FIXED 
 			}
 			else

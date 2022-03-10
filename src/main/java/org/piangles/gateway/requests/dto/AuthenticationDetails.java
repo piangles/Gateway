@@ -37,6 +37,9 @@ public class AuthenticationDetails
 	@JsonProperty(required = true)
 	private String sessionId;
 	
+	@JsonProperty(required = false)
+	private String phoneNo = null;
+	
 	@JsonProperty(required = true)
 	private long inactivityExpiryTimeInSeconds = 0L;
 
@@ -48,7 +51,8 @@ public class AuthenticationDetails
 		
 	}
 
-	public AuthenticationDetails(boolean authenticated, boolean mfaEnabled, boolean authenticatedByToken, String userId, String sessionId, 
+	public AuthenticationDetails(boolean authenticated, boolean mfaEnabled, boolean authenticatedByToken, 
+									String userId, String sessionId, String phoneNo,
 									long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp)
 	{
 		this.authenticated = authenticated;
@@ -56,6 +60,7 @@ public class AuthenticationDetails
 		this.authenticatedByToken = authenticatedByToken;
 		this.userId = userId;
 		this.sessionId = sessionId;
+		this.phoneNo = phoneNo;
 		this.inactivityExpiryTimeInSeconds = inactivityExpiryTimeInSeconds;
 		this.lastLoggedInTimestamp = lastLoggedInTimestamp;
 	}
@@ -83,6 +88,11 @@ public class AuthenticationDetails
 	public final String getSessionId()
 	{
 		return sessionId;
+	}
+	
+	public String getPhoneNo()
+	{
+		return phoneNo;
 	}
 	
 	public long getInactivityExpiryTimeInSeconds()
