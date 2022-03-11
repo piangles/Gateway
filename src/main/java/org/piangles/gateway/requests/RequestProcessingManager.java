@@ -254,7 +254,8 @@ public final class RequestProcessingManager
 			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
 									request.getTransitTime(), StatusCode.Unauthenticated, errorMessage);
 		}
-		else if (Endpoints.Ping.name().equals(request.getEndpoint()))
+		else if (	Endpoints.Ping.name().equals(request.getEndpoint()) || 
+					Endpoints.KeepSessionAlive.name().equals(request.getEndpoint()))
 		{
 			//Nothing to do here
 		}

@@ -22,6 +22,7 @@ package org.piangles.gateway.requests.processors;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.profile.BasicUserProfile;
 import org.piangles.backbone.services.profile.UserProfileService;
+import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.core.expt.UnsupportedMediaException;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
@@ -32,6 +33,7 @@ import org.piangles.gateway.requests.dto.Request;
 
 public class MFASetupRequestProcessor extends AbstractRequestProcessor<MFASetupRequest, BooleanResponse>
 {
+	private SessionManagementService sessionMgmtService = Locator.getInstance().getSessionManagementService();
 	private UserProfileService profileService = Locator.getInstance().getUserProfileService();
 	
 	public MFASetupRequestProcessor()
@@ -58,6 +60,11 @@ public class MFASetupRequestProcessor extends AbstractRequestProcessor<MFASetupR
 													validation
 													);	
 
+				if (validation)
+				{
+					sessionMgmtService.markAuthenticatedByMFA(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+				}
+				
 				booleanResponse = new BooleanResponse(validation, validation? "MFA Enabled" : "Invalid MFA Token");
 			}
 			else

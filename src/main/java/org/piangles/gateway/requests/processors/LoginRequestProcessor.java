@@ -101,7 +101,8 @@ public final class LoginRequestProcessor extends AbstractAuthenticationProcessor
 				boolean authEntryExists = authService.doesAuthenticationEntryExist(loginRequest.getId());
 				boolean loggedInAsGuest = !authEntryExists;
 				
-				loginResponse = new LoginResponse(mfaEnabled, false, true, authenticatedByMultiFactor, loggedInAsGuest, loginRequest.getId(), loginRequest.getSessionId(), null,
+				loginResponse = new LoginResponse(mfaEnabled, false, true, authenticatedByMultiFactor, 
+													loggedInAsGuest, loginRequest.getId(), loginRequest.getSessionId(), null,
 													sessionDetails.getInactivityExpiryTimeInSeconds(), 
 													0); //It is Zero here because, this is not Login it is Authentication via userId and sessionId
 			}
