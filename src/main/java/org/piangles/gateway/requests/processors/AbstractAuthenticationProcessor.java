@@ -66,7 +66,7 @@ public abstract class AbstractAuthenticationProcessor<EndpointReq, EndpointResp>
 
 			BasicUserProfile userProfile = profileService.getProfile(userId);
 
-			loginResponse = new LoginResponse(userProfile.isMFAEnabled(), validatedByToken, loggedInAsGuest, userId, sessionDetails.getSessionId(),
+			loginResponse = new LoginResponse(userProfile.isMFAEnabled(), validatedByToken, false, loggedInAsGuest, userId, sessionDetails.getSessionId(),
 					userProfile.getPhoneNo(),
 					sessionDetails.getInactivityExpiryTimeInSeconds(), lastLoggedInTimestamp);
 

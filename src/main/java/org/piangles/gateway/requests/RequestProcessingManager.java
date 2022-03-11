@@ -291,22 +291,24 @@ public final class RequestProcessingManager
 		}
 		else
 		{
-			Response response = processRequestSynchronously(request);
-			
-			performPostSynchronousRequestProcessingActions(request, response);
+			processRequestSynchronously(request);
 		}
 	}
 
-	private Response processRequestSynchronously(Request request) throws InterruptedException
+	private void processRequestSynchronously(Request request) throws Exception
 	{
 		RequestProcessingThread reqProcThread = processRequestASynchronously(request);
 		reqProcThread.join();
-		return reqProcThread.getResponse();
+		
+		Response response = reqProcThread.getResponse();
+		
+		performPostSynchronousRequestProcessingActions(request, response);
 	}
 
 	private RequestProcessingThread processRequestASynchronously(Request request)
 	{
 		RequestProcessor rp = RequestRouter.getInstance().getRequestProcessor(request.getEndpoint());
+		
 		RequestProcessingThread reqProcThread = new RequestProcessingThread(clientDetails, request, rp, epm);
 		reqProcThread.start();
 
