@@ -102,7 +102,7 @@ public final class LoginRequestProcessor extends AbstractAuthenticationProcessor
 				boolean loggedInAsGuest = !authEntryExists;
 				
 				loginResponse = new LoginResponse(mfaEnabled, false, true, authenticatedByMultiFactor, 
-													loggedInAsGuest, loginRequest.getId(), loginRequest.getSessionId(), null,
+													loggedInAsGuest, loginRequest.getId(), loginRequest.getSessionId(), userProfile.getPhoneNo(),
 													sessionDetails.getInactivityExpiryTimeInSeconds(), 
 													0); //It is Zero here because, this is not Login it is Authentication via userId and sessionId
 			}
