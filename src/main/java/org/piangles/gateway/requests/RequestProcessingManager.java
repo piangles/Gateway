@@ -254,6 +254,10 @@ public final class RequestProcessingManager
 			response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
 									request.getTransitTime(), StatusCode.Unauthenticated, errorMessage);
 		}
+		else if (Endpoints.Ping.name().equals(request.getEndpoint()))
+		{
+			//Nothing to do here
+		}
 		else if (state == ClientState.MidAuthentication && !RequestRouter.getInstance().isMidAuthenticationEndpoint(request.getEndpoint()))
 		{
 			/**
@@ -339,7 +343,11 @@ public final class RequestProcessingManager
 					clientDetails.markLastAccessed();
 					//Location.convert(geoLocation, false));
 
-					if (authDetails.isAuthenticatedByToken())
+					if (authDetails.isAuthenticatedBySession())
+					{
+						state = ClientState.PostAuthentication;
+					}
+					else if (authDetails.isAuthenticatedByToken())
 					{
 						state = ClientState.MidAuthentication;
 					}

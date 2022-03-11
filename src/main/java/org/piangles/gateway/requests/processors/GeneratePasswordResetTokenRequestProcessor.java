@@ -22,8 +22,6 @@ package org.piangles.gateway.requests.processors;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.auth.AuthenticationResponse;
 import org.piangles.backbone.services.auth.AuthenticationService;
-import org.piangles.backbone.services.profile.BasicUserProfile;
-import org.piangles.backbone.services.profile.UserProfileService;
 import org.piangles.core.expt.NotFoundException;
 import org.piangles.core.expt.ServiceRuntimeException;
 import org.piangles.gateway.CommunicationPattern;
@@ -37,7 +35,6 @@ import org.piangles.gateway.requests.dto.SimpleResponse;
 public final class GeneratePasswordResetTokenRequestProcessor extends AbstractRequestProcessor<GeneratePasswordResetTokenRequest, SimpleResponse>
 {
 	private AuthenticationService authService = Locator.getInstance().getAuthenticationService();
-	private UserProfileService upService = Locator.getInstance().getUserProfileService();
 	
 	public GeneratePasswordResetTokenRequestProcessor()
 	{
