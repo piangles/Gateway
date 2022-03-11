@@ -19,6 +19,8 @@
  
 package org.piangles.gateway.requests.processors;
 
+import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.core.expt.UnsupportedMediaException;
 import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.client.ClientDetails;
@@ -30,6 +32,8 @@ import org.piangles.gateway.requests.dto.ValidateMFATokenRequest;
 
 public class ValidateMFATokenRequestProcessor extends AbstractRequestProcessor<ValidateMFATokenRequest, BooleanResponse>
 {
+	private SessionManagementService sessionMgmtService = Locator.getInstance().getSessionManagementService();
+	
 	public ValidateMFATokenRequestProcessor()
 	{
 		super(Endpoints.ValidateMFAToken, CommunicationPattern.RequestResponse, ValidateMFATokenRequest.class, BooleanResponse.class);
@@ -43,6 +47,11 @@ public class ValidateMFATokenRequestProcessor extends AbstractRequestProcessor<V
 		if (RequestRouter.getInstance().getMFAManager() != null)
 		{
 			boolean validation = RequestRouter.getInstance().getMFAManager().validateMFAToken(clientDetails, validateMFARequest.getMFAToken());
+			
+			if (validation)
+			{
+				sessionMgmtService.markAuthenticatedByMFA(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+			}
 			
 			booleanResponse = new BooleanResponse(validation, validation? "Valid MFA Token" : "Invalid MFA Token");
 		}

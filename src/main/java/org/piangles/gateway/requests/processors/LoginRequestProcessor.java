@@ -25,6 +25,9 @@ import org.piangles.backbone.services.auth.AuthenticationService;
 import org.piangles.backbone.services.auth.AuthenticationType;
 import org.piangles.backbone.services.auth.Credential;
 import org.piangles.backbone.services.auth.FailureReason;
+import org.piangles.backbone.services.profile.BasicUserProfile;
+import org.piangles.backbone.services.profile.UserProfileService;
+import org.piangles.backbone.services.session.SessionDetails;
 import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
@@ -36,6 +39,7 @@ public final class LoginRequestProcessor extends AbstractAuthenticationProcessor
 {
 	private AuthenticationService authService = Locator.getInstance().getAuthenticationService();
 	private SessionManagementService sessionMgmtService = Locator.getInstance().getSessionManagementService();
+	private UserProfileService profileService = Locator.getInstance().getUserProfileService();
 	
 	public LoginRequestProcessor()
 	{
@@ -85,13 +89,21 @@ public final class LoginRequestProcessor extends AbstractAuthenticationProcessor
 			if (isSessionValid)
 			{
 				sessionMgmtService.makeLastAccessedCurrent(loginRequest.getId(), loginRequest.getSessionId());
+
+				SessionDetails sessionDetails = sessionMgmtService.getSessionDetails(loginRequest.getId(), loginRequest.getSessionId());
+				setSessionForCurrentThread(sessionDetails);
+				
+				BasicUserProfile userProfile = profileService.getProfile(loginRequest.getId());
+				boolean mfaEnabled = userProfile.isMFAEnabled();
+				//Do not have to do MFA on userId/sessionId authentication
+				boolean authenticatedByMultiFactor = sessionDetails.isAuthenticatedByMultiFactor();
 				
 				boolean authEntryExists = authService.doesAuthenticationEntryExist(loginRequest.getId());
 				boolean loggedInAsGuest = !authEntryExists;
 				
-				//Do not have to do MFA on userId/sessionId authentication
-				loginResponse = new LoginResponse(false, false, true, loggedInAsGuest, loginRequest.getId(), loginRequest.getSessionId(), null,
-													900, 0);  //TODO THIS HAS TO BE FIXED 
+				loginResponse = new LoginResponse(mfaEnabled, false, true, authenticatedByMultiFactor, loggedInAsGuest, loginRequest.getId(), loginRequest.getSessionId(), null,
+													sessionDetails.getInactivityExpiryTimeInSeconds(), 
+													0); //It is Zero here because, this is not Login it is Authentication via userId and sessionId
 			}
 			else
 			{

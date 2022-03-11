@@ -57,16 +57,14 @@ public abstract class AbstractAuthenticationProcessor<EndpointReq, EndpointResp>
 		UserDeviceInfo userDeviceInfo = new UserDeviceInfo(userId, clientDetails.getHostName(), clientDetails.getIPAddress(), systemInfo);
 		getGatewayDAO().insertUserDeviceInfo(userDeviceInfo);
 
-		SessionDetails sessionDetails = null;
 		try
 		{
-			sessionDetails = sessionMgmtService.register(userId);
-
+			SessionDetails sessionDetails = sessionMgmtService.register(userId);
 			setSessionForCurrentThread(sessionDetails);
 
 			BasicUserProfile userProfile = profileService.getProfile(userId);
 
-			loginResponse = new LoginResponse(userProfile.isMFAEnabled(), validatedByToken, false, loggedInAsGuest, userId, sessionDetails.getSessionId(),
+			loginResponse = new LoginResponse(userProfile.isMFAEnabled(), validatedByToken, false, false, loggedInAsGuest, userId, sessionDetails.getSessionId(),
 					userProfile.getPhoneNo(),
 					sessionDetails.getInactivityExpiryTimeInSeconds(), lastLoggedInTimestamp);
 

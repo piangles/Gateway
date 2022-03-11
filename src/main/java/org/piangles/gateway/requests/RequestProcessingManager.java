@@ -345,7 +345,14 @@ public final class RequestProcessingManager
 
 					if (authDetails.isAuthenticatedBySession())
 					{
-						state = ClientState.PostAuthentication;
+						if (authDetails.isMFAEnabled() && !authDetails.isAuthenticatedByMultiFactor())
+						{
+							state = ClientState.MidAuthentication;
+						}
+						else
+						{
+							state = ClientState.PostAuthentication;
+						}
 					}
 					else if (authDetails.isAuthenticatedByToken())
 					{

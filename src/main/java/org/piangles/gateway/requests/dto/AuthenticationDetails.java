@@ -34,6 +34,9 @@ public class AuthenticationDetails
 	@JsonProperty(required = false)
 	private boolean authenticatedBySession = false;
 
+	@JsonProperty(required = false)
+	private boolean authenticatedByMultiFactor = false;
+
 	@JsonProperty(required = true)
 	private String userId;
 	
@@ -54,7 +57,9 @@ public class AuthenticationDetails
 		
 	}
 
-	public AuthenticationDetails(boolean authenticated, boolean mfaEnabled, boolean authenticatedByToken, boolean authenticatedBySession,
+	public AuthenticationDetails(	boolean authenticated, 
+									boolean mfaEnabled, 
+									boolean authenticatedByToken, boolean authenticatedBySession, boolean authenticatedByMultiFactor,
 									String userId, String sessionId, String phoneNo,
 									long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp)
 	{
@@ -62,6 +67,7 @@ public class AuthenticationDetails
 		this.mfaEnabled = mfaEnabled;
 		this.authenticatedByToken = authenticatedByToken;
 		this.authenticatedBySession = authenticatedBySession;
+		this.authenticatedByMultiFactor = authenticatedByMultiFactor;
 		this.userId = userId;
 		this.sessionId = sessionId;
 		this.phoneNo = phoneNo;
@@ -87,6 +93,11 @@ public class AuthenticationDetails
 	public final boolean isAuthenticatedBySession()
 	{
 		return authenticatedBySession;
+	}
+
+	public final boolean isAuthenticatedByMultiFactor()
+	{
+		return authenticatedByMultiFactor;
 	}
 
 	public final String getUserId()
