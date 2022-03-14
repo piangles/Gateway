@@ -59,7 +59,7 @@ public final class GeneratePasswordResetTokenRequestProcessor extends AbstractRe
 		}
 		else
 		{
-			StringBuffer sb = new StringBuffer();
+			StringBuffer sb = new StringBuffer(authResponse.getFailureReason().name());
 			authResponse.getFailureMessages().stream().map(msg -> sb.append(msg).append("\n"));
 		
 			switch(authResponse.getFailureReason())

@@ -60,7 +60,7 @@ public class ChangePasswordRequestProcessor extends AbstractRequestProcessor<Cha
 		}
 		else
 		{
-			StringBuffer sb = new StringBuffer();
+			StringBuffer sb = new StringBuffer(authResponse.getFailureReason().name());
 			authResponse.getFailureMessages().stream().map(msg -> sb.append(msg).append("\n"));
 		
 			switch(authResponse.getFailureReason())
@@ -68,6 +68,8 @@ public class ChangePasswordRequestProcessor extends AbstractRequestProcessor<Cha
 			case AccountDoesNotExist:
 				throw new NotFoundException(sb.toString());
 			case PasswordDoesNotMeetStrength:
+				throw new ValidationException(sb.toString());
+			case OldPasswordDoesNotMatch:
 				throw new ValidationException(sb.toString());
 			default:
 				throw new ServiceRuntimeException("Unhandled FailureReason : " + authResponse.getFailureReason() + "\n" + sb.toString());

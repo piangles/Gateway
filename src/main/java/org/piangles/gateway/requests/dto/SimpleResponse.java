@@ -36,12 +36,17 @@ public final class SimpleResponse
 	
 	public SimpleResponse()
 	{
-		this(SUCCESS_MESSAGE);
+		this(true, SUCCESS_MESSAGE);
 	}
 
 	public SimpleResponse(String message)
 	{
-		this.requestSuccessful = true;
+		this(true, message);
+	}
+
+	public SimpleResponse(boolean requestSuccessful, String message)
+	{
+		this.requestSuccessful = requestSuccessful;
 		this.message = message;
 	}
 
