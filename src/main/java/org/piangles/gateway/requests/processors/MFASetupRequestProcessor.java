@@ -74,13 +74,29 @@ public class MFASetupRequestProcessor extends AbstractRequestProcessor<MFASetupR
 		}
 		else
 		{
-			userProfile = new BasicUserProfile(	userProfile.getUserId(), userProfile.getFirstName(), userProfile.getLastName(), 
-												userProfile.getEMailId(), userProfile.isEmailIdVerified(),
-												userProfile.getPhoneNo(), false,
-												false
-												);	
-			
-			booleanResponse = new BooleanResponse(true, "MFA Disabled");
+			if (RequestRouter.getInstance().getMFAManager() != null)
+			{
+				boolean validation = RequestRouter.getInstance().getMFAManager().validateMFAToken(clientDetails, mfaSetupRequest.getToken());
+				
+				if (validation)
+				{
+					userProfile = new BasicUserProfile(	userProfile.getUserId(), userProfile.getFirstName(), userProfile.getLastName(), 
+							userProfile.getEMailId(), userProfile.isEmailIdVerified(),
+							userProfile.getPhoneNo(), false,
+							false
+							);	
+
+					booleanResponse = new BooleanResponse(true, "MFA Disabled");
+				}
+				else
+				{
+					booleanResponse = new BooleanResponse(false, "Invalid MFA Token");
+				}
+			}
+			else
+			{
+				throw new UnsupportedMediaException("Multi-Factor Authentication has not been setup.");
+			}
 		}
 		
 		if (booleanResponse.isCriteriaSatisfied())
