@@ -52,7 +52,7 @@ public final class GeneratePasswordResetTokenRequestProcessor extends AbstractRe
 		{
 			if (RequestRouter.getInstance().getCommunicator() != null)
 			{
-				RequestRouter.getInstance().getCommunicator().sendGeneratePasswordResetTokenCommunication(authResponse.getUserId(), authResponse);
+				RequestRouter.getInstance().getCommunicator().sendGeneratePasswordResetTokenCommunication(tokenRequest.getEmailId(), authResponse);
 			}
 
 			simpleResponse = new SimpleResponse("Please check your registered email for the token.");
