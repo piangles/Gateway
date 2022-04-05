@@ -5,7 +5,7 @@
 	<groupId>org.piangles.gateway</groupId>
 	<artifactId>Gateway</artifactId>
 	<packaging>jar</packaging>
-	<version>8.7</version>
+	<version>8.8</version>
 
 	<name>PiAngles Gateway</name>
 	<description>
@@ -129,7 +129,7 @@
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-servlets</artifactId>
-			<version>9.4.41.v20210516</version>
+			<version>9.4.32.v20200930</version>
 		</dependency>
 
 		<dependency>
