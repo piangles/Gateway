@@ -112,7 +112,12 @@ public abstract class AbstractRequestProcessor<EndpointReq,EndpointResp> impleme
 		Validator validator = ValidationManager.getInstance().getValidator(request.getEndpoint());
 		if (validator != null) //Validate the EndpointRequest itself
 		{
+			logger.info("Performing Validation for Endpoint: " + request.getEndpoint());
 			validator.validate(clientDetails, request, epRequest);
+		}
+		else
+		{
+			logger.info("No Validator exists for Endpoint: " + request.getEndpoint());
 		}
 		
 		/**
