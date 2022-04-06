@@ -34,16 +34,26 @@ public final class LoginResponse extends AuthenticationDetails
 	@JsonProperty(required = true)
 	private boolean loggedInAsGuest = false; 
 
-	public LoginResponse(boolean mfaEnabled, boolean authenticatedByToken, boolean authenticatedBySession, boolean authenticatedByMultiFactor, boolean loggedInAsGuest, String userId, String sessionId, String phoneNo, long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp)
+	public LoginResponse(	boolean mfaEnabled, 
+							boolean authenticatedByToken, boolean authenticatedBySession, boolean authenticatedByMultiFactor, 
+							boolean loggedInAsGuest,
+							String authenticationState,
+							String userId, String sessionId, String phoneNo, 
+							long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp)
 	{
-		super(true, mfaEnabled, authenticatedByToken, authenticatedBySession, authenticatedByMultiFactor, userId, sessionId, phoneNo, inactivityExpiryTimeInSeconds, lastLoggedInTimestamp);
+		super(	true, mfaEnabled, 
+				authenticatedByToken, authenticatedBySession, authenticatedByMultiFactor, 
+				authenticationState,
+				userId, sessionId, phoneNo, inactivityExpiryTimeInSeconds, lastLoggedInTimestamp);
 		this.loggedInAsGuest = loggedInAsGuest;
 	}
 
-	public LoginResponse(int noOfAttemptsRemaining, FailureReason failureReason)
+	public LoginResponse(int noOfAttemptsRemaining, FailureReason failureReason, String authenticationState)
 	{
 		this.noOfAttemptsRemaining = noOfAttemptsRemaining;
 		this.failureReason = failureReason;
+		
+		super.setAuthenticationState(authenticationState);
 	}
 	
 	public int getNoOfAttemptsRemaining()

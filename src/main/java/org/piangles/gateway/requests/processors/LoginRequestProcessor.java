@@ -30,6 +30,7 @@ import org.piangles.backbone.services.profile.UserProfileService;
 import org.piangles.backbone.services.session.SessionDetails;
 import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.gateway.client.ClientDetails;
+import org.piangles.gateway.requests.ClientStateDeterminator;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.LoginRequest;
 import org.piangles.gateway.requests.dto.LoginResponse;
@@ -80,7 +81,9 @@ public final class LoginRequestProcessor extends AbstractAuthenticationProcessor
 			}
 			else
 			{
-				loginResponse = new LoginResponse(authResponse.getNoOfAttemptsRemaining(), authResponse.getFailureReason());
+				String authenticationState = ClientStateDeterminator.determine(null).name();
+				
+				loginResponse = new LoginResponse(authResponse.getNoOfAttemptsRemaining(), authResponse.getFailureReason(), authenticationState);
 			}
 		}
 		else //Authenticate using userId and sessionId
@@ -101,14 +104,23 @@ public final class LoginRequestProcessor extends AbstractAuthenticationProcessor
 				boolean authEntryExists = authService.doesAuthenticationEntryExist(loginRequest.getId());
 				boolean loggedInAsGuest = !authEntryExists;
 				
+				LoginResponse tempLoginResponse = new LoginResponse(mfaEnabled, false, true, authenticatedByMultiFactor, 
+													loggedInAsGuest, null, loginRequest.getId(), loginRequest.getSessionId(), userProfile.getPhoneNo(),
+													sessionDetails.getInactivityExpiryTimeInSeconds(), 
+													0); //It is Zero here because, this is not Login it is Authentication via userId and sessionId
+				
+				String authenticationState = ClientStateDeterminator.determine(tempLoginResponse).name();
+				
 				loginResponse = new LoginResponse(mfaEnabled, false, true, authenticatedByMultiFactor, 
-													loggedInAsGuest, loginRequest.getId(), loginRequest.getSessionId(), userProfile.getPhoneNo(),
+													loggedInAsGuest, authenticationState, loginRequest.getId(), loginRequest.getSessionId(), userProfile.getPhoneNo(),
 													sessionDetails.getInactivityExpiryTimeInSeconds(), 
 													0); //It is Zero here because, this is not Login it is Authentication via userId and sessionId
 			}
 			else
 			{
-				loginResponse = new LoginResponse(0, FailureReason.InvalidSession);
+				String authenticationState = ClientStateDeterminator.determine(null).name();
+				
+				loginResponse = new LoginResponse(0, FailureReason.InvalidSession, authenticationState);
 			}
 		}
 

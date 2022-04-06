@@ -38,6 +38,9 @@ public class AuthenticationDetails
 	private boolean authenticatedByMultiFactor = false;
 
 	@JsonProperty(required = true)
+	private String authenticationState = null;
+
+	@JsonProperty(required = true)
 	private String userId;
 	
 	@JsonProperty(required = true)
@@ -60,6 +63,7 @@ public class AuthenticationDetails
 	public AuthenticationDetails(	boolean authenticated, 
 									boolean mfaEnabled, 
 									boolean authenticatedByToken, boolean authenticatedBySession, boolean authenticatedByMultiFactor,
+									String authenticationState,
 									String userId, String sessionId, String phoneNo,
 									long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp)
 	{
@@ -99,6 +103,11 @@ public class AuthenticationDetails
 	{
 		return authenticatedByMultiFactor;
 	}
+	
+	public String getAuthenticationState()
+	{
+		return authenticationState;
+	}
 
 	public final String getUserId()
 	{
@@ -123,5 +132,10 @@ public class AuthenticationDetails
 	public long getLastLoggedInTimestamp()
 	{
 		return lastLoggedInTimestamp;
+	}
+	
+	protected final void setAuthenticationState(String authenticationState)
+	{
+		this.authenticationState = authenticationState;
 	}
 }

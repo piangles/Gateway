@@ -28,6 +28,7 @@ import org.piangles.backbone.services.session.SessionManagementException;
 import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.client.ClientDetails;
+import org.piangles.gateway.requests.ClientStateDeterminator;
 import org.piangles.gateway.requests.dao.UserDeviceInfo;
 import org.piangles.gateway.requests.dto.LoginResponse;
 import org.piangles.gateway.requests.dto.SystemInfo;
@@ -64,9 +65,17 @@ public abstract class AbstractAuthenticationProcessor<EndpointReq, EndpointResp>
 
 			BasicUserProfile userProfile = profileService.getProfile(userId);
 
-			loginResponse = new LoginResponse(userProfile.isMFAEnabled(), validatedByToken, false, false, loggedInAsGuest, userId, sessionDetails.getSessionId(),
-					userProfile.getPhoneNo(),
-					sessionDetails.getInactivityExpiryTimeInSeconds(), lastLoggedInTimestamp);
+			LoginResponse tempLoginResponse = new LoginResponse(userProfile.isMFAEnabled(), validatedByToken, false, false, loggedInAsGuest, 
+																null, userId, sessionDetails.getSessionId(),
+																userProfile.getPhoneNo(),
+																sessionDetails.getInactivityExpiryTimeInSeconds(), lastLoggedInTimestamp);
+			
+			String authenticationState = ClientStateDeterminator.determine(tempLoginResponse).name();
+			
+			loginResponse = new LoginResponse(	userProfile.isMFAEnabled(), validatedByToken, false, false, loggedInAsGuest, 
+												authenticationState, userId, sessionDetails.getSessionId(),
+												userProfile.getPhoneNo(),
+												sessionDetails.getInactivityExpiryTimeInSeconds(), lastLoggedInTimestamp);
 
 		}
 		catch (SessionManagementException e)
@@ -75,7 +84,9 @@ public abstract class AbstractAuthenticationProcessor<EndpointReq, EndpointResp>
 			// TODO THIS HAS TO BE FIXED - Need a better way to figure this out.
 			if (message.contains(MAX_ACTIVE_SESSION_MESAGE_1) || message.contains(MAX_ACTIVE_SESSION_MESAGE_2))
 			{
-				loginResponse = new LoginResponse(0, FailureReason.MaximumSessionCountReached);
+				String authenticationState = ClientStateDeterminator.determine(null).name();
+				
+				loginResponse = new LoginResponse(0, FailureReason.MaximumSessionCountReached, authenticationState);
 			}
 			else
 			{

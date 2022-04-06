@@ -344,31 +344,12 @@ public final class RequestProcessingManager
 					clientDetails.markLastAccessed();
 					//Location.convert(geoLocation, false));
 
-					if (authDetails.isAuthenticatedBySession())
-					{
-						if (authDetails.isMFAEnabled() && !authDetails.isAuthenticatedByMultiFactor())
-						{
-							state = ClientState.MidAuthentication;
-						}
-						else
-						{
-							state = ClientState.PostAuthentication;
-						}
-					}
-					else if (authDetails.isAuthenticatedByToken())
-					{
-						state = ClientState.MidAuthentication;
-					}
-					else if (authDetails.isMFAEnabled())
+					if (!authDetails.isAuthenticatedBySession() &&
+						authDetails.isMFAEnabled())
 					{
 						sendMFAToken();
-						state = ClientState.MidAuthentication;
 					}
-					else
-					{
-						state = ClientState.PostAuthentication;
-					}
-
+					state = ClientStateDeterminator.determine(authDetails);
 					/**
 					 * Now that client is authenticated, create the MessageProcessingManager
 					 */
