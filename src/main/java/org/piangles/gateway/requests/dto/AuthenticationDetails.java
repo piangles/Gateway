@@ -72,6 +72,7 @@ public class AuthenticationDetails
 		this.authenticatedByToken = authenticatedByToken;
 		this.authenticatedBySession = authenticatedBySession;
 		this.authenticatedByMultiFactor = authenticatedByMultiFactor;
+		this.authenticationState = authenticationState;
 		this.userId = userId;
 		this.sessionId = sessionId;
 		this.phoneNo = phoneNo;
