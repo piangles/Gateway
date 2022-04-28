@@ -29,6 +29,7 @@ import org.piangles.core.util.validate.ValidationManager;
 import org.piangles.core.util.validate.Validator;
 import org.piangles.gateway.requests.dao.GatewayDAO;
 import org.piangles.gateway.requests.dao.GatewayDAOImpl;
+import org.piangles.gateway.requests.hooks.AlertHook;
 import org.piangles.gateway.requests.hooks.MidAuthenticationHook;
 import org.piangles.gateway.requests.hooks.PostAuthenticationHook;
 import org.piangles.gateway.requests.hooks.PostRequestProcessingHook;
@@ -44,8 +45,8 @@ import org.piangles.gateway.requests.processors.KeepSessionAliveRequestProcessor
 import org.piangles.gateway.requests.processors.ListEndpointsRequestProcessor;
 import org.piangles.gateway.requests.processors.LoginRequestProcessor;
 import org.piangles.gateway.requests.processors.LogoutRequestProcessor;
-import org.piangles.gateway.requests.processors.SendMFATokenRequestProcessor;
 import org.piangles.gateway.requests.processors.MFASetupRequestProcessor;
+import org.piangles.gateway.requests.processors.SendMFATokenRequestProcessor;
 import org.piangles.gateway.requests.processors.SignUpRequestProcessor;
 import org.piangles.gateway.requests.processors.SubscriptionRequestProcessor;
 import org.piangles.gateway.requests.processors.UpdateUserPreferencesRequestProcessor;
@@ -73,6 +74,7 @@ public class RequestRouter
 	
 	private Map<String, RequestProcessor> endpointRequestProcessorMap;
 	
+	private AlertHook alertHook = null;
 	private PostRequestProcessingHook postRequestProcessingHook = null; 
 	private MidAuthenticationHook midAuthenticationHook = null;
 	private PostAuthenticationHook postAuthenticationHook = null;
@@ -260,6 +262,11 @@ public class RequestRouter
 		ValidationManager.getInstance().addValidator(validator);
 	}
 
+	public void registerAlertHook(AlertHook alertHook)
+	{
+		this.alertHook = alertHook;
+	}
+
 	public void registerPostRequestProcessingHook(PostRequestProcessingHook postRequestProcessingHook)
 	{
 		this.postRequestProcessingHook = postRequestProcessingHook;
@@ -312,6 +319,11 @@ public class RequestRouter
 	public RequestProcessor getRequestProcessor(String endpoint)
 	{
 		return endpointRequestProcessorMap.get(endpoint);
+	}
+
+	public AlertHook getAlertHook()
+	{
+		return alertHook;
 	}
 
 	public PostRequestProcessingHook getPostRequestProcessingHook()

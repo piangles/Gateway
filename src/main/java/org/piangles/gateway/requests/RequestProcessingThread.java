@@ -34,6 +34,7 @@ import org.piangles.gateway.requests.dao.RequestResponseDetails;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.Response;
 import org.piangles.gateway.requests.dto.StatusCode;
+import org.piangles.gateway.requests.hooks.AlertDetails;
 
 public final class RequestProcessingThread extends AbstractContextAwareThread
 {
@@ -103,9 +104,10 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 			}
 			catch (SessionManagementException e)
 			{
-				logger.error("Unable to validate Session because of : " + e.getMessage(), e);
+				String message = "Unable to validate Session because of : " + e.getMessage();
+				logger.error(message, e);
 				validSession = false;
-				response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), request.getTransitTime(), StatusCode.InternalError, internalErrorMessage());
+				response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), request.getTransitTime(), StatusCode.InternalError, processInternalErrorMessage(e, message));
 			}
 		}
 		else if (clientDetails.getSessionDetails().getSessionId() != null)
@@ -133,13 +135,13 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 		{
 			logger.warn("Exception while processing request because of : " + extractThrowableMessage(e), e);
 			response = new Response(getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
-									request.getTransitTime(), StatusCode.InternalError, internalErrorMessage());
+									request.getTransitTime(), StatusCode.InternalError, processInternalErrorMessage(e, extractThrowableMessage(e)));
 		}
 		catch(Throwable e) //The Top Level in Exception hierarchy. Next level has Error and Exception and we are covered. 
 		{
 			logger.error("Unhandled Exception while processing request because of : " + extractThrowableMessage(e), e);
 			response = new Response(getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
-					request.getTransitTime(), StatusCode.InternalError, internalErrorMessage());
+					request.getTransitTime(), StatusCode.InternalError, processInternalErrorMessage(e, extractThrowableMessage(e)));
 		}
 		
 		ResponseSender.sendResponse(clientDetails, response);
@@ -184,10 +186,11 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 		if (statusCode == null)
 		{
 			logger.warn("Unable to find StatusCode for ServiceRuntimeException class " + sre.getClass().getSimpleName() + " in sreStatusCodeMap, Defaulting to:" + StatusCode.InternalError);
-			logger.error(sre.getClass().getSimpleName() + " while processing request because of : " + sre.getMessage(), sre);
+			String message = sre.getClass().getSimpleName() + " while processing request because of : " + sre.getMessage();
+			logger.error(message, sre);
 			
 			statusCode = StatusCode.InternalError;
-			errorMessage = internalErrorMessage();
+			errorMessage = processInternalErrorMessage(sre, message);
 		}
 		else
 		{
@@ -201,9 +204,17 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 		return response;
 	}
 	
-	private String internalErrorMessage()
+	private String processInternalErrorMessage(Throwable throwable, String message)
 	{
-		return String.format(INTERNAL_ERR_MESSAGE, getTraceId().toString());
+		String internalErrorMessage = String.format(INTERNAL_ERR_MESSAGE, getTraceId().toString());
+		
+		if (RequestRouter.getInstance().getAlertHook() != null)
+		{
+			AlertDetails alertDetails = new AlertDetails(request.getEndpoint(), getTraceId(), throwable, message, request.getIssuedTime());
+			RequestRouter.getInstance().getAlertHook().process(alertDetails, clientDetails);
+		}
+		
+		return internalErrorMessage;
 	}
 	
 	private String extractThrowableMessage(Throwable e)
