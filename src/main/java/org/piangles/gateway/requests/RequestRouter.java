@@ -29,7 +29,6 @@ import org.piangles.core.util.validate.ValidationManager;
 import org.piangles.core.util.validate.Validator;
 import org.piangles.gateway.requests.dao.GatewayDAO;
 import org.piangles.gateway.requests.dao.GatewayDAOImpl;
-import org.piangles.gateway.requests.hooks.AlertHook;
 import org.piangles.gateway.requests.hooks.MidAuthenticationHook;
 import org.piangles.gateway.requests.hooks.PostAuthenticationHook;
 import org.piangles.gateway.requests.hooks.PostRequestProcessingHook;
@@ -75,7 +74,7 @@ public class RequestRouter
 	
 	private Map<String, RequestProcessor> endpointRequestProcessorMap;
 	
-	private AlertHook alertHook = null;
+	private AlertManager alertManager = null;
 	private PostRequestProcessingHook postRequestProcessingHook = null; 
 	private MidAuthenticationHook midAuthenticationHook = null;
 	private PostAuthenticationHook postAuthenticationHook = null;
@@ -264,9 +263,9 @@ public class RequestRouter
 		ValidationManager.getInstance().addValidator(validator);
 	}
 
-	public void registerAlertHook(AlertHook alertHook)
+	public void registerAlertManager(AlertManager alertManager)
 	{
-		this.alertHook = alertHook;
+		this.alertManager = alertManager;
 	}
 
 	public void registerPostRequestProcessingHook(PostRequestProcessingHook postRequestProcessingHook)
@@ -323,9 +322,9 @@ public class RequestRouter
 		return endpointRequestProcessorMap.get(endpoint);
 	}
 
-	public AlertHook getAlertHook()
+	public AlertManager getAlertManager()
 	{
-		return alertHook;
+		return alertManager;
 	}
 
 	public PostRequestProcessingHook getPostRequestProcessingHook()

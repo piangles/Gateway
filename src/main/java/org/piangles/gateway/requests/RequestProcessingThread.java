@@ -208,10 +208,10 @@ public final class RequestProcessingThread extends AbstractContextAwareThread
 	{
 		String internalErrorMessage = String.format(INTERNAL_ERR_MESSAGE, getTraceId().toString());
 		
-		if (RequestRouter.getInstance().getAlertHook() != null)
+		if (RequestRouter.getInstance().getAlertManager() != null)
 		{
 			AlertDetails alertDetails = new AlertDetails(request.getEndpoint(), getTraceId(), throwable, message, request.getIssuedTime());
-			RequestRouter.getInstance().getAlertHook().process(alertDetails, clientDetails);
+			RequestRouter.getInstance().getAlertManager().process(alertDetails, clientDetails);
 		}
 		
 		return internalErrorMessage;
