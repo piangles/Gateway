@@ -259,7 +259,7 @@ public final class RequestProcessingManager
 		{
 			//Nothing to do here
 		}
-		else if (state == ClientState.MidAuthentication && !RequestRouter.getInstance().isMidAuthenticationEndpoint(request.getEndpoint()))
+		else if (ClientStateDeterminator.isMidAuthentication(state) && !RequestRouter.getInstance().isMidAuthenticationEndpoint(request.getEndpoint()))
 		{
 			/**
 			 * MidAuthenticatin State is when we have sent a GeneratedToken, the only endpoint allowed is 
@@ -344,12 +344,8 @@ public final class RequestProcessingManager
 					clientDetails.markLastAccessed();
 					//Location.convert(geoLocation, false));
 
-					if (!authDetails.isAuthenticatedBySession() &&
-						authDetails.isMFAEnabled())
-					{
-						sendMFAToken();
-					}
-					state = ClientStateDeterminator.determine(authDetails);
+					state = ClientState.valueOf(authDetails.getAuthenticationState());
+					
 					/**
 					 * Now that client is authenticated, create the MessageProcessingManager
 					 */
@@ -358,15 +354,28 @@ public final class RequestProcessingManager
 				}
 			}
 			break;
-		case MidAuthentication:
+		case MidAuthenticationResetPasswordRequired:
 			if (RequestRouter.getInstance().isMidAuthenticationEndpoint(request.getEndpoint()) && response.isRequestSuccessful())
 			{
-				logger.info("GenerateResetToken/MFARelated was successful moving to PostAuthentication state for: " + clientDetails);
-				state = ClientState.PostAuthentication;
+				authDetails = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), AuthenticationDetails.class);
+
+				logger.info("ResetPassword was successful moving to " + authDetails.getAuthenticationState() + " state for: " + clientDetails);
+				
+				state = ClientState.valueOf(authDetails.getAuthenticationState());
+			}
+			break;
+		case MidAuthenticationMFARequired:
+			if (RequestRouter.getInstance().isMidAuthenticationEndpoint(request.getEndpoint()) && response.isRequestSuccessful()) 
+			{
+				authDetails = JSON.getDecoder().decode(response.getEndpointResponse().getBytes(), AuthenticationDetails.class);
+
+				logger.info("MultiFactorAuthentication was successful moving to " + authDetails.getAuthenticationState() + " state for: " + clientDetails);
+				
+				state = ClientState.valueOf(authDetails.getAuthenticationState());
 			}
 			break;
 		case PostAuthentication:
-			if (request.getEndpoint().equals("Logout"))
+			if (Endpoints.Logout.name().equals(request.getEndpoint()))
 			{
 				state = ClientState.PreAuthentication;
 				clientDetails.getClientEndpoint().close();
@@ -375,8 +384,13 @@ public final class RequestProcessingManager
 		}
 		
 		HookProcessor hookProcessor = null;
-		if (state == ClientState.MidAuthentication)
+		if (ClientStateDeterminator.isMidAuthentication(state))
 		{
+			if (ClientState.MidAuthenticationMFARequired.equals(state))
+			{
+				sendMFAToken();
+			}
+
 			if (RequestRouter.getInstance().getMidAuthenticationHook() != null)
 			{
 				logger.info("Calling registered MidAuthenticationHook for: " + clientDetails);

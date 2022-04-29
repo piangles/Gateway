@@ -19,6 +19,7 @@
  
 package org.piangles.gateway.requests.processors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.auth.AuthenticationResponse;
 import org.piangles.backbone.services.auth.AuthenticationService;
@@ -70,18 +71,18 @@ public final class LoginRequestProcessor extends AbstractAuthenticationProcessor
 	{
 		LoginResponse loginResponse = null;
 
-		if (loginRequest.getPassword() != null) //Authenticate using login and password
+		if (StringUtils.isNotBlank(loginRequest.getPassword())) //Authenticate using login and password
 		{
 			AuthenticationType type = AuthenticationType.valueOf(loginRequest.getAuthenticationType());
 			AuthenticationResponse authResponse = authService.authenticate(type, new Credential(loginRequest.getId(), loginRequest.getPassword()));
 			
 			if (authResponse.isAuthenticated())
 			{
-				loginResponse = processRegularLogin(authResponse.getUserId(), authResponse.IsValidatedByToken(), false, authResponse.getLastLoggedInTimestamp(),clientDetails, loginRequest.getSystemInfo());
+				loginResponse = processRegularSuccessfulLogin(authResponse.getUserId(), authResponse.IsValidatedByToken(), false, authResponse.getLastLoggedInTimestamp(),clientDetails, loginRequest.getSystemInfo());
 			}
 			else
 			{
-				String authenticationState = ClientStateDeterminator.determine(null).name();
+				String authenticationState = ClientStateDeterminator.determine().name();
 				
 				loginResponse = new LoginResponse(authResponse.getNoOfAttemptsRemaining(), authResponse.getFailureReason(), authenticationState);
 			}
@@ -97,28 +98,17 @@ public final class LoginRequestProcessor extends AbstractAuthenticationProcessor
 				setSessionForCurrentThread(sessionDetails);
 				
 				BasicUserProfile userProfile = profileService.getProfile(loginRequest.getId());
-				boolean mfaEnabled = userProfile.isMFAEnabled();
-				//Do not have to do MFA on userId/sessionId authentication
-				boolean authenticatedByMultiFactor = sessionDetails.isAuthenticatedByMultiFactor();
-				
 				boolean authEntryExists = authService.doesAuthenticationEntryExist(loginRequest.getId());
 				boolean loggedInAsGuest = !authEntryExists;
-				
-				LoginResponse tempLoginResponse = new LoginResponse(mfaEnabled, false, true, authenticatedByMultiFactor, 
-													loggedInAsGuest, null, loginRequest.getId(), loginRequest.getSessionId(), userProfile.getPhoneNo(),
-													sessionDetails.getInactivityExpiryTimeInSeconds(), 
-													0); //It is Zero here because, this is not Login it is Authentication via userId and sessionId
-				
-				String authenticationState = ClientStateDeterminator.determine(tempLoginResponse).name();
-				
-				loginResponse = new LoginResponse(mfaEnabled, false, true, authenticatedByMultiFactor, 
-													loggedInAsGuest, authenticationState, loginRequest.getId(), loginRequest.getSessionId(), userProfile.getPhoneNo(),
+
+				loginResponse = new LoginResponse(	sessionDetails.getAuthenticationState(), 
+													loggedInAsGuest, loginRequest.getId(), loginRequest.getSessionId(), userProfile.getPhoneNo(),
 													sessionDetails.getInactivityExpiryTimeInSeconds(), 
 													0); //It is Zero here because, this is not Login it is Authentication via userId and sessionId
 			}
 			else
 			{
-				String authenticationState = ClientStateDeterminator.determine(null).name();
+				String authenticationState = ClientStateDeterminator.determine().name();
 				
 				loginResponse = new LoginResponse(0, FailureReason.InvalidSession, authenticationState);
 			}

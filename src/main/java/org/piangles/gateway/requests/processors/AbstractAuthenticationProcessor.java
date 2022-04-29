@@ -46,12 +46,15 @@ public abstract class AbstractAuthenticationProcessor<EndpointReq, EndpointResp>
 		super(endpoint, CommunicationPattern.RequestResponse, requestClass, responseClass);
 	}
 	
-	public LoginResponse processGuestLogin(String userId, ClientDetails clientDetails, SystemInfo systemInfo) throws Exception
+	public LoginResponse processGuestSuccessfulLogin(String userId, ClientDetails clientDetails, SystemInfo systemInfo) throws Exception
 	{
-		return processRegularLogin(userId, false, true, System.currentTimeMillis(), clientDetails, systemInfo);
+		boolean authenticatedByToken = false;
+		boolean loggedInAsGuest = true;
+		
+		return processRegularSuccessfulLogin(userId, authenticatedByToken, loggedInAsGuest, System.currentTimeMillis(), clientDetails, systemInfo);
 	}
 
-	public LoginResponse processRegularLogin(String userId, boolean validatedByToken, boolean loggedInAsGuest, long lastLoggedInTimestamp, ClientDetails clientDetails, SystemInfo systemInfo) throws Exception
+	public LoginResponse processRegularSuccessfulLogin(String userId, boolean authenticatedByToken, boolean loggedInAsGuest, long lastLoggedInTimestamp, ClientDetails clientDetails, SystemInfo systemInfo) throws Exception
 	{
 		LoginResponse loginResponse = null;
 		
@@ -60,23 +63,25 @@ public abstract class AbstractAuthenticationProcessor<EndpointReq, EndpointResp>
 
 		try
 		{
+			/**
+			 * We only get here if the user has 
+			 * 1. Typed Password or TempPassword/Token.
+			 * 2. Choose to Proceed as a Guest.
+			 * Either which way => authenticatedBySession is false and authenticatedByMultiFactor is also false.
+			 */
 			SessionDetails sessionDetails = sessionMgmtService.register(userId);
 			setSessionForCurrentThread(sessionDetails);
 
 			BasicUserProfile userProfile = profileService.getProfile(userId);
 
-			LoginResponse tempLoginResponse = new LoginResponse(userProfile.isMFAEnabled(), validatedByToken, false, false, loggedInAsGuest, 
-																null, userId, sessionDetails.getSessionId(),
-																userProfile.getPhoneNo(),
-																sessionDetails.getInactivityExpiryTimeInSeconds(), lastLoggedInTimestamp);
-			
-			String authenticationState = ClientStateDeterminator.determine(tempLoginResponse).name();
-			
-			loginResponse = new LoginResponse(	userProfile.isMFAEnabled(), validatedByToken, false, false, loggedInAsGuest, 
-												authenticationState, userId, sessionDetails.getSessionId(),
+			String authenticationState = ClientStateDeterminator.determine(authenticatedByToken, userProfile).name();
+
+			loginResponse = new LoginResponse(	authenticationState, 
+												loggedInAsGuest, userId, sessionDetails.getSessionId(),
 												userProfile.getPhoneNo(),
 												sessionDetails.getInactivityExpiryTimeInSeconds(), lastLoggedInTimestamp);
-
+			
+			sessionMgmtService.updateAuthenticationState(userId, sessionDetails.getSessionId(), authenticationState);
 		}
 		catch (SessionManagementException e)
 		{
@@ -84,7 +89,7 @@ public abstract class AbstractAuthenticationProcessor<EndpointReq, EndpointResp>
 			// TODO THIS HAS TO BE FIXED - Need a better way to figure this out.
 			if (message.contains(MAX_ACTIVE_SESSION_MESAGE_1) || message.contains(MAX_ACTIVE_SESSION_MESAGE_2))
 			{
-				String authenticationState = ClientStateDeterminator.determine(null).name();
+				String authenticationState = ClientStateDeterminator.determine().name();
 				
 				loginResponse = new LoginResponse(0, FailureReason.MaximumSessionCountReached, authenticationState);
 			}
@@ -97,7 +102,6 @@ public abstract class AbstractAuthenticationProcessor<EndpointReq, EndpointResp>
 		return loginResponse;
 	}
 	
-
 	@Override
 	public final boolean shouldValidateSession()
 	{
