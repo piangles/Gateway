@@ -22,6 +22,7 @@ package org.piangles.gateway.client;
 public enum ClientState
 {
 	PreAuthentication,
-	MidAuthentication,
+	MidAuthenticationResetPasswordRequired,
+	MidAuthenticationMFARequired,
 	PostAuthentication;
 }

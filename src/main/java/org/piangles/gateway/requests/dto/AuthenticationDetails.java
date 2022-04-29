@@ -25,21 +25,9 @@ public class AuthenticationDetails
 	@JsonProperty(required = true)
 	private boolean authenticated = false;
 
-	@JsonProperty(required = false)
-	private boolean mfaEnabled = false;
-
-	@JsonProperty(required = false)
-	private boolean authenticatedByToken = false;
-
-	@JsonProperty(required = false)
-	private boolean authenticatedBySession = false;
-
-	@JsonProperty(required = false)
-	private boolean authenticatedByMultiFactor = false;
-
 	@JsonProperty(required = true)
 	private String authenticationState = null;
-
+	
 	@JsonProperty(required = true)
 	private String userId;
 	
@@ -61,17 +49,11 @@ public class AuthenticationDetails
 	}
 
 	public AuthenticationDetails(	boolean authenticated, 
-									boolean mfaEnabled, 
-									boolean authenticatedByToken, boolean authenticatedBySession, boolean authenticatedByMultiFactor,
 									String authenticationState,
 									String userId, String sessionId, String phoneNo,
 									long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp)
 	{
 		this.authenticated = authenticated;
-		this.mfaEnabled = mfaEnabled;
-		this.authenticatedByToken = authenticatedByToken;
-		this.authenticatedBySession = authenticatedBySession;
-		this.authenticatedByMultiFactor = authenticatedByMultiFactor;
 		this.authenticationState = authenticationState;
 		this.userId = userId;
 		this.sessionId = sessionId;
@@ -85,26 +67,6 @@ public class AuthenticationDetails
 		return authenticated;
 	}
 
-	public final boolean isMFAEnabled()
-	{
-		return mfaEnabled;
-	}
-
-	public final boolean isAuthenticatedByToken()
-	{
-		return authenticatedByToken;
-	}
-
-	public final boolean isAuthenticatedBySession()
-	{
-		return authenticatedBySession;
-	}
-
-	public final boolean isAuthenticatedByMultiFactor()
-	{
-		return authenticatedByMultiFactor;
-	}
-	
 	public String getAuthenticationState()
 	{
 		return authenticationState;

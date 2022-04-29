@@ -30,19 +30,21 @@ public enum Endpoints
 	
 	@Description(content="Allows to check if a EmailId or PhoneNo is already registered.")
 	UserProfileExists,
+	
 	@Description(content="Enables the user to register for the application.")
 	SignUp,
 	@Description(content="Allows the user to login and on succesful login creates a session.")
 	Login,
 	@Description(content="Enables the user to generate a temporary password in the the event the user does not remember the password.")
 	GeneratePasswordResetToken,
+	@Description(content="Post authentication by ResetToken that was generated, the user needs to change Password.")
+	ResetPassword,
 
+	
 	@Description(content="Setup Multi-factor Authentication for a user.")
 	MFASetup,
-
 	@Description(content="Sends Multi-factor Authentication Token post Login.")
 	SendMFAToken,
-
 	@Description(content="Validates the Multi-factor Authentication Token.")
 	ValidateMFAToken,
 	

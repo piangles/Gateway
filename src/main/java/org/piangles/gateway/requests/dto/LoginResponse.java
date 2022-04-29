@@ -34,15 +34,12 @@ public final class LoginResponse extends AuthenticationDetails
 	@JsonProperty(required = true)
 	private boolean loggedInAsGuest = false; 
 
-	public LoginResponse(	boolean mfaEnabled, 
-							boolean authenticatedByToken, boolean authenticatedBySession, boolean authenticatedByMultiFactor, 
+	public LoginResponse(	String authenticationState, 
 							boolean loggedInAsGuest,
-							String authenticationState,
 							String userId, String sessionId, String phoneNo, 
 							long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp)
 	{
-		super(	true, mfaEnabled, 
-				authenticatedByToken, authenticatedBySession, authenticatedByMultiFactor, 
+		super(	true,  
 				authenticationState,
 				userId, sessionId, phoneNo, inactivityExpiryTimeInSeconds, lastLoggedInTimestamp);
 		this.loggedInAsGuest = loggedInAsGuest;
@@ -74,7 +71,7 @@ public final class LoginResponse extends AuthenticationDetails
 	@Override
 	public String toString()
 	{
-		return "LoginResponse [authenticated=" + isAuthenticated() + ", authenticatedByToken=" + isAuthenticatedByToken() + ", userId=" + getUserId() + ", sessionId=" + getSessionId() + ", noOfAttemptsRemaining="
+		return "LoginResponse [authenticated=" + isAuthenticated() + ", authenticationState=" + getAuthenticationState() + ", userId=" + getUserId() + ", sessionId=" + getSessionId() + ", noOfAttemptsRemaining="
 				+ noOfAttemptsRemaining + ", failureReason=" + failureReason + "]";
 	}
 }
