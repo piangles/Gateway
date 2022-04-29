@@ -46,6 +46,7 @@ import org.piangles.gateway.requests.processors.ListEndpointsRequestProcessor;
 import org.piangles.gateway.requests.processors.LoginRequestProcessor;
 import org.piangles.gateway.requests.processors.LogoutRequestProcessor;
 import org.piangles.gateway.requests.processors.MFASetupRequestProcessor;
+import org.piangles.gateway.requests.processors.ResetPasswordRequestProcessor;
 import org.piangles.gateway.requests.processors.SendMFATokenRequestProcessor;
 import org.piangles.gateway.requests.processors.SignUpRequestProcessor;
 import org.piangles.gateway.requests.processors.SubscriptionRequestProcessor;
@@ -154,7 +155,7 @@ public class RequestRouter
 	 */
 	public void registerDefaultMidAuthenticationEndpoints()
 	{
-		registerMidAuthenticationEndpoint(Endpoints.ChangePassword.name(), Endpoints.ChangePassword);
+		registerMidAuthenticationEndpoint(Endpoints.ResetPassword.name(), Endpoints.ResetPassword);
 		registerMidAuthenticationEndpoint(Endpoints.ValidateMFAToken.name(), Endpoints.ValidateMFAToken);
 		registerMidAuthenticationEndpoint(Endpoints.SendMFAToken.name(), Endpoints.SendMFAToken);
 	}
@@ -172,6 +173,7 @@ public class RequestRouter
 		registerRequestProcessor(createRequestProcessor(LoginRequestProcessor.class));
 		
 		registerRequestProcessor(createRequestProcessor(GeneratePasswordResetTokenRequestProcessor.class));
+		registerRequestProcessor(createRequestProcessor(ResetPasswordRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(MFASetupRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(SendMFATokenRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(ValidateMFATokenRequestProcessor.class));

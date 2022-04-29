@@ -20,46 +20,55 @@
 package org.piangles.gateway.requests.processors;
 
 import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.auth.AuthenticationResponse;
+import org.piangles.backbone.services.auth.AuthenticationService;
 import org.piangles.backbone.services.profile.BasicUserProfile;
 import org.piangles.backbone.services.profile.UserProfileService;
 import org.piangles.backbone.services.session.SessionManagementService;
-import org.piangles.core.expt.UnsupportedMediaException;
+import org.piangles.core.expt.NotFoundException;
+import org.piangles.core.expt.ServiceRuntimeException;
+import org.piangles.core.expt.ValidationException;
 import org.piangles.gateway.CommunicationPattern;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.ClientStateDeterminator;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.RequestRouter;
 import org.piangles.gateway.requests.dto.AuthenticationDetails;
+import org.piangles.gateway.requests.dto.ChangePasswordRequest;
 import org.piangles.gateway.requests.dto.Request;
-import org.piangles.gateway.requests.dto.ValidateMFATokenRequest;
 
-public class ValidateMFATokenRequestProcessor extends AbstractRequestProcessor<ValidateMFATokenRequest, AuthenticationDetails>
+public class ResetPasswordRequestProcessor extends AbstractRequestProcessor<ChangePasswordRequest, AuthenticationDetails>
 {
+	private AuthenticationService authService = Locator.getInstance().getAuthenticationService();
 	private SessionManagementService sessionMgmtService = Locator.getInstance().getSessionManagementService();
 	private UserProfileService profileService = Locator.getInstance().getUserProfileService();
 	
-	public ValidateMFATokenRequestProcessor()
+	public ResetPasswordRequestProcessor()
 	{
-		super(Endpoints.ValidateMFAToken, CommunicationPattern.RequestResponse, ValidateMFATokenRequest.class, AuthenticationDetails.class);
+		super(Endpoints.ResetPassword, CommunicationPattern.RequestResponse, ChangePasswordRequest.class, AuthenticationDetails.class);
 	}
 	
 	@Override
-	protected AuthenticationDetails processRequest(ClientDetails clientDetails, Request request, ValidateMFATokenRequest validateMFARequest) throws Exception
+	protected AuthenticationDetails processRequest(ClientDetails clientDetails, Request request, ChangePasswordRequest chgPassRequest) throws Exception
 	{
 		AuthenticationDetails authDetails = null;
+		AuthenticationResponse authResponse = authService.changePassword(clientDetails.getSessionDetails().getUserId(), 
+																	chgPassRequest.getOldPassword(), chgPassRequest.getNewPassword());
 		
-		if (RequestRouter.getInstance().getMFAManager() != null)
+		if (RequestRouter.getInstance().getCommunicator() != null)
 		{
-			boolean validation = RequestRouter.getInstance().getMFAManager().validateMFAToken(clientDetails, validateMFARequest.getMFAToken());
-
+			RequestRouter.getInstance().getCommunicator().sendPasswordChangeAttemptCommunication(clientDetails, authResponse);
+		}
+		
+		if (authResponse.isRequestSuccessful())
+		{
 			String userId = clientDetails.getSessionDetails().getUserId();
 			String sessionId = clientDetails.getSessionDetails().getSessionId();
-
-			BasicUserProfile userProfile = profileService.getProfile(userId);
-
-			String authenticationState = ClientStateDeterminator.determine(validation).name();
-
-			authDetails = new AuthenticationDetails(validation, 
+			
+			BasicUserProfile userProfile = profileService.getProfile(clientDetails.getSessionDetails().getUserId());
+			String authenticationState = ClientStateDeterminator.determine(false, userProfile).name();
+			
+			authDetails = new AuthenticationDetails(true, 
 													authenticationState, 
 													userId, 
 													sessionId,
@@ -70,9 +79,22 @@ public class ValidateMFATokenRequestProcessor extends AbstractRequestProcessor<V
 		}
 		else
 		{
-			throw new UnsupportedMediaException("Multi-Factor Authentication has not been setup.");
+			StringBuffer sb = new StringBuffer(authResponse.getFailureReason().name());
+			authResponse.getFailureMessages().stream().map(msg -> sb.append(msg).append("\n"));
+		
+			switch(authResponse.getFailureReason())
+			{
+			case AccountDoesNotExist:
+				throw new NotFoundException(sb.toString());
+			case PasswordDoesNotMeetStrength:
+				throw new ValidationException(sb.toString());
+			case OldPasswordDoesNotMatch:
+				throw new ValidationException(sb.toString());
+			default:
+				throw new ServiceRuntimeException("Unhandled FailureReason : " + authResponse.getFailureReason() + "\n" + sb.toString());
+			}
 		}
-
-		return authDetails; 
+		
+		return authDetails;
 	}
 }

@@ -10,6 +10,11 @@ public final class ClientStateDeterminator
 		return ClientState.PreAuthentication;
 	}
 	
+	public static ClientState determine(boolean mfaSuccessful)
+	{
+		return mfaSuccessful? ClientState.PostAuthentication : ClientState.MidAuthenticationMFARequired;
+	}
+
 	public static ClientState determine(boolean authenticatedByToken, BasicUserProfile userProfile)
 	{
 		ClientState state = ClientState.PreAuthentication;
@@ -30,11 +35,6 @@ public final class ClientStateDeterminator
 		return state;
 	}
 
-	public static ClientState determine(boolean authenticatedByToken)
-	{
-		return null;
-	}
-	
 	public static boolean isMidAuthentication(ClientState state)
 	{
 		return ClientState.MidAuthenticationResetPasswordRequired.equals(state) || ClientState.MidAuthenticationMFARequired.equals(state);
