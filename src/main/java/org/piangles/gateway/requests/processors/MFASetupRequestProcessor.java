@@ -58,7 +58,7 @@ public class MFASetupRequestProcessor extends AbstractRequestProcessor<MFASetupR
 													validation
 													);	
 
-				booleanResponse = new BooleanResponse(validation, validation? "MFA Enabled" : "Invalid MFA Token");
+				booleanResponse = new BooleanResponse(validation, validation? "Two-factor authentication enabled" : "Invalid Two-factor authentication token");
 			}
 			else
 			{
@@ -79,7 +79,7 @@ public class MFASetupRequestProcessor extends AbstractRequestProcessor<MFASetupR
 							false
 							);	
 
-					booleanResponse = new BooleanResponse(true, "MFA Disabled");
+					booleanResponse = new BooleanResponse(true, "Two-factor authentication disabled");
 				}
 				else
 				{
