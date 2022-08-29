@@ -81,7 +81,7 @@ public class SendMFATokenRequestProcessor extends AbstractRequestProcessor<Basic
 
 			RequestRouter.getInstance().getMFAManager().sendMFAToken(clientDetails);
 			
-			simpleResponse = new SimpleResponse("Please check your registered device for the token.");
+			simpleResponse = new SimpleResponse("We sent a security code to your device.");
 		}
 		else
 		{
