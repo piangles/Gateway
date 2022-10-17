@@ -72,6 +72,7 @@ public final class RequestProcessingManager
 	{
 		logger = Locator.getInstance().getLoggingService();
 		sessionService = Locator.getInstance().getSessionManagementService();
+		RequestRouter.getInstance().registerTraceIdStore(new CacheTraceIdStore());
 
 		/*
 		 * UserId initially is the combination of the address and the port. But
@@ -162,7 +163,9 @@ public final class RequestProcessingManager
 			
 			//Step 4: Gateway Request was decoded successfully, mark TransitTime 
 			request.markTransitTime();
-			
+
+			validateTraceId(request);
+
 			//Step 5.1: Do Endpoint validation
 			endpoint = request.getEndpoint();
 			requestProcessor = RequestRouter.getInstance().getRequestProcessor(endpoint);
@@ -173,6 +176,12 @@ public final class RequestProcessingManager
 				logger.warn(errorMessage);
 				response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
 										request.getTransitTime(), StatusCode.NotFound, errorMessage);
+				
+				/**TODO end the session - this is a good idea considering the below
+				//TODO select * from logs.log_events where message like '%This endpoint% is not supported.' order by id desc limit 10000;
+				 **/
+				sessionService.unregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+
 			}
 			else //Step 5.3 Endpoint found or it is Ping
 			{
@@ -237,6 +246,27 @@ public final class RequestProcessingManager
 		if (response != null)
 		{
 			ResponseSender.sendResponse(clientDetails, response);
+		}
+	}
+
+	private void validateTraceId(Request request) throws Exception 
+	{
+		TraceIdStore traceIdTracker = RequestRouter.getInstance().getTraceIdStore();
+		String traceId = request.getTraceId().toString();
+
+		//check if the traceId is present in Redis cache
+		boolean found = traceIdTracker.exists(traceId);
+		if (found)
+		{
+			logger.warn("TraceId: " + request.getTraceId() + "is being reused, FraudAction detected");
+			//un-reqister the session
+			sessionService.unregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+
+		} else
+		{
+			//store the TraceId in Redis
+			logger.warn("Adding TraceId: " + request.getTraceId());
+			traceIdTracker.put(traceId);
 		}
 	}
 
