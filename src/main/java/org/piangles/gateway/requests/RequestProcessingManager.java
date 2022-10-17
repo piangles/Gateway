@@ -163,7 +163,7 @@ public final class RequestProcessingManager
 			
 			//Step 4: Gateway Request was decoded successfully, mark TransitTime 
 			request.markTransitTime();
-
+			
 			validateTraceId(request);
 
 			//Step 5.1: Do Endpoint validation
@@ -176,12 +176,6 @@ public final class RequestProcessingManager
 				logger.warn(errorMessage);
 				response = new Response(request.getTraceId(), request.getEndpoint(), request.getReceiptTime(), 
 										request.getTransitTime(), StatusCode.NotFound, errorMessage);
-				
-				/**TODO end the session - this is a good idea considering the below
-				//TODO select * from logs.log_events where message like '%This endpoint% is not supported.' order by id desc limit 10000;
-				 **/
-				sessionService.unregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
-
 			}
 			else //Step 5.3 Endpoint found or it is Ping
 			{
