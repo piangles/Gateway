@@ -72,8 +72,6 @@ public final class RequestProcessingManager
 	{
 		logger = Locator.getInstance().getLoggingService();
 		sessionService = Locator.getInstance().getSessionManagementService();
-		RequestRouter.getInstance().registerTraceIdStore(new CacheTraceIdStore());
-
 		/*
 		 * UserId initially is the combination of the address and the port. But
 		 * will change later through the transformation of loginId to
@@ -245,11 +243,12 @@ public final class RequestProcessingManager
 
 	private void validateTraceId(Request request) throws Exception 
 	{
-		TraceIdStore traceIdTracker = RequestRouter.getInstance().getTraceIdStore();
+		//get the relevant tracker
+		TraceIdStore traceIdStore = new CacheTraceIdStore();
 		String traceId = request.getTraceId().toString();
 
 		//check if the traceId is present in Redis cache
-		boolean found = traceIdTracker.exists(traceId);
+		boolean found = traceIdStore.exists(traceId);
 		if (found)
 		{
 			logger.warn("TraceId: " + request.getTraceId() + "is being reused, FraudAction detected");
@@ -260,7 +259,7 @@ public final class RequestProcessingManager
 		{
 			//store the TraceId in Redis
 			logger.warn("Adding TraceId: " + request.getTraceId());
-			traceIdTracker.put(traceId);
+			traceIdStore.put(traceId);
 		}
 	}
 

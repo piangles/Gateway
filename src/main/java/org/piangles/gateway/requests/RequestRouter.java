@@ -81,7 +81,6 @@ public class RequestRouter
 	
 	private Communicator communicator = null;
 	private MFAManager mfaManager = null;
-	private TraceIdStore traceIdStore;
 
 	private RequestRouter()
 	{
@@ -293,11 +292,6 @@ public class RequestRouter
 	{
 		this.mfaManager = mfaManager;
 	}
-
-	public void registerTraceIdStore(TraceIdStore traceIdStore)
-	{
-		this.traceIdStore = traceIdStore;
-	}
 	
 	/**
 	 * Accessor methods and Helper methods for the above setters / registers
@@ -356,10 +350,6 @@ public class RequestRouter
 	public MFAManager getMFAManager()
 	{
 		return mfaManager;
-	}
-	public TraceIdStore getTraceIdStore()
-	{
-		return traceIdStore;
 	}
 	
 	/**
