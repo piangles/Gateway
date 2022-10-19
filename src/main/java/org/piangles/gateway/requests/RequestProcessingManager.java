@@ -250,7 +250,7 @@ public final class RequestProcessingManager
 		{
 			String traceId = request.getTraceId().toString();
 
-			if (gatewayConfiguration.getCacheTraceIdStoreEnabled())
+			if (gatewayConfiguration.isCacheTraceIdStoreEnabled())
 			{
 				traceIdStore = new CacheTraceIdStore();
 			}

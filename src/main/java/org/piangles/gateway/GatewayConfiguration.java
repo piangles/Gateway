@@ -58,7 +58,7 @@ public final class GatewayConfiguration
 		return maxTextMessageSize;
 	}
 
-	public boolean getCacheTraceIdStoreEnabled() 
+	public boolean isCacheTraceIdStoreEnabled() 
 	{
 		return cacheTraceIdStoreEnabled;
 	}

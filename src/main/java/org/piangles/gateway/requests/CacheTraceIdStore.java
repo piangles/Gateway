@@ -28,8 +28,13 @@ public class CacheTraceIdStore implements TraceIdStore
 	@Override
 	public boolean exists(String traceId) throws Exception
 	{
-		String found = redisCache.execute((jedis) -> jedis.get(traceId));
+		String found = redisCache.execute((jedis) -> jedis.get(createKey(traceId)));
 
 		return found != null;
+	}
+
+	private String createKey(String traceId) 
+	{
+		return "traceId:" + traceId;
 	}
 }
