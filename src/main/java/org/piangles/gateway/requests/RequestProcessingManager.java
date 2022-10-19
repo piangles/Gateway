@@ -289,7 +289,10 @@ public final class RequestProcessingManager
 		}
 		else 
 		{
-			logger.warn("TraceId for request for SessionId: " + request.getSessionId() + "is null, FraudAction detected");
+			logger.error("TraceId for request for SessionId: " + request.getSessionId() + "is null, FraudAction detected");
+			//un-reqister the session
+			sessionService.unregister(this.clientDetails.getSessionDetails().getUserId(), this.clientDetails.getSessionDetails().getSessionId());
+			clientDetails.getClientEndpoint().close();
 		}
 	}
 
