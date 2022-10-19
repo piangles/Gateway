@@ -17,23 +17,25 @@ public final class GatewayConfiguration
 	public static int DEFAULT_PORT = 80;
 	public static long DEFAULT_IDLE_TIMEOUT = 1 * 60 * 1000; //1 Minute in MilliSeconds
 	public static int DEFAULT_MAX_TEXT_MESSAGE_SIZE = 320 * 1024;//320 Kilo Bytes
-	
+	public static boolean DEFAULT_CACHE_TRACE_ID_STORE_ENABLED = true;
 	private String host = null;
 	private int port = -1;
 	private long idleTimeout = -1;
 	private int maxTextMessageSize = -1;
+	private boolean cacheTraceIdStoreEnabled = false;
 	
 	public GatewayConfiguration()
 	{
-		this(DEFAULT_HOST, DEFAULT_PORT, DEFAULT_IDLE_TIMEOUT, DEFAULT_MAX_TEXT_MESSAGE_SIZE);
+		this(DEFAULT_HOST, DEFAULT_PORT, DEFAULT_IDLE_TIMEOUT, DEFAULT_MAX_TEXT_MESSAGE_SIZE, DEFAULT_CACHE_TRACE_ID_STORE_ENABLED);
 	}
 	
-	public GatewayConfiguration(String host, int port, long idleTimeout, int maxTextMessageSize)
+	public GatewayConfiguration(String host, int port, long idleTimeout, int maxTextMessageSize, boolean cacheTraceIdStoreEnabled)
 	{
 		this.host = host;
 		this.port = port;
 		this.idleTimeout = idleTimeout;
 		this.maxTextMessageSize = maxTextMessageSize;
+		this.cacheTraceIdStoreEnabled = cacheTraceIdStoreEnabled;
 	}
 
 	public String getHost()
@@ -54,5 +56,10 @@ public final class GatewayConfiguration
 	public int getMaxTextMessageSize()
 	{
 		return maxTextMessageSize;
+	}
+
+	public boolean isCacheTraceIdStoreEnabled() 
+	{
+		return cacheTraceIdStoreEnabled;
 	}
 }

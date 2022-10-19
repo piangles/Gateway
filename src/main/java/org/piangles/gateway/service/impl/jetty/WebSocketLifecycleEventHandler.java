@@ -90,7 +90,7 @@ public final class WebSocketLifecycleEventHandler
 				remoteAddr = session.getRemoteAddress();
 			}
 			
-			rpm = new RequestProcessingManager(remoteAddr, new ClientEndpointImpl(session));
+			rpm = new RequestProcessingManager(remoteAddr, new ClientEndpointImpl(session), gatewayConfiguration);
 		}
 		catch(Throwable t)
 		{
