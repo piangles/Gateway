@@ -268,6 +268,7 @@ public final class RequestProcessingManager
 				logger.error("TraceId: " + request.getTraceId() + "is being reused, FraudAction detected for: " + clientDetails);
 				//un-reqister the session
 				sessionService.unregister(this.clientDetails.getSessionDetails().getUserId(), this.clientDetails.getSessionDetails().getSessionId());
+				clientDetails.getClientEndpoint().close();
 			}
 			else
 			{
