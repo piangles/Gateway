@@ -252,26 +252,27 @@ public final class RequestProcessingManager
 		{
 			traceIdStore = new CacheTraceIdStore();
 		}
-
-		if (traceIdStore != null)
+		else 
 		{
-			//check if the traceId is present in Redis cache
-			boolean found = traceIdStore.exists(traceId);
-			if (found) 
-			{
-				logger.warn("TraceId: " + request.getTraceId() + "is being reused, FraudAction detected");
-				//un-reqister the session
-				sessionService.unregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
-
-			} 
-			else 
+			//default to in-memory traceIdStore
+			traceIdStore = new InMemoryTraceIdStore();
+		}
+		
+		//check if the traceId is present in Redis cache
+		boolean found = traceIdStore.exists(traceId);
+		if (found) 
+		{
+			logger.warn("TraceId: " + request.getTraceId() + "is being reused, FraudAction detected");
+			//un-reqister the session
+			sessionService.unregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+		} 
+		else 
 			{
 				//store the TraceId in Redis
 				logger.warn("Adding TraceId: " + request.getTraceId());
 				traceIdStore.put(traceId);
 			}
 		}
-	}
 
 	private Response validateRequestAgainstState(Request request, RequestProcessor requestProcessor)
 	{
