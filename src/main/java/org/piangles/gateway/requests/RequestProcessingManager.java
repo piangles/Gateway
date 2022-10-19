@@ -70,10 +70,11 @@ public final class RequestProcessingManager
 	private EventProcessingManager epm = null;
 	private boolean debugEnabled = false;
 
-	public RequestProcessingManager(InetSocketAddress remoteAddr, ClientEndpoint clientEndpoint)
+	public RequestProcessingManager(InetSocketAddress remoteAddr, ClientEndpoint clientEndpoint, GatewayConfiguration gatewayConfiguration)
 	{
 		logger = Locator.getInstance().getLoggingService();
 		sessionService = Locator.getInstance().getSessionManagementService();
+		this.gatewayConfiguration = gatewayConfiguration;
 		/*
 		 * UserId initially is the combination of the address and the port. But
 		 * will change later through the transformation of loginId to
@@ -164,7 +165,7 @@ public final class RequestProcessingManager
 			//Step 4: Gateway Request was decoded successfully, mark TransitTime 
 			request.markTransitTime();
 			
-			validateTraceId(request);
+			validateTraceId(request, clientDetails);
 
 			//Step 5.1: Do Endpoint validation
 			endpoint = request.getEndpoint();
@@ -243,7 +244,7 @@ public final class RequestProcessingManager
 		}
 	}
 
-	private void validateTraceId(Request request) throws Exception 
+	private void validateTraceId(Request request, ClientDetails clientDetails) throws Exception 
 	{
 		TraceIdStore traceIdStore = null;
 		if (request.getTraceId() != null)
@@ -264,14 +265,14 @@ public final class RequestProcessingManager
 			boolean found = traceIdStore.exists(traceId);
 			if (found)
 			{
-				logger.warn("TraceId: " + request.getTraceId() + "is being reused, FraudAction detected");
+				logger.error("TraceId: " + request.getTraceId() + "is being reused, FraudAction detected for: " + clientDetails);
 				//un-reqister the session
-				sessionService.unregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+				sessionService.unregister(this.clientDetails.getSessionDetails().getUserId(), this.clientDetails.getSessionDetails().getSessionId());
 			}
 			else
 			{
 				//store the TraceId in Redis
-				logger.warn("Adding TraceId: " + request.getTraceId());
+				logger.debug("Adding TraceId: " + request.getTraceId() + " for: " + clientDetails);
 				traceIdStore.put(traceId);
 			}
 		}
