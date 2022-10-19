@@ -23,10 +23,12 @@ import java.net.InetSocketAddress;
 
 import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.ServiceException;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.session.SessionManagementException;
 import org.piangles.backbone.services.session.SessionManagementService;
 import org.piangles.core.expt.BadRequestException;
+import org.piangles.core.expt.ServiceRuntimeException;
 import org.piangles.core.expt.UnsupportedMediaException;
 import org.piangles.core.resources.ResourceException;
 import org.piangles.core.services.remoting.SessionDetails;
@@ -76,6 +78,24 @@ public final class RequestProcessingManager
 		logger = Locator.getInstance().getLoggingService();
 		sessionService = Locator.getInstance().getSessionManagementService();
 		this.gatewayConfiguration = gatewayConfiguration;
+		
+		try 
+		{
+			if (gatewayConfiguration.isCacheTraceIdStoreEnabled()) 
+			{
+				traceIdStore = new CacheTraceIdStore();
+			} 
+			else 
+			{
+				//default to in-memory traceIdStore
+				traceIdStore = new InMemoryTraceIdStore();
+			}
+		}
+		catch (Exception e) 
+		{
+			logger.error("RequestProcessingManager->Error creating TraceIdStore", e);
+			throw new ServiceRuntimeException(e);
+		}
 		/*
 		 * UserId initially is the combination of the address and the port. But
 		 * will change later through the transformation of loginId to
@@ -250,16 +270,6 @@ public final class RequestProcessingManager
 		if (request.getTraceId() != null)
 		{
 			String traceId = request.getTraceId().toString();
-
-			if (gatewayConfiguration.isCacheTraceIdStoreEnabled())
-			{
-				traceIdStore = new CacheTraceIdStore();
-			}
-			else
-			{
-				//default to in-memory traceIdStore
-				traceIdStore = new InMemoryTraceIdStore();
-			}
 
 			//check if the traceId is present in Redis cache
 			boolean found = traceIdStore.exists(traceId);
