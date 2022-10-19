@@ -20,7 +20,7 @@ public class CacheTraceIdStore implements TraceIdStore
 	{
 		redisCache.execute((jedis) ->
 		{
-			jedis.set(traceId, "");
+			jedis.set(createKey(traceId), "");
 			return null;
 		});
 	}

@@ -69,6 +69,7 @@ public final class RequestProcessingManager
 	private ClientDetails clientDetails = null;
 	private EventProcessingManager epm = null;
 	private boolean debugEnabled = false;
+	private TraceIdStore traceIdStore;
 
 	public RequestProcessingManager(InetSocketAddress remoteAddr, ClientEndpoint clientEndpoint, GatewayConfiguration gatewayConfiguration)
 	{
@@ -246,7 +247,6 @@ public final class RequestProcessingManager
 
 	private void validateTraceId(Request request, ClientDetails clientDetails) throws Exception 
 	{
-		TraceIdStore traceIdStore = null;
 		if (request.getTraceId() != null)
 		{
 			String traceId = request.getTraceId().toString();
