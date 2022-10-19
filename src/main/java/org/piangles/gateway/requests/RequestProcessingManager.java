@@ -33,6 +33,7 @@ import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.util.coding.JSON;
 import org.piangles.gateway.ClientEndpoint;
 import org.piangles.gateway.CommunicationPattern;
+import org.piangles.gateway.GatewayConfiguration;
 import org.piangles.gateway.Message;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.client.ClientState;
@@ -62,6 +63,7 @@ public final class RequestProcessingManager
 	private LoggingService logger = null;
 	private SessionManagementService sessionService = null;  
 	//private GeoLocationService geolocationService = null;
+	private GatewayConfiguration gatewayConfiguration = null;
 
 	private ClientState state = ClientState.PreAuthentication;
 	private ClientDetails clientDetails = null;
@@ -243,23 +245,31 @@ public final class RequestProcessingManager
 
 	private void validateTraceId(Request request) throws Exception 
 	{
-		//get the relevant tracker
-		TraceIdStore traceIdStore = new CacheTraceIdStore();
+		TraceIdStore traceIdStore = null;
 		String traceId = request.getTraceId().toString();
 
-		//check if the traceId is present in Redis cache
-		boolean found = traceIdStore.exists(traceId);
-		if (found)
+		if (gatewayConfiguration.getCacheTraceIdStoreEnabled()) 
 		{
-			logger.warn("TraceId: " + request.getTraceId() + "is being reused, FraudAction detected");
-			//un-reqister the session
-			sessionService.unregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+			traceIdStore = new CacheTraceIdStore();
+		}
 
-		} else
+		if (traceIdStore != null)
 		{
-			//store the TraceId in Redis
-			logger.warn("Adding TraceId: " + request.getTraceId());
-			traceIdStore.put(traceId);
+			//check if the traceId is present in Redis cache
+			boolean found = traceIdStore.exists(traceId);
+			if (found) 
+			{
+				logger.warn("TraceId: " + request.getTraceId() + "is being reused, FraudAction detected");
+				//un-reqister the session
+				sessionService.unregister(clientDetails.getSessionDetails().getUserId(), clientDetails.getSessionDetails().getSessionId());
+
+			} 
+			else 
+			{
+				//store the TraceId in Redis
+				logger.warn("Adding TraceId: " + request.getTraceId());
+				traceIdStore.put(traceId);
+			}
 		}
 	}
 

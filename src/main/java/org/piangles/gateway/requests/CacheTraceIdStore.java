@@ -8,7 +8,7 @@ import org.piangles.gateway.GatewayService;
 public class CacheTraceIdStore implements TraceIdStore 
 {
 	private RedisCache redisCache = null;
-	private static final String GATEWAY_COMPONENT_ID = "ce6eca41-2ed9-42bb-8699-487c4759d217";
+	private static final String GATEWAY_COMPONENT_ID = "4f1fc058-75d9-4956-a5df-da4697c4e5b3";
 
 	public CacheTraceIdStore() throws Exception 
 	{
