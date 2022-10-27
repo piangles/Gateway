@@ -23,7 +23,6 @@ import java.net.InetSocketAddress;
 
 import org.apache.commons.lang3.StringUtils;
 import org.piangles.backbone.services.Locator;
-import org.piangles.backbone.services.ServiceException;
 import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.backbone.services.session.SessionManagementException;
 import org.piangles.backbone.services.session.SessionManagementService;
@@ -65,7 +64,6 @@ public final class RequestProcessingManager
 	private LoggingService logger = null;
 	private SessionManagementService sessionService = null;  
 	//private GeoLocationService geolocationService = null;
-	private GatewayConfiguration gatewayConfiguration = null;
 
 	private ClientState state = ClientState.PreAuthentication;
 	private ClientDetails clientDetails = null;
@@ -77,7 +75,6 @@ public final class RequestProcessingManager
 	{
 		logger = Locator.getInstance().getLoggingService();
 		sessionService = Locator.getInstance().getSessionManagementService();
-		this.gatewayConfiguration = gatewayConfiguration;
 		
 		try 
 		{
@@ -186,8 +183,6 @@ public final class RequestProcessingManager
 			//Step 4: Gateway Request was decoded successfully, mark TransitTime 
 			request.markTransitTime();
 			
-			validateTraceId(request, clientDetails);
-
 			//Step 5.1: Do Endpoint validation
 			endpoint = request.getEndpoint();
 			requestProcessor = RequestRouter.getInstance().getRequestProcessor(endpoint);
@@ -225,6 +220,8 @@ public final class RequestProcessingManager
 					}
 					else//Step 6.3 Process regular request
 					{
+						validateTraceId(request, clientDetails);
+
 						processRequestAndSendResponse(request, requestProcessor);
 					}
 				}
@@ -275,7 +272,7 @@ public final class RequestProcessingManager
 			boolean found = traceIdStore.exists(traceId);
 			if (found)
 			{
-				logger.error("TraceId: " + request.getTraceId() + "is being reused, FraudAction detected for: " + clientDetails);
+				logger.error("TraceId: " + request.getTraceId() + " is being reused, FraudAction detected for: " + clientDetails);
 				//un-reqister the session
 				sessionService.unregister(this.clientDetails.getSessionDetails().getUserId(), this.clientDetails.getSessionDetails().getSessionId());
 				clientDetails.getClientEndpoint().close();
@@ -289,7 +286,7 @@ public final class RequestProcessingManager
 		}
 		else 
 		{
-			logger.error("TraceId for request for SessionId: " + request.getSessionId() + "is null, FraudAction detected for: "  + clientDetails);
+			logger.error("TraceId for request for SessionId: " + request.getSessionId() + " is null, FraudAction detected for: "  + clientDetails);
 			//un-reqister the session
 			sessionService.unregister(this.clientDetails.getSessionDetails().getUserId(), this.clientDetails.getSessionDetails().getSessionId());
 			clientDetails.getClientEndpoint().close();
