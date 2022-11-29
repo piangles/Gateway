@@ -30,22 +30,34 @@ public final class ClientDetails
 	private InetSocketAddress remoteAddress;
 	private ClientEndpoint clientEndpoint = null;
 	
+	private boolean authenticated = false;
+	private boolean authenticatedBySession = false;
+	
 	private SessionDetails sessionDetails = null;
 	private long inactivityExpiryTimeInSeconds = 0L;
 	private long lastLoggedInTimestamp = 0L;
+	
+	private Metrics metrics = null;
 	
 	private AtomicLong lastAccessed = null;
 	private Location location = null;
 	private Object applicationData;
 	
-	public ClientDetails(InetSocketAddress remoteAddress, ClientEndpoint clientEndpoint, SessionDetails sessionDetails, long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp, Location location)
+	public ClientDetails(	InetSocketAddress remoteAddress, ClientEndpoint clientEndpoint, 
+							boolean authenticated, boolean authenticatedBySession, 
+							SessionDetails sessionDetails, long inactivityExpiryTimeInSeconds, long lastLoggedInTimestamp, Location location)
 	{
 		this.remoteAddress = remoteAddress;
 		this.clientEndpoint = clientEndpoint;
 
+		this.authenticated = authenticated;
+		this.authenticatedBySession = authenticatedBySession;
+		
 		this.sessionDetails = sessionDetails;
 		this.inactivityExpiryTimeInSeconds = inactivityExpiryTimeInSeconds;
 		this.lastLoggedInTimestamp = lastLoggedInTimestamp;
+		
+		metrics = new Metrics(); 
 		
 		this.lastAccessed = new AtomicLong(); 
 		this.location = location;
@@ -54,6 +66,16 @@ public final class ClientDetails
 	public ClientEndpoint getClientEndpoint()
 	{
 		return clientEndpoint;
+	}
+	
+	public boolean isAuthenticated()
+	{
+		return authenticated;
+	}
+	
+	public boolean isAuthenticatedBySession()
+	{
+		return authenticatedBySession;
 	}
 
 	public SessionDetails getSessionDetails()
@@ -69,6 +91,11 @@ public final class ClientDetails
 	public long getLastLoggedInTimestamp()
 	{
 		return lastLoggedInTimestamp;
+	}
+	
+	public Metrics getMetrics()
+	{
+		return metrics;
 	}
 
 	public InetSocketAddress getRemoteAddress()

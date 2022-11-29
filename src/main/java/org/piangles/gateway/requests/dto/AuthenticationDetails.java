@@ -27,7 +27,10 @@ public class AuthenticationDetails
 
 	@JsonProperty(required = true)
 	private String authenticationState = null;
-	
+
+	@JsonProperty(required = true)
+	private boolean authenticatedBySession = false;
+
 	@JsonProperty(required = true)
 	private String userId;
 	
@@ -72,6 +75,11 @@ public class AuthenticationDetails
 		return authenticationState;
 	}
 
+	public boolean isAuthenticatedBySession()
+	{
+		return authenticatedBySession;
+	}
+	
 	public final String getUserId()
 	{
 		return userId;
@@ -96,7 +104,12 @@ public class AuthenticationDetails
 	{
 		return lastLoggedInTimestamp;
 	}
-	
+
+	public void markAuthenticatedBySession()
+	{
+		authenticatedBySession = true;
+	}
+
 	protected final void setAuthenticationState(String authenticationState)
 	{
 		this.authenticationState = authenticationState;

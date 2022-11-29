@@ -102,7 +102,7 @@ public final class RequestProcessingManager
 		//geolocationService = Locator.getInstance().getGeoLocationService();
 		String userId = remoteAddr.getAddress().getHostName() + ":" + remoteAddr.getPort();
 
-		clientDetails = new ClientDetails(remoteAddr, clientEndpoint, new SessionDetails(userId, null), 0L, 0L, null);
+		clientDetails = new ClientDetails(remoteAddr, clientEndpoint, false, false, new SessionDetails(userId, null), 0L, 0L, null);
 
 		logger.info(String.format("New connection from : [Host=%s & Port=%d ]", clientDetails.getHostName(), clientDetails.getPort()));
 	}
@@ -169,16 +169,52 @@ public final class RequestProcessingManager
 			//Step 2 : Decode the raw message to Request.
 			if (StringUtils.isBlank(messageAsString))
 			{
-				throw new BadRequestException("GatewayMessage cannot be empty.");
+				String errorMessage = "GatewayMessage cannot be empty.";
+				logger.warn("Hacker->Alert: " + errorMessage + " ClientDetails: " + clientDetails);
+				
+				throw new BadRequestException(errorMessage);
 			}
-			message = JSON.getDecoder().decode(messageAsString.getBytes(), Message.class);
+			
+			try
+			{
+				message = JSON.getDecoder().decode(messageAsString.getBytes(), Message.class);
+			}
+			catch(Exception e)
+			{
+				logger.warn("Hacker->Alert: Unable to deserialize Message object. ClientDetails: " + clientDetails);
+				
+				clientDetails.getClientEndpoint().close();
+				return;
+			}
 			
 			//Step 3 : Decode the Gateway Request from the Message.
 			if (StringUtils.isBlank(message.getPayload()))
 			{
-				throw new BadRequestException("GatewayMessage Payload cannot be empty.");
+				String errorMessage = "GatewayMessage Payload cannot be empty.";
+				logger.warn("Hacker->Alert: " + errorMessage + " ClientDetails: " + clientDetails);
+				
+				throw new BadRequestException(errorMessage);
 			}
-			request = JSON.getDecoder().decode(message.getPayload().getBytes(), Request.class);
+			
+			try
+			{
+				request = JSON.getDecoder().decode(message.getPayload().getBytes(), Request.class);
+			}
+			catch(Exception e)
+			{
+				logger.warn("Hacker->Alert: Unable to deserialize Request object." + " ClientDetails: " + clientDetails);
+				
+				clientDetails.getClientEndpoint().close();
+				return;
+			}
+			
+			if (request.getTraceId() == null)
+			{
+				logger.warn("Hack->Alert: Request object has null TraceId.");
+				
+				closeOutHacker(request);
+				return;
+			}
 			
 			//Step 4: Gateway Request was decoded successfully, mark TransitTime 
 			request.markTransitTime();
@@ -210,6 +246,8 @@ public final class RequestProcessingManager
 						}
 						else
 						{
+							clientDetails.getMetrics().increment(endpoint);
+							
 							Ping ping = JSON.getDecoder().decode(request.getEndpointRequest().getBytes(), Ping.class);
 							Pong pong = new Pong(ping.getSequenceNo(), ping.getTimestamp());
 							String epResponseAsStr = new String(JSON.getEncoder().encode(pong));
@@ -220,9 +258,12 @@ public final class RequestProcessingManager
 					}
 					else//Step 6.3 Process regular request
 					{
-						validateTraceId(request, clientDetails);
-
-						processRequestAndSendResponse(request, requestProcessor);
+						if (isTraceIdValid(request))
+						{
+							clientDetails.getMetrics().increment(endpoint);
+							
+							processRequestAndSendResponse(request, requestProcessor);
+						}
 					}
 				}
 			}
@@ -262,8 +303,10 @@ public final class RequestProcessingManager
 		}
 	}
 
-	private void validateTraceId(Request request, ClientDetails clientDetails) throws Exception 
+	private boolean isTraceIdValid(Request request) throws Exception 
 	{
+		boolean validity = false;
+		
 		if (request.getTraceId() != null)
 		{
 			String traceId = request.getTraceId().toString();
@@ -272,25 +315,24 @@ public final class RequestProcessingManager
 			boolean found = traceIdStore.exists(traceId);
 			if (found)
 			{
-				logger.error("TraceId: " + request.getTraceId() + " is being reused, FraudAction detected for: " + clientDetails);
-				//un-reqister the session
-				sessionService.unregister(this.clientDetails.getSessionDetails().getUserId(), this.clientDetails.getSessionDetails().getSessionId());
-				clientDetails.getClientEndpoint().close();
+				logger.warn("Hacker->Alert TraceId: " + request.getTraceId() + " is being reused.");
+				closeOutHacker(request);
 			}
 			else
 			{
 				//store the TraceId in Redis
-				logger.debug("Adding TraceId: " + request.getTraceId() + " for: " + clientDetails);
+				//logger.debug("Adding TraceId: " + request.getTraceId() + " for: " + clientDetails);
 				traceIdStore.put(traceId);
+				validity = true;
 			}
 		}
 		else 
 		{
-			logger.error("TraceId for request for SessionId: " + request.getSessionId() + " is null, FraudAction detected for: "  + clientDetails);
-			//un-reqister the session
-			sessionService.unregister(this.clientDetails.getSessionDetails().getUserId(), this.clientDetails.getSessionDetails().getSessionId());
-			clientDetails.getClientEndpoint().close();
+			logger.warn("Hacker->Alert TraceId for request for SessionId: " + request.getSessionId() + " is null.");
+			closeOutHacker(request);
 		}
+		
+		return validity;
 	}
 
 	private Response validateRequestAgainstState(Request request, RequestProcessor requestProcessor)
@@ -392,6 +434,7 @@ public final class RequestProcessingManager
 					 */
 					//GeoLocation geoLocation = geolocationService.getGeoLocation(clientDetails.getIPAddress());
 					clientDetails = new ClientDetails(clientDetails.getRemoteAddress(), clientDetails.getClientEndpoint(),
+							true, authDetails.isAuthenticatedBySession(),
 							new SessionDetails(authDetails.getUserId(), authDetails.getSessionId()),
 							authDetails.getInactivityExpiryTimeInSeconds(), authDetails.getLastLoggedInTimestamp(), null);
 					clientDetails.markLastAccessed();
@@ -483,5 +526,19 @@ public final class RequestProcessingManager
 		{
 			throw new UnsupportedMediaException("Multi-Factor Authentication has not been setup.");
 		}
+	}
+	
+	private void closeOutHacker(Request request) throws SessionManagementException
+	{
+		String userId = clientDetails.getSessionDetails().getUserId();
+		String sessionId = clientDetails.getSessionDetails().getSessionId();
+
+		logger.warn("Hacker->Alert userId: " + userId + " sessionId: " + sessionId + " remoteAddress: " + clientDetails.getRemoteAddress());
+		//un-reqister the session
+		if (StringUtils.isNoneBlank(userId, sessionId))
+		{
+			sessionService.unregister(userId, sessionId);
+		}
+		clientDetails.getClientEndpoint().close();
 	}
 }
