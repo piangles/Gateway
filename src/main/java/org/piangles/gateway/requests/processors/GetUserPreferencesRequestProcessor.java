@@ -19,28 +19,26 @@
  
 package org.piangles.gateway.requests.processors;
 
-import java.util.Map;
-
 import org.piangles.backbone.services.Locator;
+import org.piangles.backbone.services.prefs.UserPreferences;
 import org.piangles.backbone.services.prefs.UserPreferencesService;
-import org.piangles.core.util.reflect.TypeToken;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.EmptyRequest;
 import org.piangles.gateway.requests.dto.Request;
 
-public class GetUserPreferencesRequestProcessor extends AbstractRequestProcessor<EmptyRequest, Map<String,Object>>
+public class GetUserPreferencesRequestProcessor extends AbstractRequestProcessor<EmptyRequest, UserPreferences>
 {
 	private UserPreferencesService upService = Locator.getInstance().getUserPreferencesService();
 	
 	public GetUserPreferencesRequestProcessor()
 	{
-		super(Endpoints.GetUserPreferences, EmptyRequest.class, new TypeToken<Map<String, Object>>() {}.getActualClass());
+		super(Endpoints.GetUserPreferences, EmptyRequest.class, UserPreferences.class);
 	}
 	
 	@Override
-	protected Map<String, Object> processRequest(ClientDetails clientDetails, Request request, EmptyRequest emptyRequest) throws Exception
+	protected UserPreferences processRequest(ClientDetails clientDetails, Request request, EmptyRequest emptyRequest) throws Exception
 	{
-		return upService.retrieveUserPreferences(clientDetails.getSessionDetails().getUserId()).getNVPair(); 
+		return upService.retrieveUserPreferences(clientDetails.getSessionDetails().getUserId()); 
 	}
 }

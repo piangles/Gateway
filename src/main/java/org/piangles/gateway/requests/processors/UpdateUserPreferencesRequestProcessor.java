@@ -19,32 +19,33 @@
  
 package org.piangles.gateway.requests.processors;
 
-import java.util.Map;
-
 import org.piangles.backbone.services.Locator;
 import org.piangles.backbone.services.prefs.UserPreferences;
 import org.piangles.backbone.services.prefs.UserPreferencesService;
-import org.piangles.core.util.reflect.TypeToken;
+import org.piangles.core.expt.ValidationException;
 import org.piangles.gateway.client.ClientDetails;
 import org.piangles.gateway.requests.Endpoints;
 import org.piangles.gateway.requests.dto.Request;
 import org.piangles.gateway.requests.dto.SimpleResponse;
 
-public class UpdateUserPreferencesRequestProcessor extends AbstractRequestProcessor<Map<String, Object>, SimpleResponse>
+public class UpdateUserPreferencesRequestProcessor extends AbstractRequestProcessor<UserPreferences, SimpleResponse>
 {
 	private UserPreferencesService upService = Locator.getInstance().getUserPreferencesService();
 	
 	public UpdateUserPreferencesRequestProcessor()
 	{
-		super(Endpoints.UpdateUserPreferences, new TypeToken<Map<String, Object>>() {}.getActualClass(), SimpleResponse.class);
+		super(Endpoints.UpdateUserPreferences, UserPreferences.class, SimpleResponse.class);
 	}
 	
 	@Override
-	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, Map<String, Object> nvPair) throws Exception
+	protected SimpleResponse processRequest(ClientDetails clientDetails, Request request, UserPreferences userPrefs) throws Exception
 	{
-		UserPreferences prefs = new UserPreferences(clientDetails.getSessionDetails().getUserId(), nvPair);
+		if (!clientDetails.getSessionDetails().getUserId().equalsIgnoreCase(userPrefs.getUserId()))
+		{
+			throw new ValidationException("UserPreferences does not belong to current user.");
+		}
 		
-		upService.persistUserPreferences(clientDetails.getSessionDetails().getUserId(), prefs);
+		upService.persistUserPreferences(clientDetails.getSessionDetails().getUserId(), userPrefs);
 		
 		return new SimpleResponse("UserPreferences persisted successfully.");
 	}
