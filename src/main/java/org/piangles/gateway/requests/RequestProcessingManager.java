@@ -479,7 +479,7 @@ public final class RequestProcessingManager
 			break;
 		}
 		
-		HookProcessor hookProcessor = null;
+		//HookProcessor hookProcessor = null;
 		if (ClientStateDeterminator.isMidAuthentication(state))
 		{
 			if (ClientState.MidAuthenticationMFARequired.equals(state))
@@ -490,25 +490,32 @@ public final class RequestProcessingManager
 			if (RequestRouter.getInstance().getMidAuthenticationHook() != null)
 			{
 				logger.info("Calling registered MidAuthenticationHook for: " + clientDetails);
-				hookProcessor = new HookProcessor(request.getTraceId(), clientDetails.getSessionDetails(), ()->{
+				HookProcessor hookProcessor = new HookProcessor(request.getTraceId(), clientDetails.getSessionDetails(), ()->{
 					RequestRouter.getInstance().getMidAuthenticationHook().process(request.getEndpoint(), clientDetails);
 				});
+				
+				hookProcessor.start();
+				hookProcessor.join();
+				logger.info("HookProcessing completed for: " + clientDetails);
 			}
 		}
 		else if (state == ClientState.PostAuthentication && RequestRouter.getInstance().getPostAuthenticationHook() != null)
 		{
 			logger.info("Calling registered PostAuthenticationHook for: " + clientDetails);
-			hookProcessor = new HookProcessor(request.getTraceId(), clientDetails.getSessionDetails(), ()->{
+			HookProcessor hookProcessor = new HookProcessor(request.getTraceId(), clientDetails.getSessionDetails(), ()->{
 				RequestRouter.getInstance().getPostAuthenticationHook().process(request.getEndpoint(), clientDetails);
 			});
+			
+			hookProcessor.start();
+			logger.info("HookProcessing triggered for: " + clientDetails);
 		}
 		
-		if (hookProcessor != null)
-		{
-			hookProcessor.start();
-			hookProcessor.join();
-			logger.info("HookProcessing completed for: " + clientDetails);
-		}
+//		if (hookProcessor != null)
+//		{
+//			hookProcessor.start();
+//			hookProcessor.join();
+//			logger.info("HookProcessing completed for: " + clientDetails);
+//		}
 	}
 	
 	private boolean doesSessionIdsMatch(String sessionId)
