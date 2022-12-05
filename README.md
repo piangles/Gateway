@@ -2,7 +2,7 @@ Gateway
 =================
 See our [web site](https://www.piangles.org) for details on the project.
 
-### Introduction ###
+### Introduction to Gateway ###
 	
 ### Credits ### 
 - Saradhi Vemuri
