@@ -20,7 +20,7 @@
 package org.piangles.gateway.events;
 
 import java.time.Duration;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -84,7 +84,7 @@ public final class EventListener extends Thread
 					ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(DEFAULT_WAIT_TIME));
 					if (records.count() != 0)
 					{
-						Map<Event, Topic> eventTopicMap = new HashMap<>();
+						Map<Event, Topic> eventTopicMap = new LinkedHashMap<>();
 						for (ConsumerRecord<String, String> record : records)
 						{
 							//Convert the String in Value to Event
