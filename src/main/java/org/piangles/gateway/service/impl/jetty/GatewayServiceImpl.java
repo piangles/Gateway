@@ -41,6 +41,7 @@ import org.piangles.backbone.services.logging.LoggingService;
 import org.piangles.core.services.remoting.SessionAwareable;
 import org.piangles.core.services.remoting.SessionDetails;
 import org.piangles.core.services.remoting.SessionDetailsCreator;
+import org.piangles.core.util.central.Environment;
 import org.piangles.gateway.Constants;
 import org.piangles.gateway.GatewayConfiguration;
 import org.piangles.gateway.GatewayService;
@@ -86,7 +87,7 @@ public class GatewayServiceImpl implements GatewayService
         defaultContext.setContextPath("/");
         String welcomePage = null;
         String apiMetadataEnabled = System.getenv(GATEWAY_METADATA_ENABLED);
-        if (Boolean.parseBoolean(apiMetadataEnabled))
+        if (Boolean.parseBoolean(apiMetadataEnabled) && !Environment.PROD.equalsIgnoreCase(new Environment().identifyEnvironment()))
         {
         	welcomePage = "index.html";
         }

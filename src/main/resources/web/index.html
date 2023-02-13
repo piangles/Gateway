@@ -60,7 +60,7 @@ label {
     	var requestSchema;
     	var responseSchema;
 
-		var url = "ws://" + currentLocation.hostname + ":" + currentLocation.port + "/api/";
+		var url = "wss://" + currentLocation.hostname + ":" + currentLocation.port + "/api/";
 		var ws = new WebSocket(url);
 		console.log("Websocket : " + url)
 
