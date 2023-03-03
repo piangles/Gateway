@@ -65,13 +65,13 @@ label {
 		console.log("Websocket : " + url)
 
 		class Request {
-			constructor(sessionId, endPoint, endpointRequest) {
+			constructor(sessionId, endpoint, endpointRequest) {
 				this.issuedTime = Date.now();
 				this.traceId = CreateUUID();
 	
 				this.sessionId = sessionId;
 				
-				this.endPoint = endPoint;
+				this.endpoint = endpoint;
 				this.endpointRequest = endpointRequest;
 			}
 		}	
