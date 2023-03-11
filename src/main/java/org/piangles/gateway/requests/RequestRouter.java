@@ -159,6 +159,20 @@ public class RequestRouter
 		registerMidAuthenticationEndpoint(Endpoints.SendMFAToken.name(), Endpoints.SendMFAToken);
 	}
 
+	public void registerDefaultRequestFilters()
+	{
+		
+	}
+	
+	public void registerDefaultRequestValidators()
+	{
+		registerRequestValidator(new GenericContactRequestValidator(Endpoints.UserProfileExists));
+		registerRequestValidator(new SignUpRequestValidator());
+		registerRequestValidator(new LoginRequestValidator());
+		registerRequestValidator(new ChangePasswordRequestValidator());
+		registerRequestValidator(new SubscriptionRequestValidator());
+	}
+	
 	/**
 	 * Register all standard endpoints and request processors
 	 */
@@ -194,15 +208,6 @@ public class RequestRouter
 		
 		registerRequestProcessor(createRequestProcessor(SubscriptionRequestProcessor.class));
 		registerRequestProcessor(createRequestProcessor(AutoSuggestRequestProcessor.class));
-	}
-	
-	public void registerDefaultRequestValidators()
-	{
-		registerRequestValidator(new GenericContactRequestValidator(Endpoints.UserProfileExists));
-		registerRequestValidator(new SignUpRequestValidator());
-		registerRequestValidator(new LoginRequestValidator());
-		registerRequestValidator(new ChangePasswordRequestValidator());
-		registerRequestValidator(new SubscriptionRequestValidator());
 	}
 	
 	public void registerPreAuthenticationEndpoint(String endpointName, Enum<?> endpoint)
