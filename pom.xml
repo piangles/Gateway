@@ -129,7 +129,7 @@
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-servlets</artifactId>
-			<version>9.4.32.v20200930</version>
+			<version>9.4.52.v20230823</version>
 		</dependency>
 
 		<dependency>
